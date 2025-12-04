@@ -19,6 +19,13 @@ const __dirname = dirname(__filename);
 // テンプレートディレクトリのパス（パッケージルートからの相対パス）
 const TEMPLATES_DIR = join(__dirname, "..", "templates");
 
+// spec2impl が管理するパス（常に上書き対象）
+const SPEC2IMPL_PATHS = [
+  "commands/spec2impl.md",
+  "agents/spec2impl/",
+  "skills/skill-creator/",
+];
+
 interface InstallOptions {
   force?: boolean;
   dryRun?: boolean;
@@ -27,6 +34,18 @@ interface InstallOptions {
 interface FileInfo {
   relativePath: string;
   exists: boolean;
+  isSpec2implManaged: boolean;
+}
+
+/**
+ * ファイルが spec2impl 管理下かどうかを判定
+ */
+function isSpec2implManagedPath(relativePath: string): boolean {
+  return SPEC2IMPL_PATHS.some(
+    (managedPath) =>
+      relativePath === managedPath ||
+      relativePath.startsWith(managedPath)
+  );
 }
 
 function getFilesToCopy(
@@ -48,6 +67,7 @@ function getFilesToCopy(
       files.push({
         relativePath,
         exists: existsSync(targetPath),
+        isSpec2implManaged: isSpec2implManagedPath(relativePath),
       });
     }
   }
@@ -59,9 +79,10 @@ function copyFilesRecursively(
   srcDir: string,
   destDir: string,
   force: boolean
-): { copied: string[]; skipped: string[] } {
+): { copied: string[]; skipped: string[]; updated: string[] } {
   const copied: string[] = [];
   const skipped: string[] = [];
+  const updated: string[] = [];
 
   function processDir(src: string, dest: string, relativePath = "") {
     if (!existsSync(dest)) {
@@ -78,7 +99,11 @@ function copyFilesRecursively(
       if (statSync(srcPath).isDirectory()) {
         processDir(srcPath, destPath, relPath);
       } else {
-        if (existsSync(destPath) && !force) {
+        const isManaged = isSpec2implManagedPath(relPath);
+        const fileExists = existsSync(destPath);
+
+        // spec2impl 管理ファイルは常に上書き、それ以外は force が必要
+        if (fileExists && !isManaged && !force) {
           skipped.push(relPath);
         } else {
           // 親ディレクトリを作成
@@ -87,14 +112,19 @@ function copyFilesRecursively(
             mkdirSync(parentDir, { recursive: true });
           }
           copyFileSync(srcPath, destPath);
-          copied.push(relPath);
+
+          if (fileExists && isManaged) {
+            updated.push(relPath);
+          } else {
+            copied.push(relPath);
+          }
         }
       }
     }
   }
 
   processDir(srcDir, destDir);
-  return { copied, skipped };
+  return { copied, skipped, updated };
 }
 
 function install(targetDir: string, options: InstallOptions = {}) {
@@ -120,7 +150,9 @@ function install(targetDir: string, options: InstallOptions = {}) {
 
     const files = getFilesToCopy(templateClaudeDir, claudeDir);
     for (const file of files) {
-      if (file.exists && !options.force) {
+      if (file.exists && file.isSpec2implManaged) {
+        console.log(chalk.cyan(`  .claude/${file.relativePath} (update)`));
+      } else if (file.exists && !options.force) {
         console.log(chalk.yellow(`  .claude/${file.relativePath} (skip - exists)`));
       } else if (file.exists && options.force) {
         console.log(chalk.cyan(`  .claude/${file.relativePath} (overwrite)`));
@@ -132,8 +164,8 @@ function install(targetDir: string, options: InstallOptions = {}) {
   }
 
   try {
-    // ファイル単位でコピー（既存ファイルはスキップ or 上書き）
-    const { copied, skipped } = copyFilesRecursively(
+    // ファイル単位でコピー
+    const { copied, skipped, updated } = copyFilesRecursively(
       templateClaudeDir,
       claudeDir,
       options.force || false
@@ -142,6 +174,15 @@ function install(targetDir: string, options: InstallOptions = {}) {
     spinner.succeed(chalk.green("spec2impl installed successfully!"));
 
     console.log("");
+
+    if (updated.length > 0) {
+      console.log(chalk.bold("Updated files:"));
+      for (const file of updated) {
+        console.log(chalk.cyan(`  .claude/${file}`));
+      }
+      console.log("");
+    }
+
     if (copied.length > 0) {
       console.log(chalk.bold("Installed files:"));
       for (const file of copied) {
@@ -151,11 +192,11 @@ function install(targetDir: string, options: InstallOptions = {}) {
 
     if (skipped.length > 0) {
       console.log("");
-      console.log(chalk.yellow("Skipped (already exist):"));
+      console.log(chalk.yellow("Skipped (user files):"));
       for (const file of skipped) {
         console.log(chalk.dim(`  .claude/${file}`));
       }
-      console.log(chalk.dim("\n  Use --force to overwrite existing files."));
+      console.log(chalk.dim("\n  Use --force to overwrite user files."));
     }
 
     console.log("");
@@ -178,13 +219,13 @@ function install(targetDir: string, options: InstallOptions = {}) {
 program
   .name("spec2impl")
   .description("Generate Claude Code implementation environment from specification documents")
-  .version("0.1.0");
+  .version("0.2.1");
 
 program
   .command("init")
   .description("Install spec2impl slash command and agents to current project")
   .argument("[directory]", "Target project directory", ".")
-  .option("-f, --force", "Overwrite existing .claude directory")
+  .option("-f, --force", "Overwrite all existing files (including user files)")
   .option("--dry-run", "Preview files without installing")
   .action((directory: string, options: InstallOptions) => {
     install(directory, options);
@@ -193,7 +234,7 @@ program
 // デフォルトコマンド（引数なしで実行した場合）
 program
   .argument("[directory]", "Target project directory (defaults to current directory)")
-  .option("-f, --force", "Overwrite existing .claude directory")
+  .option("-f, --force", "Overwrite all existing files (including user files)")
   .option("--dry-run", "Preview files without installing")
   .action((directory: string | undefined, options: InstallOptions) => {
     if (directory && !directory.startsWith("-")) {
