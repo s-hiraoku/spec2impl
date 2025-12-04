@@ -1,0 +1,994 @@
+# spec2impl 仕様書
+
+## 概要
+
+spec2impl は、仕様書ドキュメントから Claude Code 用の実装環境を自動構築するツールです。
+
+### コンセプト
+
+```
+docs/ ディレクトリを指定するだけで、実装に必要な環境が整う
+```
+
+### 目的
+
+- 仕様書から Skills、Subagents を自動生成
+- 実装に役立つ MCP Server を自動設定
+- CLAUDE.md を更新して実装ワークフローを定義
+- Claude Code での実装作業を効率化
+
+---
+
+## 使用方法
+
+```bash
+# 基本的な使い方
+$ npx spec2impl docs/
+
+# オプション
+$ npx spec2impl docs/ --domain <name>    # ドメイン名を指定
+$ npx spec2impl docs/ --output <dir>     # 出力先を指定
+$ npx spec2impl docs/ --dry-run          # プレビュー（ファイル生成なし）
+```
+
+### 実行例
+
+```bash
+$ npx spec2impl docs/
+
+Analyzing specifications...
+✓ Found: docs/user-api.md, docs/payment-api.md
+
+Generating implementation environment...
+✓ Skills generated
+✓ Subagents generated
+✓ CLAUDE.md updated
+✓ .mcp.json updated
+
+⚠️  MCP Setup Required
+
+The following MCP servers were added and require configuration:
+
+┌─────────────────────────────────────────────────────────────┐
+│ 1. slack-mcp-server                                         │
+│                                                             │
+│    Requires: SLACK_TOKEN                                    │
+│                                                             │
+│    Setup:                                                   │
+│    1. Go to https://api.slack.com/apps                      │
+│    2. Create an app or select existing                      │
+│    3. Get OAuth token from "OAuth & Permissions"            │
+│    4. Set environment variable:                             │
+│       export SLACK_TOKEN=xoxp-your-token                    │
+└─────────────────────────────────────────────────────────────┘
+
+See: .claude/mcp-setup.md for detailed instructions
+
+✨ Implementation environment ready!
+
+Next steps:
+  1. Configure required MCP servers (see above)
+  2. Start Claude Code: claude
+  3. Begin implementing: "User API を実装して"
+```
+
+---
+
+## 出力ディレクトリ構造
+
+```
+project/
+├── docs/                           # 入力（仕様書）
+│   ├── user-api.md
+│   └── payment-api.md
+│
+├── .claude/                        # 【生成】
+│   ├── skills/
+│   │   └── implementation/
+│   │       ├── SKILL.md            # メインスキル
+│   │       └── patterns/           # 実装パターン
+│   │           ├── api.md
+│   │           ├── validation.md
+│   │           └── error-handling.md
+│   │
+│   ├── agents/
+│   │   └── implementation-agents.md # Subagent 定義
+│   │
+│   └── mcp-setup.md                # MCP 設定ガイド
+│
+├── .mcp.json                       # 【生成】MCP 設定
+└── CLAUDE.md                       # 【更新】実装ワークフロー
+```
+
+---
+
+## コンポーネント仕様
+
+### 1. Spec Analyzer
+
+仕様書を解析して構造化データに変換します。
+
+#### 入力
+
+- Markdown 形式の仕様書（docs/ ディレクトリ内）
+
+#### 出力
+
+```typescript
+interface SpecAnalysis {
+  meta: {
+    title: string;
+    domain: string;
+    version?: string;
+    source: string; // ファイルパス
+  };
+
+  // API 定義
+  apis: {
+    name: string;
+    method?: string;
+    endpoint?: string;
+    description: string;
+    parameters: {
+      name: string;
+      type: string;
+      required: boolean;
+      description: string;
+    }[];
+    response?: {
+      type: string;
+      description: string;
+    };
+  }[];
+
+  // データモデル
+  models: {
+    name: string;
+    description: string;
+    fields: {
+      name: string;
+      type: string;
+      required: boolean;
+      description: string;
+    }[];
+  }[];
+
+  // ワークフロー/ユースケース
+  workflows: {
+    name: string;
+    description: string;
+    steps: string[];
+  }[];
+
+  // 制約/ルール
+  constraints: {
+    description: string;
+    type: "validation" | "business_rule" | "security";
+  }[];
+
+  // 検出された技術スタック（MCP 推奨用）
+  techStack: {
+    frameworks: string[]; // React, Next.js, etc.
+    databases: string[]; // PostgreSQL, MySQL, etc.
+    services: string[]; // Slack, GitHub, etc.
+  };
+}
+```
+
+---
+
+### 2. Skills Generator
+
+仕様書から SKILL.md と実装パターンを生成します。
+
+#### 出力ファイル
+
+**`.claude/skills/implementation/SKILL.md`**
+
+```markdown
+---
+name: implementation
+description: 仕様書に基づく実装スキル
+version: 1.0.0
+generated_by: spec2impl
+generated_at: <timestamp>
+sources:
+  - docs/user-api.md
+  - docs/payment-api.md
+---
+
+# Implementation Skill
+
+## Overview
+
+このスキルは以下の仕様書に基づいています：
+
+- `docs/user-api.md` - User Management API
+- `docs/payment-api.md` - Payment Processing API
+
+## Key Concepts
+
+### User
+
+<User モデルの説明とフィールド>
+
+### Payment
+
+<Payment モデルの説明とフィールド>
+
+## API Reference
+
+### User API
+
+#### POST /users
+
+- **Description**: ユーザーを作成
+- **Parameters**:
+  - email (string, required): メールアドレス
+  - name (string, required): 名前
+- **Response**: User object
+
+#### GET /users/:id
+
+...
+
+### Payment API
+
+...
+
+## Implementation Patterns
+
+実装パターンは以下を参照：
+
+- `patterns/api.md` - API 実装パターン
+- `patterns/validation.md` - バリデーションパターン
+- `patterns/error-handling.md` - エラーハンドリング
+
+## Constraints
+
+1. メールアドレスは一意である必要がある
+2. パスワードは 8 文字以上
+3. 支払い金額は 0 より大きい
+   ...
+
+## Verification Checklist
+
+実装完了時に確認：
+
+- [ ] すべての API エンドポイントが実装されている
+- [ ] バリデーションが仕様通りに動作する
+- [ ] エラーレスポンスが仕様に準拠している
+- [ ] テストがすべてのケースをカバーしている
+```
+
+**`.claude/skills/implementation/patterns/api.md`**
+
+```markdown
+# API Implementation Patterns
+
+## RESTful Endpoint Pattern
+
+### Create (POST)
+
+<実装パターンとコード例>
+
+### Read (GET)
+
+<実装パターンとコード例>
+
+### Update (PUT/PATCH)
+
+<実装パターンとコード例>
+
+### Delete (DELETE)
+
+<実装パターンとコード例>
+```
+
+**`.claude/skills/implementation/patterns/validation.md`**
+
+```markdown
+# Validation Patterns
+
+## Input Validation
+
+### Required Fields
+
+<バリデーションパターン>
+
+### Format Validation
+
+<メール、電話番号などのフォーマット検証>
+
+### Business Rule Validation
+
+<ビジネスルールに基づく検証>
+```
+
+**`.claude/skills/implementation/patterns/error-handling.md`**
+
+```markdown
+# Error Handling Patterns
+
+## Error Response Format
+
+<統一されたエラーレスポンス形式>
+
+## HTTP Status Codes
+
+<各ステータスコードの使い分け>
+
+## Error Types
+
+<エラー種別と対応方法>
+```
+
+---
+
+### 3. Subagent Generator
+
+検証・テスト生成用の Subagent を定義します。
+
+#### 出力ファイル
+
+**`.claude/agents/implementation-agents.md`**
+
+```markdown
+---
+domain: implementation
+generated_by: spec2impl
+generated_at: <timestamp>
+---
+
+# Implementation Subagents
+
+## 1. SpecVerifier
+
+**Purpose**: 実装が仕様を満たしているか検証
+
+**Trigger**:
+
+- 実装完了時
+- "verify implementation" と言われた時
+- "仕様に準拠しているか確認" と言われた時
+
+**Instructions**:
+```
+
+You are a specification verifier.
+
+## Your Task
+
+Verify that the implementation matches the specification.
+
+## Steps
+
+1. Read the specification from docs/ directory
+2. Read the implementation code
+3. Check each requirement:
+
+### API Verification
+
+- [ ] All endpoints are implemented
+- [ ] HTTP methods are correct
+- [ ] Request parameters match spec
+- [ ] Response format matches spec
+- [ ] Status codes are correct
+
+### Model Verification
+
+- [ ] All fields are present
+- [ ] Types are correct
+- [ ] Required fields are enforced
+
+### Constraint Verification
+
+- [ ] All validations are implemented
+- [ ] Business rules are enforced
+- [ ] Security requirements are met
+
+## Output Format
+
+Report findings as:
+
+✅ PASS: <item> - <details>
+❌ FAIL: <item> - Expected: X, Got: Y
+⚠️ WARN: <item> - <concern>
+
+## Important
+
+- Be thorough and check every requirement
+- Provide specific file locations for issues
+- Suggest fixes for failures
+
+```
+
+---
+
+## 2. TestGenerator
+
+**Purpose**: 仕様からテストケースを生成
+
+**Trigger**:
+- "generate tests" と言われた時
+- "テストを作成" と言われた時
+
+**Instructions**:
+
+```
+
+You are a test generator.
+
+## Your Task
+
+Generate comprehensive tests based on the specification.
+
+## Test Categories
+
+### 1. Happy Path Tests
+
+- Normal operation for each API
+- Valid inputs
+- Expected outputs
+
+### 2. Validation Tests
+
+- Missing required fields
+- Invalid formats
+- Out of range values
+
+### 3. Edge Cases
+
+- Boundary values
+- Empty inputs
+- Maximum lengths
+
+### 4. Error Cases
+
+- Not found scenarios
+- Unauthorized access
+- Conflict situations
+
+## Output
+
+Generate test files following the project's testing conventions.
+Include clear descriptions for each test case.
+
+```
+
+---
+
+## 3. ImplementationGuide
+
+**Purpose**: 仕様に基づく実装支援
+
+**Trigger**:
+- "how to implement" と言われた時
+- "<feature> を実装したい" と言われた時
+
+**Instructions**:
+
+```
+
+You are an implementation guide.
+
+## Your Task
+
+Help implement features according to the specification.
+
+## Steps
+
+1. Identify the relevant specification section
+2. Explain the requirements clearly
+3. Suggest implementation approach
+4. Reference patterns from .claude/skills/implementation/patterns/
+5. List constraints to satisfy
+6. Provide verification criteria
+
+## Important
+
+- Always reference the specification
+- Follow established patterns
+- Consider edge cases
+- Remind about testing
+
+```
+
+```
+
+---
+
+### 4. MCP Configurator
+
+実装に役立つ MCP Server を設定します。
+
+#### MCP レジストリ
+
+```typescript
+interface McpServerConfig {
+  name: string;
+  package: string;
+  description: string;
+  requiresAuth: boolean;
+  envVars?: {
+    name: string;
+    description: string;
+    required: boolean;
+  }[];
+  setupInstructions?: string;
+  setupUrl?: string;
+  // どの技術スタックで推奨するか
+  recommendedFor: {
+    frameworks?: string[];
+    databases?: string[];
+    services?: string[];
+  };
+}
+
+const mcpRegistry: McpServerConfig[] = [
+  // 認証不要
+  {
+    name: "context7",
+    package: "@context7/mcp",
+    description: "ライブラリドキュメント参照",
+    requiresAuth: false,
+    recommendedFor: {
+      frameworks: ["react", "next.js", "vue", "typescript"],
+    },
+  },
+  {
+    name: "filesystem",
+    package: "@modelcontextprotocol/server-filesystem",
+    description: "ファイルシステム操作",
+    requiresAuth: false,
+    recommendedFor: {},
+  },
+
+  // 認証必要
+  {
+    name: "slack",
+    package: "slack-mcp-server",
+    description: "Slack ワークスペース連携",
+    requiresAuth: true,
+    envVars: [
+      {
+        name: "SLACK_TOKEN",
+        description: "Slack OAuth User Token (xoxp-...)",
+        required: true,
+      },
+    ],
+    setupUrl: "https://api.slack.com/apps",
+    setupInstructions: `
+1. Slack API (https://api.slack.com/apps) にアクセス
+2. 「Create New App」または既存のアプリを選択
+3. 「OAuth & Permissions」に移動
+4. 「User Token Scopes」で必要なスコープを追加:
+   - channels:history
+   - channels:read
+   - chat:write
+   - search:read
+5. 「Install to Workspace」をクリック
+6. 表示される xoxp- で始まるトークンをコピー
+`,
+    recommendedFor: {
+      services: ["slack"],
+    },
+  },
+  {
+    name: "github",
+    package: "@modelcontextprotocol/server-github",
+    description: "GitHub リポジトリ連携",
+    requiresAuth: true,
+    envVars: [
+      {
+        name: "GITHUB_TOKEN",
+        description: "GitHub Personal Access Token",
+        required: true,
+      },
+    ],
+    setupUrl: "https://github.com/settings/tokens",
+    setupInstructions: `
+1. GitHub Settings > Developer settings > Personal access tokens にアクセス
+2. 「Generate new token (classic)」をクリック
+3. 必要なスコープを選択:
+   - repo (リポジトリアクセス)
+   - read:org (組織情報の読み取り)
+4. トークンを生成してコピー
+`,
+    recommendedFor: {
+      services: ["github"],
+    },
+  },
+  {
+    name: "postgres",
+    package: "@modelcontextprotocol/server-postgres",
+    description: "PostgreSQL データベース操作",
+    requiresAuth: true,
+    envVars: [
+      {
+        name: "POSTGRES_URL",
+        description: "PostgreSQL 接続文字列",
+        required: true,
+      },
+    ],
+    setupInstructions: `
+接続文字列の形式:
+postgresql://[user]:[password]@[host]:[port]/[database]
+
+例:
+export POSTGRES_URL=postgresql://postgres:password@localhost:5432/mydb
+`,
+    recommendedFor: {
+      databases: ["postgresql", "postgres"],
+    },
+  },
+];
+```
+
+#### 出力ファイル
+
+**`.mcp.json`**
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp"]
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "slack-mcp-server"],
+      "env": {
+        "SLACK_MCP_XOXP_TOKEN": "${SLACK_TOKEN}"
+      }
+    }
+  }
+}
+```
+
+**`.claude/mcp-setup.md`**
+
+````markdown
+# MCP Setup Guide
+
+spec2impl が推奨する MCP サーバーの設定方法です。
+
+## 認証不要
+
+以下の MCP はそのまま使用できます：
+
+| MCP      | 用途                       |
+| -------- | -------------------------- |
+| context7 | ライブラリドキュメント参照 |
+
+---
+
+## 認証が必要
+
+### Slack MCP Server
+
+Slack ワークスペースと連携するための MCP です。
+
+**必要な環境変数**: `SLACK_TOKEN`
+
+**取得手順**:
+
+1. [Slack API](https://api.slack.com/apps) にアクセス
+2. 「Create New App」または既存のアプリを選択
+3. 「OAuth & Permissions」に移動
+4. 「User Token Scopes」で以下を追加:
+   - `channels:history`
+   - `channels:read`
+   - `chat:write`
+   - `search:read`
+5. 「Install to Workspace」をクリック
+6. 表示される `xoxp-` で始まるトークンをコピー
+
+**設定方法**:
+
+```bash
+# 方法 1: 環境変数
+export SLACK_TOKEN=xoxp-your-token-here
+
+# 方法 2: .env ファイル（.gitignore に追加すること）
+echo "SLACK_TOKEN=xoxp-your-token-here" >> .env
+```
+````
+
+**確認**:
+
+```bash
+claude mcp list
+# slack が表示されれば OK
+```
+
+---
+
+## トラブルシューティング
+
+### MCP が認識されない
+
+```bash
+# MCP サーバーの状態を確認
+claude mcp list
+
+# デバッグモードで起動
+claude --mcp-debug
+```
+
+### 認証エラー
+
+- 環境変数が正しく設定されているか確認
+- トークンの有効期限を確認
+- 必要な権限（スコープ）があるか確認
+
+````
+
+---
+
+### 5. CLAUDE.md Updater
+
+CLAUDE.md に実装環境の情報を追記します。
+
+#### 追記内容
+
+```markdown
+<!-- spec2impl generated section - DO NOT EDIT MANUALLY -->
+## 📋 Implementation Environment
+
+> Generated by spec2impl
+> Generated at: <timestamp>
+> Sources: docs/user-api.md, docs/payment-api.md
+
+### Specifications
+
+| File | Description |
+|------|-------------|
+| `docs/user-api.md` | User Management API |
+| `docs/payment-api.md` | Payment Processing API |
+
+### Resources
+
+| Type | Location | Description |
+|------|----------|-------------|
+| Skill | `.claude/skills/implementation/SKILL.md` | 実装パターンと制約 |
+| Patterns | `.claude/skills/implementation/patterns/` | 実装パターン詳細 |
+| Subagents | `.claude/agents/implementation-agents.md` | 検証・テスト生成 |
+| MCP Setup | `.claude/mcp-setup.md` | MCP 設定ガイド |
+
+### MCP Servers
+
+| MCP | 用途 | 認証 |
+|-----|------|------|
+| context7 | ドキュメント参照 | 不要 |
+| slack | Slack 連携 | 要設定 |
+
+⚠️ 認証が必要な MCP は `.claude/mcp-setup.md` を参照して設定してください。
+
+### Workflow
+
+#### 実装開始時
+
+````
+
+1. Read .claude/skills/implementation/SKILL.md
+2. Understand the specification for the feature
+3. Follow patterns in .claude/skills/implementation/patterns/
+
+```
+
+#### 実装完了時
+
+```
+
+Use subagent SpecVerifier to verify implementation
+
+```
+
+#### テスト作成時
+
+```
+
+Use subagent TestGenerator to create tests
+
+```
+
+### Subagent Usage
+
+- **検証**: `Use SpecVerifier to check if implementation matches spec`
+- **テスト生成**: `Use TestGenerator to create tests for <feature>`
+- **実装ガイド**: `Use ImplementationGuide to explain how to implement <feature>`
+
+### Implementation Checklist
+
+<!-- API実装チェックリスト -->
+- [ ] POST /users - ユーザー作成
+- [ ] GET /users/:id - ユーザー取得
+- [ ] PUT /users/:id - ユーザー更新
+- [ ] DELETE /users/:id - ユーザー削除
+- [ ] POST /payments - 支払い作成
+- [ ] GET /payments/:id - 支払い取得
+
+<!-- end spec2impl generated section -->
+```
+
+---
+
+## パッケージ構造
+
+```
+spec2impl/
+├── package.json
+├── tsconfig.json
+├── README.md
+├── LICENSE
+│
+├── src/
+│   ├── index.ts                 # ライブラリエントリポイント
+│   ├── cli.ts                   # CLI エントリポイント
+│   │
+│   ├── analyzer/
+│   │   ├── index.ts
+│   │   ├── markdown-parser.ts   # Markdown 仕様書パーサー
+│   │   └── types.ts             # SpecAnalysis 型定義
+│   │
+│   ├── generators/
+│   │   ├── index.ts
+│   │   ├── skills-generator.ts  # Skills 生成
+│   │   └── subagent-generator.ts # Subagent 生成
+│   │
+│   ├── configurators/
+│   │   └── mcp-configurator.ts  # MCP 設定
+│   │
+│   ├── updaters/
+│   │   └── claude-md-updater.ts # CLAUDE.md 更新
+│   │
+│   ├── templates/
+│   │   ├── skill.md.hbs         # SKILL.md テンプレート
+│   │   ├── agents.md.hbs        # Subagents テンプレート
+│   │   ├── mcp-setup.md.hbs     # MCP設定ガイドテンプレート
+│   │   ├── claude-md-section.md.hbs
+│   │   └── patterns/
+│   │       ├── api.md.hbs
+│   │       ├── validation.md.hbs
+│   │       └── error-handling.md.hbs
+│   │
+│   ├── mcp-registry/
+│   │   └── index.ts             # MCP レジストリ
+│   │
+│   └── utils/
+│       ├── file.ts              # ファイル操作
+│       └── logger.ts            # ログ出力
+│
+├── templates/                    # 配布用テンプレート（src/templates のコピー）
+│
+└── tests/
+    ├── analyzer.test.ts
+    ├── generators.test.ts
+    └── fixtures/
+        ├── simple-api.md
+        └── complex-api.md
+```
+
+---
+
+## package.json
+
+```json
+{
+  "name": "spec2impl",
+  "version": "0.1.0",
+  "description": "Generate Claude Code implementation environment from specification documents",
+  "author": "",
+  "license": "MIT",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "ai",
+    "skills",
+    "mcp",
+    "subagent",
+    "specification",
+    "code-generation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "spec2impl": "./dist/cli.js"
+  },
+  "files": ["dist", "templates"],
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "build": "tsup src/cli.ts src/index.ts --format esm --dts --clean",
+    "test": "vitest",
+    "lint": "eslint src/",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "chalk": "^5.3.0",
+    "handlebars": "^4.7.8",
+    "gray-matter": "^4.0.3",
+    "marked": "^12.0.0",
+    "ora": "^8.0.0",
+    "yaml": "^2.4.0",
+    "glob": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.0.0",
+    "eslint": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+```
+
+---
+
+## CLI 仕様
+
+### コマンド
+
+```bash
+# メインコマンド
+spec2impl <docs-directory>
+
+# オプション
+-d, --domain <name>     # ドメイン名を指定（デフォルト: 自動推測）
+-o, --output <dir>      # 出力先ディレクトリ（デフォルト: カレントディレクトリ）
+--dry-run               # プレビューのみ（ファイル生成なし）
+--skip-mcp              # MCP 設定をスキップ
+-v, --version           # バージョン表示
+-h, --help              # ヘルプ表示
+
+# サブコマンド
+spec2impl validate <docs-directory>  # 仕様書の検証のみ
+spec2impl init                       # 設定ファイルの初期化
+```
+
+### 終了コード
+
+| コード | 意味                 |
+| ------ | -------------------- |
+| 0      | 成功                 |
+| 1      | 一般的なエラー       |
+| 2      | 仕様書が見つからない |
+| 3      | 仕様書のパースエラー |
+
+---
+
+## 将来の拡張（P1 以降）
+
+### P1: 追加機能
+
+- OpenAPI/Swagger 仕様書のサポート
+- GraphQL スキーマのサポート
+- Slash Commands の生成
+- 複数ドメインの分離管理
+
+### P2: 高度な機能
+
+- Marketplace からの Skills 取得
+- カスタムテンプレート
+- CI/CD 統合
+- Slack 連携（進捗通知など）
+
+---
+
+## 参考プロジェクト
+
+- [yusufkaraaslan/Skill_Seekers](https://github.com/yusufkaraaslan/Skill_Seekers) - ドキュメントから Skills 生成
+- [travisvn/awesome-claude-skills](https://github.com/travisvn/awesome-claude-skills) - Skills カタログ
+- [obra/superpowers](https://github.com/obra/superpowers) - Claude Code ワークフロー
+- [korotovsky/slack-mcp-server](https://github.com/korotovsky/slack-mcp-server) - Slack MCP
