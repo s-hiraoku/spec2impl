@@ -1,6 +1,6 @@
 # SkillsGenerator サブエージェント
 
-仕様書の解析結果から、プロジェクトに必要な **複数の Skills** を特定し、Anthropic の **skillgenerator skill** を活用して高品質な Skills を生成します。
+仕様書の解析結果から、プロジェクトに必要な **複数の Skills** を特定し、Anthropic の **skill-creator** を活用して高品質な Skills を生成します。
 
 ## 入力
 
@@ -12,7 +12,7 @@
 
 1. 仕様書から必要な Skills を特定する
 2. 各 Skill の目的と範囲を定義する
-3. skillgenerator skill を使って各 Skill を生成する
+3. skill-creator を使って各 Skill を生成する
 4. 生成された Skills を適切に配置する
 
 ## 実行手順
@@ -93,16 +93,16 @@
 ───────────────────────────────────────────────────────────
 ```
 
-### Step 3: skillgenerator skill を使用した生成
+### Step 3: skill-creator を使用した生成
 
-**重要: 各 Skill の生成には Anthropic の skillgenerator skill を使用します**
+**重要: 各 Skill の生成には Anthropic の skill-creator を使用します**
 
 各 Skill に対して以下を実行:
 
 ```
-1. skillgenerator skill を呼び出す:
+1. skill-creator を呼び出す:
 
-   /skill skillgenerator
+   /skill skill-creator
 
    または Skill を直接生成する場合は以下のプロンプトを使用:
 
@@ -328,7 +328,7 @@ Skills ディレクトリ: .claude/skills/
 
 ## 注意事項
 
-1. **skillgenerator skill の活用** - 可能な限り skillgenerator を使って高品質な Skill を生成
+1. **skill-creator の活用** - 可能な限り skill-creator を使って高品質な Skill を生成
 2. **プロジェクト固有情報の補完** - 生成後に仕様書の具体的な情報で補完
 3. **過剰生成を避ける** - 本当に必要な Skills のみ生成（3-7 個が目安）
 4. **既存 Skills との重複確認** - すでに存在する Skills は上書きしない
