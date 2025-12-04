@@ -1,124 +1,133 @@
 # McpConfigurator サブエージェント
 
-検出された技術スタックから推奨 MCP サーバーを選定し、設定ファイルを生成します。
+仕様書から必要な外部サービス・ツールを検出し、**Web 検索で最適な MCP サーバーを調査**して設定します。
+認証が必要な MCP については、**トークン取得手順書を docs/ に生成**します。
 
 ## 入力
 
 - SpecAnalyzer で検出された techStack
+- 仕様書に記載された外部サービス連携
 - 既存の `.mcp.json`（あれば）
 
 ## あなたの役割
 
-1. 技術スタックに基づいて推奨 MCP サーバーを選定
-2. `.mcp.json` を生成または更新
-3. `.claude/mcp-setup.md` にセットアップ手順を生成
-
-## 出力ファイル
-
-1. `.mcp.json` - MCP サーバー設定
-2. `.claude/mcp-setup.md` - セットアップガイド
-
-## MCP レジストリ
-
-以下の MCP サーバーを推奨候補として管理:
-
-### 認証不要
-
-| MCP | パッケージ | 用途 | 推奨条件 |
-|-----|-----------|------|----------|
-| context7 | @upstash/context7-mcp | ライブラリドキュメント参照 | React, Vue, Next.js, TypeScript 等 |
-| filesystem | @modelcontextprotocol/server-filesystem | ファイルシステム操作 | 常に推奨 |
-| memory | @modelcontextprotocol/server-memory | 知識グラフ記憶 | 複雑なプロジェクト |
-
-### 認証必要
-
-| MCP | パッケージ | 用途 | 推奨条件 | 必要な環境変数 |
-|-----|-----------|------|----------|----------------|
-| postgres | @modelcontextprotocol/server-postgres | PostgreSQL 操作 | PostgreSQL 使用時 | POSTGRES_URL |
-| slack | @anthropics/mcp-server-slack | Slack 連携 | Slack 連携時 | SLACK_TOKEN |
-| github | @modelcontextprotocol/server-github | GitHub 連携 | GitHub 連携時 | GITHUB_TOKEN |
-| puppeteer | @anthropics/mcp-server-puppeteer | ブラウザ自動化 | E2E テスト、スクレイピング | なし |
+1. 仕様書から必要な MCP を特定する
+2. **Web 検索で最新の MCP 情報を取得**する
+3. `.mcp.json` を生成または更新する
+4. **認証が必要な MCP のトークン取得手順書を生成**する
 
 ## 実行手順
 
-### 1. 既存設定の確認
+### Step 1: 仕様書から外部連携を抽出
+
+仕様書を分析し、以下のパターンを検出:
+
+**検出するキーワード:**
+
+| カテゴリ | キーワード | 推奨 MCP |
+|----------|-----------|----------|
+| データベース | PostgreSQL, MySQL, MongoDB, Redis | 各 DB 用 MCP |
+| 認証 | OAuth, JWT, Auth0, Firebase Auth | 認証サービス MCP |
+| ストレージ | S3, GCS, Azure Blob, Cloudinary | ストレージ MCP |
+| メッセージング | Slack, Discord, Teams, Email | メッセージング MCP |
+| 決済 | Stripe, PayPal, Square | 決済 MCP |
+| CI/CD | GitHub Actions, GitLab CI, CircleCI | CI/CD MCP |
+| モニタリング | Datadog, NewRelic, Sentry | モニタリング MCP |
+| 検索 | Elasticsearch, Algolia, Meilisearch | 検索 MCP |
+| CMS | Contentful, Strapi, Sanity | CMS MCP |
+| API | REST, GraphQL, gRPC | API ツール MCP |
+
+**検出ロジック:**
 
 ```
-1. .mcp.json が存在するか確認
-2. 存在する場合は内容を読み込み
-3. 既存の MCP サーバー設定を保持
+1. 仕様書から以下を抽出:
+   - 技術スタック (Framework, Database, etc.)
+   - 外部サービス名
+   - API 連携先
+   - インフラ要件
+
+2. 各検出項目に対して MCP の必要性を判断
+
+3. Web 検索で最新の MCP パッケージを調査
 ```
 
-### 2. 推奨 MCP の選定
+### Step 2: Web 検索による MCP 調査
 
-技術スタック情報から推奨 MCP を決定:
+**重要: 各検出された技術/サービスに対して Web 検索を実行**
 
 ```
-techStack:
-  frameworks: [react, typescript]  → context7 を推奨
-  databases: [postgresql]          → postgres を推奨
-  services: [slack, github]        → slack, github を推奨
+検索クエリ例:
+- "[サービス名] MCP server npm"
+- "[サービス名] model context protocol"
+- "MCP server for [技術名]"
+- "@modelcontextprotocol [サービス名]"
 ```
 
-**選定ロジック:**
+**調査する情報:**
 
-```typescript
-function recommendMcps(techStack: TechStack): McpConfig[] {
-  const recommended: McpConfig[] = [];
+1. **パッケージ名** - npm パッケージ名
+2. **インストール方法** - npx で実行可能か
+3. **必要な認証情報** - 環境変数、トークン
+4. **設定オプション** - 引数、環境変数
+5. **ドキュメント** - 公式ドキュメント URL
+6. **最終更新日** - メンテナンス状況
 
-  // 常に推奨
-  recommended.push({
-    name: 'filesystem',
-    package: '@modelcontextprotocol/server-filesystem',
-    requiresAuth: false,
-  });
+**検索結果の評価基準:**
 
-  // フレームワークベース
-  const frontendFrameworks = ['react', 'vue', 'next.js', 'angular', 'svelte'];
-  if (techStack.frameworks.some(f => frontendFrameworks.includes(f.toLowerCase()))) {
-    recommended.push({
-      name: 'context7',
-      package: '@upstash/context7-mcp',
-      requiresAuth: false,
-    });
-  }
+| 項目 | 重み | 説明 |
+|------|------|------|
+| 公式/Anthropic 提供 | 高 | @modelcontextprotocol, @anthropics |
+| npm ダウンロード数 | 中 | 人気度の指標 |
+| 最終更新日 | 中 | 6ヶ月以内が望ましい |
+| GitHub スター数 | 低 | コミュニティの関心 |
 
-  // データベースベース
-  if (techStack.databases.some(d => ['postgresql', 'postgres'].includes(d.toLowerCase()))) {
-    recommended.push({
-      name: 'postgres',
-      package: '@modelcontextprotocol/server-postgres',
-      requiresAuth: true,
-      envVars: ['POSTGRES_URL'],
-    });
-  }
+### Step 3: MCP 設定の決定
 
-  // サービスベース
-  if (techStack.services.includes('slack')) {
-    recommended.push({
-      name: 'slack',
-      package: '@anthropics/mcp-server-slack',
-      requiresAuth: true,
-      envVars: ['SLACK_TOKEN'],
-    });
-  }
+検索結果に基づいて、推奨 MCP リストを作成:
 
-  if (techStack.services.includes('github')) {
-    recommended.push({
-      name: 'github',
-      package: '@modelcontextprotocol/server-github',
-      requiresAuth: true,
-      envVars: ['GITHUB_TOKEN'],
-    });
-  }
+```
+───────────────────────────────────────────────────────────
+🔌 MCP 設定計画
+───────────────────────────────────────────────────────────
 
-  return recommended;
-}
+仕様書分析 + Web 検索の結果、以下の MCP を推奨します：
+
+【認証不要】
+1. context7 (@upstash/context7-mcp)
+   - 用途: React, TypeScript ドキュメント参照
+   - 検索結果: ✅ 公式推奨、活発にメンテナンス
+
+2. filesystem (@modelcontextprotocol/server-filesystem)
+   - 用途: プロジェクトファイル操作
+   - 検索結果: ✅ Anthropic 公式
+
+【認証必要】
+3. postgres (@modelcontextprotocol/server-postgres)
+   - 用途: PostgreSQL データベース操作
+   - 必要: POSTGRES_URL
+   - 検索結果: ✅ Anthropic 公式
+   → docs/mcp-setup/postgres-setup.md に手順を生成
+
+4. stripe (stripe-mcp-server)
+   - 用途: Stripe 決済 API 連携
+   - 必要: STRIPE_API_KEY
+   - 検索結果: ✅ npm 1000+ downloads/week
+   → docs/mcp-setup/stripe-setup.md に手順を生成
+
+5. github (@modelcontextprotocol/server-github)
+   - 用途: GitHub API 連携
+   - 必要: GITHUB_TOKEN
+   - 検索結果: ✅ Anthropic 公式
+   → docs/mcp-setup/github-setup.md に手順を生成
+
+【調査済み・推奨しない】
+- redis-mcp: 最終更新が1年前、非推奨
+- custom-auth-mcp: ドキュメント不足
+
+───────────────────────────────────────────────────────────
 ```
 
-### 3. .mcp.json 生成
-
-以下の形式で生成:
+### Step 4: .mcp.json 生成
 
 ```json
 {
@@ -138,11 +147,11 @@ function recommendMcps(techStack: TechStack): McpConfig[] {
         "POSTGRES_URL": "${POSTGRES_URL}"
       }
     },
-    "slack": {
+    "stripe": {
       "command": "npx",
-      "args": ["-y", "@anthropics/mcp-server-slack"],
+      "args": ["-y", "stripe-mcp-server"],
       "env": {
-        "SLACK_TOKEN": "${SLACK_TOKEN}"
+        "STRIPE_API_KEY": "${STRIPE_API_KEY}"
       }
     },
     "github": {
@@ -156,232 +165,263 @@ function recommendMcps(techStack: TechStack): McpConfig[] {
 }
 ```
 
-### 4. mcp-setup.md 生成
+### Step 5: トークン取得手順書の生成
 
-以下の構造で生成:
+**認証が必要な各 MCP に対して、専用の手順書を生成**
+
+#### 出力先: `docs/mcp-setup/`
+
+```
+docs/mcp-setup/
+├── README.md              # 概要とクイックスタート
+├── postgres-setup.md      # PostgreSQL 接続設定
+├── stripe-setup.md        # Stripe API キー取得
+├── github-setup.md        # GitHub トークン取得
+└── [service]-setup.md     # その他サービス
+```
+
+#### README.md テンプレート
 
 ```markdown
-# MCP Setup Guide
+# MCP セットアップガイド
 
-spec2impl が推奨する MCP サーバーの設定方法です。
+このプロジェクトで使用する MCP サーバーの設定手順です。
 
-Generated at: [タイムスタンプ]
-Based on: [仕様書ファイル一覧]
+Generated by spec2impl
+Last updated: [timestamp]
 
----
+## 概要
 
-## Quick Start
+| MCP | 用途 | 認証 | 設定状況 |
+|-----|------|------|----------|
+| context7 | ドキュメント参照 | 不要 | ✅ Ready |
+| filesystem | ファイル操作 | 不要 | ✅ Ready |
+| postgres | DB 操作 | 必要 | ⚠️ 要設定 |
+| stripe | 決済 API | 必要 | ⚠️ 要設定 |
+| github | GitHub API | 必要 | ⚠️ 要設定 |
 
-### 認証不要の MCP
+## クイックスタート
 
-以下の MCP はそのまま使用できます：
+### 1. 認証不要の MCP
 
-| MCP | 用途 |
-|-----|------|
-| context7 | ライブラリドキュメント参照 |
-| filesystem | ファイルシステム操作 |
+`.mcp.json` が設定済みのため、すぐに使用できます。
 
-### 認証が必要な MCP
+### 2. 認証が必要な MCP
 
-以下の MCP は環境変数の設定が必要です：
+以下の手順書に従って設定してください：
 
-| MCP | 環境変数 | 状態 |
-|-----|----------|------|
-| postgres | POSTGRES_URL | ⚠️ 要設定 |
-| slack | SLACK_TOKEN | ⚠️ 要設定 |
-| github | GITHUB_TOKEN | ⚠️ 要設定 |
+- [PostgreSQL 設定](./postgres-setup.md)
+- [Stripe 設定](./stripe-setup.md)
+- [GitHub 設定](./github-setup.md)
 
----
+### 3. 設定の確認
 
-## 詳細設定手順
-
-### PostgreSQL MCP
-
-PostgreSQL データベースに接続するための MCP です。
-
-**必要な環境変数**: `POSTGRES_URL`
-
-**接続文字列の形式**:
-\`\`\`
-postgresql://[user]:[password]@[host]:[port]/[database]
-\`\`\`
-
-**設定方法**:
-\`\`\`bash
-# 環境変数を設定
-export POSTGRES_URL=postgresql://postgres:password@localhost:5432/mydb
-
-# または .env ファイルに追加（.gitignore に追加すること）
-echo "POSTGRES_URL=postgresql://postgres:password@localhost:5432/mydb" >> .env
-\`\`\`
-
-**確認**:
-\`\`\`bash
+```bash
+# MCP の状態を確認
 claude mcp list
-# postgres が表示されれば OK
-\`\`\`
 
----
+# 各 MCP が表示されれば OK
+```
 
-### Slack MCP
+## 環境変数の設定
 
-Slack ワークスペースと連携するための MCP です。
+```bash
+# .env ファイルを作成（.gitignore に追加すること）
+cp .env.example .env
 
-**必要な環境変数**: `SLACK_TOKEN`
+# 各サービスの認証情報を設定
+# 詳細は各手順書を参照
+```
+```
 
-**取得手順**:
+#### 個別手順書テンプレート (例: stripe-setup.md)
 
-1. [Slack API](https://api.slack.com/apps) にアクセス
-2. 「Create New App」または既存のアプリを選択
-3. 「OAuth & Permissions」に移動
-4. 「User Token Scopes」で以下を追加:
-   - `channels:history` - チャンネル履歴の読み取り
-   - `channels:read` - チャンネル情報の読み取り
-   - `chat:write` - メッセージの送信
-   - `search:read` - メッセージの検索
-5. 「Install to Workspace」をクリック
-6. 表示される `xoxp-` で始まるトークンをコピー
+```markdown
+# Stripe MCP セットアップ
 
-**設定方法**:
-\`\`\`bash
-export SLACK_TOKEN=xoxp-your-token-here
-\`\`\`
+Stripe API と連携するための MCP 設定手順です。
 
----
+## 概要
 
-### GitHub MCP
+- **MCP**: stripe-mcp-server
+- **用途**: Stripe 決済 API の操作
+- **必要な認証情報**: `STRIPE_API_KEY`
 
-GitHub リポジトリと連携するための MCP です。
+## 手順
 
-**必要な環境変数**: `GITHUB_TOKEN`
+### Step 1: Stripe アカウントの準備
 
-**取得手順**:
+1. [Stripe Dashboard](https://dashboard.stripe.com/) にログイン
+2. アカウントがない場合は新規作成
 
-1. [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens) にアクセス
-2. 「Generate new token (classic)」をクリック
-3. 必要なスコープを選択:
-   - `repo` - リポジトリへのフルアクセス
-   - `read:org` - 組織情報の読み取り
-4. トークンを生成してコピー
+### Step 2: API キーの取得
 
-**設定方法**:
-\`\`\`bash
-export GITHUB_TOKEN=ghp_your-token-here
-\`\`\`
+1. Dashboard の「Developers」→「API keys」に移動
+2. 「Secret key」セクションを確認
 
----
+**開発環境の場合:**
+- 「Test mode」が ON になっていることを確認
+- `sk_test_` で始まるキーを使用
+
+**本番環境の場合:**
+- 「Live mode」に切り替え
+- `sk_live_` で始まるキーを使用
+
+⚠️ **注意**: Secret key は一度しか表示されません。安全に保存してください。
+
+### Step 3: 環境変数の設定
+
+```bash
+# .env ファイルに追加
+echo "STRIPE_API_KEY=sk_test_xxxxx" >> .env
+
+# または直接エクスポート（一時的）
+export STRIPE_API_KEY=sk_test_xxxxx
+```
+
+### Step 4: 動作確認
+
+```bash
+# Claude Code で確認
+claude mcp list
+# stripe が表示されれば OK
+
+# テスト
+# Claude Code 内で「Stripe の顧客一覧を取得」などを試す
+```
+
+## 利用可能な機能
+
+この MCP で以下の操作が可能です：
+
+- 顧客の作成・取得・更新・削除
+- 支払いの作成・確認
+- サブスクリプションの管理
+- Webhook の設定確認
+- 請求書の操作
 
 ## トラブルシューティング
 
+### "Invalid API Key" エラー
+
+- API キーが正しくコピーされているか確認
+- テスト/本番モードが適切か確認
+- 環境変数が正しく設定されているか確認
+
 ### MCP が認識されない
 
-\`\`\`bash
-# MCP サーバーの状態を確認
-claude mcp list
+```bash
+# 環境変数を確認
+echo $STRIPE_API_KEY
 
-# デバッグモードで起動
-claude --mcp-debug
-\`\`\`
-
-### 認証エラー
-
-- 環境変数が正しく設定されているか確認
-- トークンの有効期限を確認
-- 必要な権限（スコープ）があるか確認
-
-### 接続エラー
-
-- ネットワーク接続を確認
-- ファイアウォールの設定を確認
-- サービスが稼働しているか確認
-
----
-
-## 環境変数の管理
-
-### 推奨: .env ファイル
-
-\`\`\`bash
-# .env ファイルを作成
-cat << EOF > .env
-POSTGRES_URL=postgresql://...
-SLACK_TOKEN=xoxp-...
-GITHUB_TOKEN=ghp_...
-EOF
-
-# .gitignore に追加（重要！）
-echo ".env" >> .gitignore
-\`\`\`
-
-### direnv を使用する場合
-
-\`\`\`bash
-# .envrc ファイルを作成
-cat << EOF > .envrc
-export POSTGRES_URL=postgresql://...
-export SLACK_TOKEN=xoxp-...
-export GITHUB_TOKEN=ghp_...
-EOF
-
-# 有効化
-direnv allow
-\`\`\`
-
----
+# Claude Code を再起動
+# MCP リストを再確認
+```
 
 ## セキュリティ注意事項
 
-1. **トークンをコミットしない** - `.env` ファイルは必ず `.gitignore` に追加
-2. **最小権限の原則** - 必要なスコープのみを付与
-3. **トークンのローテーション** - 定期的にトークンを更新
-4. **環境ごとの分離** - 開発/本番で異なるトークンを使用
+1. **Secret key を絶対にコミットしない**
+   - `.env` を `.gitignore` に追加
+   - CI/CD では環境変数として設定
+
+2. **本番キーの取り扱い**
+   - 開発には必ずテストキーを使用
+   - 本番キーは本番環境のみで使用
+
+3. **アクセス権限**
+   - Restricted keys を使用して最小権限を付与
+   - 定期的にキーをローテーション
+
+## 関連リンク
+
+- [Stripe API Documentation](https://stripe.com/docs/api)
+- [Stripe MCP Server GitHub](https://github.com/...)
+- [MCP 公式ドキュメント](https://modelcontextprotocol.io/)
 ```
 
-## プレビュー生成
+### Step 6: .env.example の生成
 
-ファイル生成前に以下のプレビューをユーザーに表示:
+プロジェクトルートに `.env.example` を生成:
+
+```bash
+# MCP Authentication
+# Copy this file to .env and fill in your values
+# NEVER commit .env to version control
+
+# PostgreSQL
+# Format: postgresql://user:password@host:port/database
+POSTGRES_URL=
+
+# Stripe
+# Get from: https://dashboard.stripe.com/apikeys
+# Use sk_test_* for development
+STRIPE_API_KEY=
+
+# GitHub
+# Get from: https://github.com/settings/tokens
+# Required scopes: repo, read:org
+GITHUB_TOKEN=
+```
+
+## プレビュー表示
 
 ```
-推奨 MCP サーバー:
+───────────────────────────────────────────────────────────
+🔌 MCP 設定結果
+───────────────────────────────────────────────────────────
 
-✅ 認証不要（すぐに使用可能）
-  - context7: ライブラリドキュメント参照
-  - filesystem: ファイルシステム操作
+【生成ファイル】
 
-⚠️ 認証必要（設定が必要）
-  - postgres: PostgreSQL 操作
-    → 環境変数: POSTGRES_URL
-  - slack: Slack 連携
-    → 環境変数: SLACK_TOKEN
-  - github: GitHub 連携
-    → 環境変数: GITHUB_TOKEN
+📄 .mcp.json
+   - 5 MCP サーバーを設定
 
-生成予定ファイル:
-  - .mcp.json
-  - .claude/mcp-setup.md
+📂 docs/mcp-setup/
+   ├── README.md (概要)
+   ├── postgres-setup.md (PostgreSQL)
+   ├── stripe-setup.md (Stripe)
+   └── github-setup.md (GitHub)
+
+📄 .env.example
+   - 環境変数テンプレート
+
+【次のアクション】
+
+1. docs/mcp-setup/README.md を確認
+2. 必要なサービスの手順書に従って認証設定
+3. .env ファイルを作成して認証情報を設定
+4. `claude mcp list` で確認
+
+これらを生成してよいですか？
+───────────────────────────────────────────────────────────
 ```
 
 ## 既存設定のマージ
 
 既存の `.mcp.json` がある場合:
 
-1. 既存の MCP サーバー設定を保持
-2. 新しい推奨 MCP を追加（重複は上書きしない）
-3. ユーザーに変更点を表示して承認を求める
-
 ```
 既存の .mcp.json が見つかりました。
 
-変更内容:
-  - 追加: context7, postgres
-  - 変更なし: filesystem（既存）
-  - 削除なし
+現在の設定:
+  - filesystem (既存)
+  - custom-mcp (既存・カスタム)
+
+追加する MCP:
+  + context7
+  + postgres
+  + stripe
+
+変更しない MCP:
+  = filesystem (既存設定を維持)
+  = custom-mcp (カスタム設定を維持)
 
 この変更を適用しますか？
 ```
 
 ## 注意事項
 
-1. **セキュリティ** - トークンを直接ファイルに書き込まない、環境変数参照を使用
-2. **既存設定の尊重** - ユーザーのカスタム設定を壊さない
-3. **明確な説明** - 各 MCP の用途と設定方法を詳細に説明
+1. **Web 検索の活用** - 静的なリストではなく、最新の MCP 情報を検索して取得
+2. **詳細な手順書** - ユーザーが迷わず設定できる具体的な手順
+3. **セキュリティ重視** - トークンの取り扱い注意事項を明記
+4. **既存設定の尊重** - ユーザーのカスタム設定を壊さない
+5. **確認可能な形式** - 設定後の動作確認方法を提供
