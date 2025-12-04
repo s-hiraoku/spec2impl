@@ -1,6 +1,12 @@
 import { fileURLToPath } from "url";
 import { dirname, join, resolve } from "path";
-import { existsSync, cpSync, readdirSync, statSync } from "fs";
+import {
+  existsSync,
+  mkdirSync,
+  copyFileSync,
+  readdirSync,
+  statSync,
+} from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -14,30 +20,55 @@ export interface InstallOptions {
 
 export interface InstallResult {
   success: boolean;
-  files: string[];
+  copied: string[];
+  skipped: string[];
   error?: string;
 }
 
-function getFilesToCopy(dir: string, base = ""): string[] {
-  const files: string[] = [];
-  const entries = readdirSync(dir);
+function copyFilesRecursively(
+  srcDir: string,
+  destDir: string,
+  force: boolean
+): { copied: string[]; skipped: string[] } {
+  const copied: string[] = [];
+  const skipped: string[] = [];
 
-  for (const entry of entries) {
-    const fullPath = join(dir, entry);
-    const relativePath = base ? join(base, entry) : entry;
+  function processDir(src: string, dest: string, relativePath = "") {
+    if (!existsSync(dest)) {
+      mkdirSync(dest, { recursive: true });
+    }
 
-    if (statSync(fullPath).isDirectory()) {
-      files.push(...getFilesToCopy(fullPath, relativePath));
-    } else {
-      files.push(relativePath);
+    const entries = readdirSync(src);
+
+    for (const entry of entries) {
+      const srcPath = join(src, entry);
+      const destPath = join(dest, entry);
+      const relPath = relativePath ? join(relativePath, entry) : entry;
+
+      if (statSync(srcPath).isDirectory()) {
+        processDir(srcPath, destPath, relPath);
+      } else {
+        if (existsSync(destPath) && !force) {
+          skipped.push(relPath);
+        } else {
+          const parentDir = dirname(destPath);
+          if (!existsSync(parentDir)) {
+            mkdirSync(parentDir, { recursive: true });
+          }
+          copyFileSync(srcPath, destPath);
+          copied.push(relPath);
+        }
+      }
     }
   }
 
-  return files;
+  processDir(srcDir, destDir);
+  return { copied, skipped };
 }
 
 /**
  * Install spec2impl templates to a target directory
+ * Merges with existing .claude directory without overwriting (unless force is true)
  */
 export function install(
   targetDir: string,
@@ -45,44 +76,47 @@ export function install(
 ): InstallResult {
   const projectRoot = resolve(targetDir);
   const claudeDir = join(projectRoot, ".claude");
+  const templateClaudeDir = join(TEMPLATES_DIR, ".claude");
 
   if (!existsSync(TEMPLATES_DIR)) {
     return {
       success: false,
-      files: [],
+      copied: [],
+      skipped: [],
       error: "Template directory not found. Package may be corrupted.",
     };
   }
 
-  if (existsSync(claudeDir) && !options.force) {
-    return {
-      success: false,
-      files: [],
-      error: ".claude directory already exists. Use force option to overwrite.",
-    };
-  }
-
-  const files = getFilesToCopy(join(TEMPLATES_DIR, ".claude")).map(
-    (f) => `.claude/${f}`
-  );
-
   if (options.dryRun) {
+    // Dry run: just list files that would be copied
+    const { copied, skipped } = copyFilesRecursively(
+      templateClaudeDir,
+      claudeDir,
+      options.force || false
+    );
     return {
       success: true,
-      files,
+      copied: copied.map((f) => `.claude/${f}`),
+      skipped: skipped.map((f) => `.claude/${f}`),
     };
   }
 
   try {
-    cpSync(join(TEMPLATES_DIR, ".claude"), claudeDir, { recursive: true });
+    const { copied, skipped } = copyFilesRecursively(
+      templateClaudeDir,
+      claudeDir,
+      options.force || false
+    );
     return {
       success: true,
-      files,
+      copied: copied.map((f) => `.claude/${f}`),
+      skipped: skipped.map((f) => `.claude/${f}`),
     };
   } catch (error) {
     return {
       success: false,
-      files: [],
+      copied: [],
+      skipped: [],
       error: error instanceof Error ? error.message : String(error),
     };
   }
