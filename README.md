@@ -21,17 +21,30 @@ spec2impl は、Markdown 形式の仕様書を解析し、Claude Code での実�
 
 ## インストール
 
-このプロジェクトの `.claude/` ディレクトリをあなたのプロジェクトにコピーしてください：
+### npx でインストール（推奨）
+
+プロジェクトのルートディレクトリで以下を実行：
 
 ```bash
-# このリポジトリをクローン
-git clone https://github.com/your-repo/spec2impl.git
+npx spec2impl
+```
 
-# .claude ディレクトリをコピー
+これにより、`.claude/` ディレクトリに必要なファイルが自動的にインストールされます。
+
+**オプション:**
+- `--dry-run` - インストールせずにファイル一覧をプレビュー
+- `--force` - 既存の `.claude/` を上書き
+
+### 手動インストール
+
+このリポジトリから `.claude/` ディレクトリをコピーすることもできます：
+
+```bash
+git clone https://github.com/your-repo/spec2impl.git
 cp -r spec2impl/.claude /path/to/your/project/
 ```
 
-または、手動で以下のファイルをコピー：
+**インストールされるファイル:**
 
 ```
 .claude/
