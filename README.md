@@ -148,8 +148,9 @@ These agents are called internally by other agents during the workflow:
 |-------|-------|-------------|
 | **Approval Presenter** | haiku | Presents step results for user approval. Shows summary, details, files, risks, and MCP token requirements. |
 | **Progress Dashboard** | haiku | Displays workflow progress after each step. Also tracks TASKS.md progress during implementation. |
-| **Marketplace Plugin Scout** | - | Searches and evaluates plugins via web search. Provides scored recommendations. Does NOT install. |
-| **Marketplace** | - | Installs, lists, and removes plugins from GitHub/npm/URLs. Delegates search to Plugin Scout. |
+| **Marketplace Plugin Scout** | - | Searches aitmpl.com first, then web. Provides scored recommendations. Does NOT install. |
+| **Marketplace** | - | Installs plugins from GitHub/npm/URLs. Delegates search to Plugin Scout. |
+| **aitmpl Downloader** | - | Downloads templates from aitmpl.com. Called by Plugin Scout when found on aitmpl. |
 
 ---
 
