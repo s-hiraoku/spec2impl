@@ -56,13 +56,38 @@ WebSearch(`${techStack[0]} ${searchQuery} skill`);
 ```
 
 **Search Priority Order:**
-1. Provided Search Query + "claude skill"
-2. awesome-claude-skills repository
-3. Tech Stack + Search Query combination
+1. **aitmpl.com** - Check https://www.aitmpl.com/skills/ first
+2. Provided Search Query + "claude skill"
+3. awesome-claude-skills repository
+4. Tech Stack + Search Query combination
 
-### Example Searches
+### aitmpl.com Integration
 
-The Skills Generator provides specific search queries. Use them directly:
+**IMPORTANT: Always check aitmpl.com first for skills.**
+
+aitmpl.com is a curated repository of Claude Code templates including skills, agents, commands, and more.
+
+```typescript
+// 1. First, check aitmpl.com for the skill
+WebFetch({
+  url: "https://www.aitmpl.com/skills/",
+  prompt: `Find skills related to: ${skillName}, ${searchQuery}`
+});
+
+// 2. If found on aitmpl.com, use aitmpl-downloader to install
+Task({
+  subagent_type: "aitmpl-downloader",
+  prompt: `Download skill from aitmpl.com: ${skillUrl}`
+});
+```
+
+**aitmpl.com Skill Categories:**
+- https://www.aitmpl.com/skills/ - All available skills
+- Check for exact matches first, then related skills
+
+### Example Search Flow
+
+The Skills Generator provides specific search queries. Follow this search order:
 
 **Input from Skills Generator:**
 ```
@@ -71,33 +96,42 @@ Search Query: "Next.js 14 App Router patterns Server Components"
 Tech Stack: Next.js 14, React 18
 ```
 
-**Your searches:**
+**Your search flow:**
 ```typescript
+// Step 1: Check aitmpl.com first
+WebFetch({
+  url: "https://www.aitmpl.com/skills/",
+  prompt: "Find skills for Next.js 14 App Router Server Components"
+});
+
+// Step 2: If not found on aitmpl, search the web
 WebSearch(`claude skill Next.js 14 App Router patterns Server Components`);
-WebSearch(`Next.js 14 App Router patterns Server Components claude code github`);
 WebSearch(`awesome claude skills next-app-router`);
-WebSearch(`Next.js 14 App Router skill`);
+WebSearch(`Next.js 14 App Router skill github`);
 ```
 
-**Input from Skills Generator:**
+**If found on aitmpl.com:**
 ```
-Skill Name: mdx-content
-Search Query: "MDX Next.js content blog processing"
-Tech Stack: MDX, next-mdx-remote, contentlayer
+Source: aitmpl.com/skills/next-app-router
+Action: Use aitmpl-downloader to install
 ```
 
-**Your searches:**
-```typescript
-WebSearch(`claude skill MDX Next.js content blog processing`);
-WebSearch(`MDX Next.js content blog processing claude code github`);
-WebSearch(`awesome claude skills mdx-content`);
-WebSearch(`MDX contentlayer skill`);
+**If found elsewhere:**
+```
+Source: github:user/repo or npm:package-name
+Action: Use marketplace to install
 ```
 
 ### For MCP Plugins
 
 ```typescript
-// Execute multiple searches
+// Step 1: Check aitmpl.com first
+WebFetch({
+  url: "https://www.aitmpl.com/mcps/",
+  prompt: `Find MCP server for: ${service}`
+});
+
+// Step 2: Search for official MCP servers
 WebSearch(`${service} MCP server modelcontextprotocol official`);
 WebSearch(`@modelcontextprotocol server-${service}`);
 WebSearch(`${service} MCP server npm latest`);
@@ -107,6 +141,13 @@ WebSearch(`claude code MCP ${service}`);
 ### For Agent Plugins
 
 ```typescript
+// Step 1: Check aitmpl.com first
+WebFetch({
+  url: "https://www.aitmpl.com/agents/",
+  prompt: `Find agent for: ${query}`
+});
+
+// Step 2: Search the web
 WebSearch(`claude code agent plugin ${query} github`);
 WebSearch(`claude custom agent ${query}`);
 ```
@@ -115,6 +156,7 @@ WebSearch(`claude custom agent ${query}`);
 
 | Criteria | Score | Notes |
 |----------|-------|-------|
+| **aitmpl.com resource** | +60 | All types - curated, verified |
 | Official @modelcontextprotocol | +50 | MCP only |
 | Official Anthropic resource | +50 | All types |
 | travisvn/awesome-claude-* | +30 | Skills, Agents |
