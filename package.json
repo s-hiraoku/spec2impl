@@ -22,7 +22,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "spec2impl": "./dist/cli.js"
+    "spec2impl": "dist/cli.js"
   },
   "files": [
     "dist",
