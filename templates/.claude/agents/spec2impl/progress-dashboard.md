@@ -1,6 +1,6 @@
 ---
-name: progress-dashboard
-description: Generates a visual progress dashboard comparing specification tasks against implementation status, with dependency analysis and next task recommendations.
+name: Progress Dashboard
+description: Generates visual progress reports comparing specification requirements against implementation status. Shows overall progress with visual bars, category breakdown, current focus, next recommended tasks with dependency analysis, and blockers. Internal service called by other agents during implementation.
 tools:
   - Read
   - Glob

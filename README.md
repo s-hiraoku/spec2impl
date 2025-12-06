@@ -129,12 +129,36 @@ The Marketplace and Progress Dashboard agents are **internal services** called b
 
 ## Sub-Agents Reference
 
-### spec-analyzer
+spec2impl uses specialized sub-agents for each step of the workflow. Below is a summary of each agent:
+
+| Agent | Step | Description |
+|-------|------|-------------|
+| **Spec Analyzer** | 1 | Analyzes Markdown specs to extract APIs, models, workflows, constraints, and tech stack |
+| **Skills Generator** | 2 | Searches marketplace for skills, installs found ones, assesses gaps, generates missing skills |
+| **Subagent Generator** | 3 | Researches latest agent design patterns and generates SpecVerifier, TestGenerator, etc. |
+| **MCP Configurator** | 4 | Detects external services, searches for MCP servers, generates .mcp.json and setup docs |
+| **Task List Generator** | 5 | Extracts tasks from specs and auto-generates implementation tasks with dependencies |
+| **CLAUDE.md Updater** | 6 | Updates CLAUDE.md with implementation environment, preserving existing sections |
+
+### Internal Services
+
+These agents are called internally by other agents during the workflow:
+
+| Agent | Description |
+|-------|-------------|
+| **Marketplace Plugin Scout** | Searches and evaluates plugins via web search. Provides scored recommendations. Does NOT install. |
+| **Marketplace** | Installs, lists, and removes plugins from GitHub/npm/URLs. Delegates search to Plugin Scout. |
+| **Progress Dashboard** | Generates visual progress reports with task breakdown, recommendations, and blockers. |
+
+---
+
+### Spec Analyzer
 
 Analyzes Markdown specification documents to extract structured implementation data.
 
 | Property | Value |
 |----------|-------|
+| **Step** | 1 |
 | **Tools** | Glob, Grep, Read |
 | **Input** | Directory path containing specs |
 | **Output** | Structured YAML with APIs, models, workflows, constraints, tech stack |
@@ -149,31 +173,35 @@ Analyzes Markdown specification documents to extract structured implementation d
 
 ---
 
-### task-list-generator
+### Skills Generator
 
-Extracts and generates implementation tasks, creating a structured `docs/TASKS.md` file.
+Identifies required Skills from specifications, searches for existing skills via marketplace, installs them, assesses gaps, and generates only what's missing.
 
 | Property | Value |
 |----------|-------|
-| **Tools** | Read, Write, Edit, Glob, Grep, Bash |
-| **Input** | SpecAnalyzer output |
-| **Output** | `docs/TASKS.md` |
+| **Step** | 2 |
+| **Tools** | Read, Write, Edit, Glob, Grep, Bash, Task, WebSearch, WebFetch |
+| **Input** | SpecAnalyzer output, tech stack |
+| **Output** | `.claude/skills/` directory with Skill files |
 
-**Task Categories:**
-| Category | ID Prefix | Description |
-|----------|-----------|-------------|
-| Spec-Defined | `T-SPEC-*` | Tasks extracted from specifications |
-| Auto-Generated | `T-AUTO-*` | Tasks generated from API/model definitions |
-| Verification | `T-VERIFY-*` | Post-implementation verification tasks |
+**7-Step Process (Marketplace First, Then Generate):**
+1. **Identify** required skills from specification
+2. **Search** via marketplace-plugin-scout for each skill category
+3. **Evaluate** and select best matches
+4. **Install** found skills via marketplace
+5. **Assess Gaps** - evaluate if additional skills needed
+6. **Generate** missing skills using skill-creator
+7. **Customize** with project-specific information
 
 ---
 
-### subagent-generator
+### Subagent Generator
 
-Generates specialized sub-agents using latest design patterns researched via web search.
+Identifies required sub-agents from specification analysis and generates optimally configured agents.
 
 | Property | Value |
 |----------|-------|
+| **Step** | 3 |
 | **Tools** | Read, Write, Edit, Glob, Grep, Bash, Task, WebSearch, WebFetch |
 | **Input** | SpecAnalyzer output, tech stack, project structure |
 | **Output** | `.claude/agents/` directory with agent files |
@@ -189,57 +217,60 @@ Generates specialized sub-agents using latest design patterns researched via web
 
 | Type | Always Generated | Description |
 |------|------------------|-------------|
-| Core | Yes | spec-verifier, test-generator |
+| Core | Yes | spec-verifier, test-generator, implementation-guide |
 | Feature-Specific | Conditional | api-implementer, model-designer, auth-implementer, etc. |
 | Domain-Specific | Auto-detected | E-commerce, SaaS, CMS-specific agents |
 
 ---
 
-### skills-generator
+### MCP Configurator
 
-Identifies required Skills from specifications, searches for skill plugins via `marketplace-plugin-scout`, and generates only what's missing.
-
-| Property | Value |
-|----------|-------|
-| **Tools** | Read, Write, Edit, Glob, Grep, Bash, Task, WebSearch, WebFetch |
-| **Input** | SpecAnalyzer output, tech stack |
-| **Output** | `.claude/skills/` directory with Skill files |
-
-**Process:**
-1. Identify required skills from specification
-2. **Search via marketplace-plugin-scout** for each skill category
-3. Evaluate and select best matches
-4. **Install via marketplace-plugin-scout** from external sources
-5. Generate only missing skills using skill-creator
-6. Customize with project-specific information
-
----
-
-### mcp-configurator
-
-Detects external services, searches for MCP plugins via `marketplace-plugin-scout`, and generates optimal configuration.
+Detects external services from specifications and configures optimal MCP servers.
 
 | Property | Value |
 |----------|-------|
+| **Step** | 4 |
 | **Tools** | Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch |
 | **Input** | Tech stack, external service requirements |
 | **Output** | `.mcp.json`, `docs/mcp-setup/`, `.env.example` |
 
-**Process:**
-1. Extract external services from specification
-2. **Search via marketplace-plugin-scout** for MCP servers
-3. Evaluate and select best MCPs (official packages preferred)
-4. Generate .mcp.json configuration
-5. Generate token acquisition guides for each MCP
+**5-Step Process (Marketplace First, Then Configure):**
+1. **Extract** external services from specification
+2. **Search** via marketplace-plugin-scout for MCP servers
+3. **Evaluate** and select best MCPs (official packages preferred)
+4. **Configure** .mcp.json with selected MCPs
+5. **Document** token acquisition guides in docs/mcp-setup/
 
 ---
 
-### claude-md-updater
+### Task List Generator
+
+Extracts existing tasks from specifications and auto-generates implementation tasks.
+
+| Property | Value |
+|----------|-------|
+| **Step** | 5 |
+| **Tools** | Read, Write, Edit, Glob, Grep, Bash |
+| **Input** | SpecAnalyzer output |
+| **Output** | `docs/TASKS.md` |
+
+**Task Categories:**
+
+| Category | ID Prefix | Description |
+|----------|-----------|-------------|
+| Spec-Defined | `T-SPEC-*` | Tasks extracted from specifications |
+| Auto-Generated | `T-AUTO-*` | Tasks generated from API/model definitions |
+| Verification | `T-VERIFY-*` | Post-implementation verification tasks |
+
+---
+
+### CLAUDE.md Updater
 
 Updates or creates CLAUDE.md with the implementation environment section.
 
 | Property | Value |
 |----------|-------|
+| **Step** | 6 |
 | **Tools** | Read, Write, Edit, Glob, Bash |
 | **Input** | Generated files info, existing CLAUDE.md |
 | **Output** | `CLAUDE.md` (merged) |
@@ -251,53 +282,52 @@ Updates or creates CLAUDE.md with the implementation environment section.
 
 ---
 
-### marketplace
+### Marketplace Plugin Scout
 
-Internal registry and installer for Claude Code Plugins. Works with `marketplace-plugin-scout` for search functionality.
+Searches and evaluates plugins (Skills, MCP servers, Agents) via web search.
 
 | Property | Value |
 |----------|-------|
+| **Type** | Internal Service |
+| **Tools** | WebSearch, WebFetch, Read, Glob, Grep |
+| **Called By** | Skills Generator, MCP Configurator |
+
+**Key Responsibilities:**
+- Search GitHub, npm, and other sources for latest plugins
+- Evaluate plugin quality (freshness, stars, compatibility)
+- Compare official vs community packages
+- Provide recommendations with scores
+
+**Important:** This agent searches and evaluates only. It does NOT install plugins - that's delegated to the Marketplace agent.
+
+---
+
+### Marketplace
+
+Internal registry and installer for Claude Code Plugins.
+
+| Property | Value |
+|----------|-------|
+| **Type** | Internal Service |
 | **Tools** | Bash, Read, Write, Edit, Glob, Grep |
 | **Sources** | GitHub, npm, Custom URLs |
 
-**Actions (called by Skills Generator and MCP Configurator):**
-- `search` - **Delegates to marketplace-plugin-scout**
+**Actions:**
 - `install` - Download and install plugin from source
 - `list` - Show installed plugins (skills, MCPs, agents)
 - `uninstall` - Remove plugins
 
-**Note:** This agent is called internally by other agents, not directly by users. For plugin discovery, it delegates to `marketplace-plugin-scout`.
+**Important:** For plugin discovery, this agent delegates to `marketplace-plugin-scout`.
 
 ---
 
-### marketplace-plugin-scout (External)
+### Progress Dashboard
 
-Specialized agent for searching, evaluating, and registering plugins from the Claude Code Marketplace.
-
-| Property | Value |
-|----------|-------|
-| **Location** | `.claude/agents/marketplace-plugin-scout.md` |
-| **Purpose** | Plugin discovery via web search, evaluation, and registration |
-
-**Key Responsibilities:**
-- Search the Claude Code Marketplace
-- Evaluate plugin quality (freshness, popularity, compatibility)
-- Compare official vs community packages
-- Provide recommendations with scores
-
-**Called by:**
-- Skills Generator (for skill plugins)
-- MCP Configurator (for MCP server plugins)
-- Marketplace (for search delegation)
-
----
-
-### progress-dashboard
-
-Generates visual progress reports comparing specification requirements against implementation.
+Generates visual progress reports comparing specification requirements against implementation status.
 
 | Property | Value |
 |----------|-------|
+| **Type** | Internal Service |
 | **Tools** | Read, Glob, Grep |
 | **Input** | `docs/TASKS.md` |
 | **Output** | Visual dashboard with progress bars |

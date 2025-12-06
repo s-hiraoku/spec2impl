@@ -1,9 +1,10 @@
 ---
-name: spec-analyzer
-description: |
-  Analyze specification documents to extract structured implementation data.
-  Use when parsing Markdown specs to extract APIs, models, workflows, and constraints.
-tools: Glob, Grep, Read
+name: Spec Analyzer
+description: Analyzes Markdown specification documents to extract structured implementation data including APIs, data models, workflows, constraints, and technology stack. Called by spec2impl orchestrator as Step 1 of the workflow.
+tools:
+  - Glob
+  - Grep
+  - Read
 ---
 
 # Spec Analyzer Agent

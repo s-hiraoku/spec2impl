@@ -1,6 +1,6 @@
 ---
 name: Subagent Generator
-description: Identifies required sub-agents from specification analysis, researches latest agent design patterns via web search, and generates optimally configured agents. Always uses web search for latest best practices.
+description: Identifies required sub-agents from specification analysis and generates optimally configured agents. Researches latest agent design patterns via web search before generation. Creates SpecVerifier, TestGenerator, ImplementationGuide, and feature-specific agents. Called by spec2impl orchestrator as Step 3 of the workflow.
 tools:
   - Read
   - Write

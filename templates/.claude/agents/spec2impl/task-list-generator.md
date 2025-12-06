@@ -1,6 +1,6 @@
 ---
 name: Task List Generator
-description: Extracts and generates implementation tasks from specifications, creating a structured TASKS.md file with categorized tasks, dependencies, and progress tracking
+description: Extracts existing tasks from specifications and auto-generates implementation tasks from API/model definitions. Creates docs/TASKS.md with categorized tasks (T-SPEC-*, T-AUTO-*, T-VERIFY-*), dependency ordering, and progress tracking. Called by spec2impl orchestrator as Step 5 of the workflow.
 tools:
   - Read
   - Write

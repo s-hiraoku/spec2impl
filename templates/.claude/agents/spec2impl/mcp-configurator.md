@@ -1,6 +1,6 @@
 ---
 name: MCP Configurator
-description: Detects required external services from specifications, researches optimal MCP servers via web search, evaluates and selects the best options, generates .mcp.json configuration, and creates token setup documentation. Always uses web search for latest MCP information.
+description: Detects external services from specifications and configures optimal MCP servers. Uses marketplace-plugin-scout for web search, evaluates options (preferring official packages), generates .mcp.json configuration, and creates token setup documentation in docs/mcp-setup/. Called by spec2impl orchestrator as Step 4 of the workflow.
 tools:
   - Read
   - Write
