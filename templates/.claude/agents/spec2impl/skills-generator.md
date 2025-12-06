@@ -1,6 +1,6 @@
 ---
 name: Skills Generator
-description: Analyzes specification analysis results to identify required skills and generates high-quality skills using the skill-creator. Automatically detects skill categories based on API definitions, data models, authentication requirements, and business logic complexity.
+description: Identifies required skills from specification analysis, researches latest skills via web search, and generates/installs optimal skills for the project. Always uses web search to find the most current and best-suited skills.
 tools:
   - Read
   - Write
@@ -9,11 +9,41 @@ tools:
   - Grep
   - Bash
   - Task
+  - WebSearch
+  - WebFetch
 ---
 
 # Skills Generator Sub-Agent
 
-Identifies the **multiple Skills** needed for a project from specification analysis results and generates high-quality Skills using Anthropic's **skill-creator**.
+Prepares **all required Skills** for a project by:
+1. **Identifying** what skills are needed from specification analysis
+2. **Researching** latest available skills via web search
+3. **Evaluating** and selecting the best options
+4. **Installing** from external sources or generating new skills
+
+## Core Principle: Marketplace First, Then Generate
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Skills Acquisition Flow                   │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   Step 1: Identify Required Skills from Spec                │
+│              ↓                                              │
+│   Step 2: Search via marketplace-plugin-scout ← ★ CRITICAL │
+│              ↓                                              │
+│   Step 3: Evaluate & Select Best Options                    │
+│              ↓                                              │
+│   Step 4: Install via marketplace-plugin-scout              │
+│              ↓                                              │
+│   Step 5: Generate Missing Skills                           │
+│              ↓                                              │
+│   Step 6: Customize for Project Specifics                   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**IMPORTANT:** Always use the `marketplace-plugin-scout` sub-agent for plugin search and installation. This agent specializes in searching the Claude Code Marketplace and handles the complexity of finding and evaluating plugins.
 
 ## Input
 
@@ -21,412 +51,472 @@ Identifies the **multiple Skills** needed for a project from specification analy
 - Detected technology stack
 - Project context
 
-## Your Role
+## Output
 
-1. Identify required Skills from the specification
-2. Define the purpose and scope of each Skill
-3. Generate each Skill using skill-creator
-4. Place generated Skills in appropriate directories
+Multiple Skills installed in `.claude/skills/`:
+- Skills installed from external sources (GitHub, npm, etc.)
+- Newly generated project-specific skills
+- Customized skills with project context
+
+---
 
 ## Execution Steps
 
 ### Step 1: Identify Required Skills
 
-Analyze the specification and identify required Skills from the following perspectives:
+Analyze the specification to identify what skills are needed.
 
-**Auto-Detected Skill Categories:**
+**Detection Categories:**
 
-| Category | Detection Condition | Example Skill Name |
+| Category | Detection Condition | Skill Type Needed |
 |----------|---------------------|-------------------|
-| API Implementation | REST/GraphQL endpoints defined | `api-implementation` |
-| Data Models | Model/schema definitions exist | `data-modeling` |
-| Authentication | JWT/OAuth/auth-related descriptions | `authentication` |
-| Database | DB operations, migrations | `database-operations` |
-| Validation | Many input validation rules | `input-validation` |
-| Error Handling | Error codes/formats defined | `error-handling` |
-| Testing | Test requirements exist | `testing-patterns` |
-| Frontend | UI/UX components exist | `frontend-components` |
-| External Integration | External API/service integrations | `external-integrations` |
-| Workflow | Complex business logic | `business-workflows` |
+| API Implementation | REST/GraphQL endpoints defined | API patterns skill |
+| Data Models | Model/schema definitions exist | Data modeling skill |
+| Authentication | JWT/OAuth/auth-related | Auth implementation skill |
+| Database | DB operations, migrations | Database skill |
+| Validation | Input validation rules | Validation skill |
+| Error Handling | Error codes/formats defined | Error handling skill |
+| Testing | Test requirements exist | Testing skill |
+| Frontend | UI/UX components | Frontend skill |
+| External Integration | External API/services | Integration skill |
 
-**Detection Logic:**
-
-```
-1. Extract from specification:
-   - Technical keywords (Express, React, PostgreSQL, etc.)
-   - Number and complexity of API endpoints
-   - Number of data models and their relationships
-   - Security requirements
-   - Business rule complexity
-
-2. Add Skills based on thresholds:
-   - 3+ APIs -> api-implementation skill
-   - 2+ models -> data-modeling skill
-   - Auth-related descriptions present -> authentication skill
-   - 5+ validation rules -> input-validation skill
-   - Error code definitions present -> error-handling skill
-
-3. Consider project-specific Skills:
-   - Domain-specific patterns
-   - Recurring implementation patterns
-```
-
-### Step 2: Check Marketplace for Existing Skills
-
-Before generating new Skills, check if suitable Skills already exist in the Marketplace.
-
-**Process:**
-
-```
-1. For each identified Skill category, search the Marketplace:
-
-   Use Task tool to call Marketplace agent:
-
-   Task({
-     prompt: `
-       Read .claude/agents/spec2impl/marketplace.md and execute:
-       Action: search
-       Query: [skill category] [technology stack]
-     `
-   })
-
-2. Evaluate search results:
-   - If a matching Skill exists with 80%+ coverage → recommend install
-   - If partial match (50-80%) → recommend install + customize
-   - If no match or <50% → generate new Skill
-
-3. Present findings to user:
-```
-
-**Example Output:**
+**Output Format:**
 
 ```
 -----------------------------------------------------------
-Marketplace Search Results
+Step 1/6: Required Skills Identification
 -----------------------------------------------------------
 
-Searching for existing Skills...
+Analyzing specification...
+
+Required Skills:
 
 1. api-implementation
-   ✅ Found: github:travisvn/awesome-claude-skills/express-api
-   Coverage: 90% (12/13 patterns match)
-   Recommendation: Install from Marketplace
+   Reason: 12 REST endpoints detected
+   Tech context: Express, TypeScript
 
 2. data-modeling
-   ⚠️ Partial: npm:@claude-skills/postgres-models
-   Coverage: 60% (3/5 models supported)
-   Recommendation: Install + customize
+   Reason: 5 data models with relationships
+   Tech context: PostgreSQL, Prisma
 
 3. authentication
-   ❌ Not found
-   Recommendation: Generate new Skill
+   Reason: JWT auth requirements found
+   Tech context: JWT, bcrypt
 
 4. input-validation
-   ✅ Found: github:travisvn/awesome-claude-skills/zod-validation
-   Coverage: 85%
-   Recommendation: Install from Marketplace
+   Reason: 15 validation rules specified
+   Tech context: Zod
 
 5. error-handling
-   ❌ Not found
-   Recommendation: Generate new Skill
+   Reason: 8 error codes defined
+   Tech context: Express middleware
+
+6. stripe-integration
+   Reason: Payment processing required
+   Tech context: Stripe API
 
 -----------------------------------------------------------
-Install 2 Skills from Marketplace?
-Generate 3 new Skills?
-[y] Proceed  [n] Modify  [a] Generate all new
------------------------------------------------------------
-```
-
-**Installation Flow:**
-
-```
-If user approves Marketplace installation:
-
-1. Call Marketplace agent for each approved Skill:
-
-   Task({
-     prompt: `
-       Read .claude/agents/spec2impl/marketplace.md and execute:
-       Action: install
-       Source: github:travisvn/awesome-claude-skills/express-api
-     `
-   })
-
-2. For partial matches, note customization needed in Step 4
-```
-
-### Step 3: Create Skills Generation Plan
-
-Present the list of Skills to generate (excluding those installed from Marketplace):
-
-```
------------------------------------------------------------
-Skills Generation Plan
------------------------------------------------------------
-
-Based on specification analysis, the following Skills will be generated:
-
-1. api-implementation
-   Purpose: REST API endpoint implementation patterns
-   Target: 12 endpoints (User API, Payment API)
-
-2. data-modeling
-   Purpose: Data model definitions and relationships
-   Target: User, UserProfile, Payment, Transaction
-
-3. authentication
-   Purpose: JWT authentication and authorization implementation
-   Target: Login, token management, permission checks
-
-4. input-validation
-   Purpose: Input validation patterns
-   Target: 15 validation rules
-
-5. error-handling
-   Purpose: Unified error handling
-   Target: 6 error codes
-
-Please specify if additional Skills are needed.
+Identified: 6 skills needed
+Proceed to web search? [y/n]
 -----------------------------------------------------------
 ```
 
-### Step 4: Generate Using skill-creator
+---
 
-**Important: Use Anthropic's skill-creator to generate each Skill**
+### Step 2: Search Marketplace via marketplace-plugin-scout
 
-Execute the following for each Skill:
+**CRITICAL: Always use the marketplace-plugin-scout sub-agent for skill plugin search.**
 
-```
-1. Call skill-creator:
+The AI/development ecosystem changes rapidly. The marketplace-plugin-scout agent handles the complexity of searching, evaluating, and comparing plugins from the Claude Code Marketplace.
 
-   /skill skill-creator
+**How to Call marketplace-plugin-scout:**
 
-   Or use the following prompt to generate directly:
+```typescript
+// For each required skill category, call marketplace-plugin-scout
+Task({
+  subagent_type: "marketplace-plugin-scout",
+  prompt: `
+    Search for skill plugins in Claude Code Marketplace.
 
-   "Create a skill for [Skill Name] that covers:
-   - [Purpose 1]
-   - [Purpose 2]
-   - Context: [Project's technology stack]
-   - Based on specification: [Summary of relevant specification sections]"
+    Requirements:
+    - Skill Type: ${skill.category}
+    - Technology Stack: ${skill.techContext.join(', ')}
+    - Use Case: ${skill.reason}
 
-2. Review the generated Skill
-
-3. Supplement with project-specific information:
-   - Specific model names
-   - Specific API endpoints
-   - Project-specific constraints
-```
-
-### Step 5: Details for Each Generated Skill
-
-#### 5.1 api-implementation Skill
-
-**Purpose:** Provide project-specific API implementation patterns
-
-**Example Generation Prompt:**
-```
-Create an API implementation skill for a [tech stack] project with:
-
-Endpoints to implement:
-[Endpoint list extracted from specification]
-
-Request/Response formats:
-[Formats extracted from specification]
-
-Include:
-- Route definitions
-- Controller patterns
-- Middleware usage
-- Response formatting
+    Please search the marketplace, evaluate available options, and provide recommendations.
+    Include: source URL, last updated date, compatibility assessment, and score.
+  `
+});
 ```
 
-**Output File:** `.claude/skills/api-implementation/SKILL.md`
+**For Multiple Skills (Batch Search):**
 
-**Content to Include:**
-- Project-specific endpoint list
-- Implementation template for each endpoint
-- Request/Response formats
-- Middleware usage patterns
+```typescript
+// Search for all required skills at once
+Task({
+  subagent_type: "marketplace-plugin-scout",
+  prompt: `
+    Search for the following skill plugins in Claude Code Marketplace:
 
-#### 5.2 data-modeling Skill
+    ${requiredSkills.map((s, i) => `
+    ${i + 1}. ${s.name}
+       - Category: ${s.category}
+       - Tech Stack: ${s.techContext.join(', ')}
+       - Reason: ${s.reason}
+    `).join('\n')}
 
-**Purpose:** Data model implementation and relationship management
-
-**Example Generation Prompt:**
-```
-Create a data modeling skill for [DB type] with:
-
-Models:
-[Model definitions extracted from specification]
-
-Relationships:
-[Model relationships]
-
-Include:
-- Schema definitions
-- Migration patterns
-- Query patterns
-- Index strategies
+    For each skill:
+    1. Search the marketplace
+    2. Evaluate available options
+    3. Provide top recommendation with score
+    4. Note if no suitable plugin found (needs generation)
+  `
+});
 ```
 
-**Output File:** `.claude/skills/data-modeling/SKILL.md`
-
-#### 5.3 authentication Skill
-
-**Purpose:** Authentication and authorization implementation patterns
-
-**Example Generation Prompt:**
-```
-Create an authentication skill for [auth method] with:
-
-Requirements:
-[Auth requirements extracted from specification]
-
-Include:
-- Token generation/validation
-- Password hashing
-- Session management
-- Role-based access control
-```
-
-**Output File:** `.claude/skills/authentication/SKILL.md`
-
-#### 5.4 input-validation Skill
-
-**Purpose:** Unified input validation patterns
-
-**Example Generation Prompt:**
-```
-Create an input validation skill with:
-
-Validation rules from spec:
-[Validation rules extracted from specification]
-
-Include:
-- Schema validation (Zod/Joi patterns)
-- Custom validators
-- Error message formatting
-- Sanitization patterns
-```
-
-**Output File:** `.claude/skills/input-validation/SKILL.md`
-
-#### 5.5 error-handling Skill
-
-**Purpose:** Unified error handling
-
-**Example Generation Prompt:**
-```
-Create an error handling skill with:
-
-Error codes from spec:
-[Error codes extracted from specification]
-
-Include:
-- Custom error classes
-- Error response format
-- Global error handler
-- Logging patterns
-```
-
-**Output File:** `.claude/skills/error-handling/SKILL.md`
-
-### Step 6: Generate Project-Specific Skills
-
-If domain-specific logic exists in the specification, generate dedicated Skills:
-
-**Example: E-commerce Project**
-- `order-processing` - Order processing workflow
-- `payment-integration` - Payment integration patterns
-- `inventory-management` - Inventory management logic
-
-**Example: SaaS Project**
-- `multi-tenancy` - Multi-tenant implementation
-- `subscription-billing` - Subscription management
-- `usage-tracking` - Usage tracking
-
-### Step 7: Configure Skill Relationships
-
-Set up reference relationships between generated Skills:
-
-```markdown
-## Related Skills
-
-Project Skills:
-
-- [api-implementation](./api-implementation/SKILL.md) - API implementation patterns
-- [data-modeling](./data-modeling/SKILL.md) - Data models
-- [authentication](./authentication/SKILL.md) - Authentication & authorization
-- [input-validation](./input-validation/SKILL.md) - Input validation
-- [error-handling](./error-handling/SKILL.md) - Error handling
-
-## Usage Flow
-
-1. Check data models -> `data-modeling`
-2. Implement APIs -> `api-implementation`
-3. Add validation -> `input-validation`
-4. Implement authentication -> `authentication`
-5. Unify error handling -> `error-handling`
-```
-
-## Output Directory Structure
-
-```
-.claude/skills/
-├── api-implementation/
-│   └── SKILL.md
-├── data-modeling/
-│   └── SKILL.md
-├── authentication/
-│   └── SKILL.md
-├── input-validation/
-│   └── SKILL.md
-├── error-handling/
-│   └── SKILL.md
-├── [project-specific-skill]/
-│   └── SKILL.md
-└── README.md  (Skills list and usage guide)
-```
-
-## Preview Display
+**Expected Output from marketplace-plugin-scout:**
 
 ```
 -----------------------------------------------------------
-Skills Generation Results
+Step 2/6: Marketplace Search Results
 -----------------------------------------------------------
 
-Generated Skills: 5
+Searching via marketplace-plugin-scout... (6 categories)
 
-1. [DONE] api-implementation
-   - 12 endpoint patterns
-   - Request/Response templates
+[1/6] api-implementation (Express, TypeScript)
 
-2. [DONE] data-modeling
-   - 4 model definitions
-   - Relationship diagram
+   ✅ RECOMMENDED
+   │ Plugin: express-api-skill
+   │ Source: github:travisvn/awesome-claude-skills/express-api
+   │ Updated: 2024-11-15 (3 weeks ago)
+   │ Stars: 234
+   │ Match: Express ✓ TypeScript ✓ REST ✓
+   │ Score: 85/100
+   │
+   │ Alternative:
+   │ Plugin: api-patterns
+   │ Source: npm:@claude-skills/api-patterns
+   │ Downloads: 1.2k/week
+   │ Score: 72/100
 
-3. [DONE] authentication
-   - JWT implementation patterns
-   - RBAC configuration
+[2/6] data-modeling (PostgreSQL, Prisma)
 
-4. [DONE] input-validation
-   - 15 validation rules
-   - Zod schemas
+   ✅ RECOMMENDED
+   │ Plugin: prisma-data-modeling
+   │ Source: github:anthropics/claude-skills/prisma
+   │ Updated: 2024-12-01 (5 days ago)
+   │ Stars: 156
+   │ Match: PostgreSQL ✓ Prisma ✓
+   │ Score: 92/100
+   │
+   │ Note: Official Anthropic resource
 
-5. [DONE] error-handling
-   - 6 error classes
-   - Global handler
+[3/6] authentication (JWT)
 
-Skills directory: .claude/skills/
+   ⚠️ PARTIAL MATCH
+   │ Plugin: auth-patterns
+   │ Source: github:travisvn/awesome-claude-skills/auth
+   │ Updated: 2024-09-20 (2.5 months ago)
+   │ Match: JWT ✓ (generic, not project-specific)
+   │ Score: 65/100
+   │
+   │ Recommendation: Install + customize with project roles
 
-Proceed with generating these Skills?
+[4/6] input-validation (Zod)
+
+   ✅ RECOMMENDED
+   │ Plugin: zod-validation
+   │ Source: npm:claude-skill-zod-validation
+   │ Downloads: 890/week
+   │ Updated: 2024-10-30
+   │ Match: Zod ✓ TypeScript ✓
+   │ Score: 78/100
+
+[5/6] error-handling
+
+   ❌ NOT FOUND
+   │ No suitable skill plugin found
+   │ Recommendation: Generate new skill using skill-creator
+
+[6/6] stripe-integration
+
+   ✅ RECOMMENDED
+   │ Plugin: stripe-skill
+   │ Source: github:stripe/claude-stripe-skill
+   │ Updated: 2024-11-28
+   │ Stars: 89
+   │ Match: Stripe API ✓
+   │ Score: 88/100
+   │
+   │ Note: Official Stripe resource
+
+-----------------------------------------------------------
+Summary:
+  ✅ Ready to install: 4 skills
+  ⚠️ Install + customize: 1 skill
+  ❌ Need to generate: 1 skill
+
+Proceed with this plan? [y/m/q]
 -----------------------------------------------------------
 ```
+
+---
+
+### Step 3: Evaluate & Present Options
+
+Present findings with clear recommendations:
+
+```
+-----------------------------------------------------------
+Step 3/6: Skills Acquisition Plan
+-----------------------------------------------------------
+
+Based on web search results:
+
+TO INSTALL (4 skills):
+┌─────────────────────┬─────────────────────────────────────┬───────┐
+│ Skill               │ Source                              │ Score │
+├─────────────────────┼─────────────────────────────────────┼───────┤
+│ api-implementation  │ github:travisvn/awesome-claude-     │ 85    │
+│                     │ skills/express-api                  │       │
+├─────────────────────┼─────────────────────────────────────┼───────┤
+│ data-modeling       │ github:anthropics/claude-skills/    │ 92    │
+│                     │ prisma                              │       │
+├─────────────────────┼─────────────────────────────────────┼───────┤
+│ input-validation    │ npm:claude-skill-zod-validation     │ 78    │
+├─────────────────────┼─────────────────────────────────────┼───────┤
+│ stripe-integration  │ github:stripe/claude-stripe-skill   │ 88    │
+└─────────────────────┴─────────────────────────────────────┴───────┘
+
+TO INSTALL + CUSTOMIZE (1 skill):
+┌─────────────────────┬─────────────────────────────────────┬───────┐
+│ authentication      │ github:travisvn/awesome-claude-     │ 65    │
+│                     │ skills/auth                         │       │
+│                     │ + Add: User roles, permissions      │       │
+└─────────────────────┴─────────────────────────────────────┴───────┘
+
+TO GENERATE (1 skill):
+┌─────────────────────┬─────────────────────────────────────┐
+│ error-handling      │ Will generate using skill-creator   │
+│                     │ Based on: Express middleware,       │
+│                     │ 8 error codes from spec             │
+└─────────────────────┴─────────────────────────────────────┘
+
+-----------------------------------------------------------
+[y] Proceed  [m] Modify selections  [s] Search more  [q] Quit
+-----------------------------------------------------------
+```
+
+---
+
+### Step 4: Install Selected Skills via marketplace-plugin-scout
+
+**Use marketplace-plugin-scout agent to register and install each skill:**
+
+```typescript
+// Install each selected skill via marketplace-plugin-scout
+Task({
+  subagent_type: "marketplace-plugin-scout",
+  prompt: `
+    Register and install the following skill plugins:
+
+    ${skillsToInstall.map((s, i) => `
+    ${i + 1}. ${s.name}
+       - Source: ${s.source}
+       - Target Directory: .claude/skills/${s.targetName}/
+    `).join('\n')}
+
+    For each plugin:
+    1. Verify the source is valid and accessible
+    2. Register the plugin in the marketplace
+    3. Install to the target directory
+    4. Verify installation completed successfully
+  `
+});
+```
+
+**Output Format:**
+
+```
+-----------------------------------------------------------
+Step 4/6: Installing Skills
+-----------------------------------------------------------
+
+Installing 5 skills from external sources...
+
+[1/5] api-implementation
+      Source: github:travisvn/awesome-claude-skills/express-api
+      Fetching from GitHub...
+      ✅ Installed to .claude/skills/api-implementation/
+      Files: SKILL.md, patterns/routes.md, patterns/controllers.md
+
+[2/5] data-modeling
+      Source: github:anthropics/claude-skills/prisma
+      Fetching from GitHub...
+      ✅ Installed to .claude/skills/data-modeling/
+      Files: SKILL.md, patterns/schema.md, patterns/queries.md
+
+[3/5] input-validation
+      Source: npm:claude-skill-zod-validation
+      Installing from npm...
+      ✅ Installed to .claude/skills/input-validation/
+      Files: SKILL.md
+
+[4/5] stripe-integration
+      Source: github:stripe/claude-stripe-skill
+      Fetching from GitHub...
+      ✅ Installed to .claude/skills/stripe-integration/
+      Files: SKILL.md, patterns/payments.md, patterns/webhooks.md
+
+[5/5] authentication
+      Source: github:travisvn/awesome-claude-skills/auth
+      Fetching from GitHub...
+      ✅ Installed to .claude/skills/authentication/
+      Files: SKILL.md, patterns/jwt.md
+      ⚠️ Marked for customization in Step 6
+
+-----------------------------------------------------------
+Installation complete: 5/5 successful
+Updated: .claude/marketplace.json
+-----------------------------------------------------------
+```
+
+---
+
+### Step 5: Generate Missing Skills
+
+For skills not found via web search, generate using skill-creator.
+
+**Research best practices before generating:**
+
+```typescript
+// Before generating, search for best practices
+WebSearch(`${skill.techContext} best practices implementation patterns 2024`);
+WebSearch(`${skill.name} design patterns ${skill.techContext}`);
+```
+
+**Generation Process:**
+
+```
+-----------------------------------------------------------
+Step 5/6: Generating Missing Skills
+-----------------------------------------------------------
+
+Generating 1 skill...
+
+[1/1] error-handling
+
+   Researching best practices...
+   WebSearch: "express error handling best practices 2024"
+   WebSearch: "typescript error handling patterns"
+
+   Found patterns:
+   - Custom error classes with status codes
+   - Global error middleware
+   - Async error wrapper
+   - Structured error response format
+
+   Generating with skill-creator...
+
+   ✅ Created .claude/skills/error-handling/SKILL.md
+
+   Contents:
+   - Custom error class hierarchy
+   - Global error handler middleware
+   - Error response format matching spec
+   - Logging patterns
+   - 8 error codes from specification
+
+-----------------------------------------------------------
+Generation complete: 1/1 successful
+-----------------------------------------------------------
+```
+
+---
+
+### Step 6: Customize for Project
+
+Add project-specific information to installed skills.
+
+```
+-----------------------------------------------------------
+Step 6/6: Project Customization
+-----------------------------------------------------------
+
+Customizing 1 skill with project-specific information...
+
+[1/1] authentication
+
+   Adding project-specific context:
+
+   + User roles from spec: admin, manager, user, guest
+   + Permission matrix: 12 permissions defined
+   + Token structure: custom claims for tenant_id
+   + Session duration: 24h access, 7d refresh
+
+   ✅ Updated .claude/skills/authentication/SKILL.md
+   ✅ Created .claude/skills/authentication/project-config.md
+
+-----------------------------------------------------------
+Customization complete
+
+Creating skills index...
+✅ Generated .claude/skills/README.md
+✅ Updated .claude/marketplace.json
+
+-----------------------------------------------------------
+```
+
+---
+
+## Final Summary
+
+```
+═══════════════════════════════════════════════════════════════
+  Skills Generation Complete
+═══════════════════════════════════════════════════════════════
+
+  Research Summary:
+  ─────────────────
+  Web searches performed: 24
+  Skills evaluated: 18
+
+  Installation Summary:
+  ─────────────────────
+  📦 Installed from external: 5 (83%)
+  ✨ Generated new: 1 (17%)
+  🔧 Customized: 1
+
+  Sources used:
+  - GitHub (travisvn/awesome-claude-skills): 2 skills
+  - GitHub (anthropics/claude-skills): 1 skill
+  - GitHub (stripe/claude-stripe-skill): 1 skill
+  - npm: 1 skill
+  - Generated: 1 skill
+
+  Files created:
+  ─────────────
+  .claude/skills/
+  ├── api-implementation/     [GitHub - updated 3 weeks ago]
+  ├── data-modeling/          [GitHub/Anthropic - updated 5 days ago]
+  ├── authentication/         [GitHub + customized]
+  ├── input-validation/       [npm]
+  ├── error-handling/         [Generated]
+  ├── stripe-integration/     [GitHub/Official]
+  └── README.md
+
+  .claude/marketplace.json (updated)
+
+═══════════════════════════════════════════════════════════════
+```
+
+---
 
 ## Important Notes
 
-1. **Leverage skill-creator** - Generate high-quality Skills using skill-creator whenever possible
-2. **Supplement with project-specific information** - Enhance generated content with concrete specification details
-3. **Avoid over-generation** - Generate only truly necessary Skills (3-7 is the guideline)
-4. **Check for duplicates** - Do not overwrite existing Skills
-5. **Match technology stack** - Use code examples appropriate for the detected technology stack
+1. **Always Web Search First** - Never rely on static lists; the ecosystem evolves rapidly
+2. **Evaluate Freshness** - Prefer resources updated within the last 6 months
+3. **Verify Sources** - Prefer official/well-maintained repositories
+4. **Tech Stack Match** - Ensure skills match your project's technology
+5. **Document Sources** - Record where each skill came from for reproducibility
+6. **Customize Thoughtfully** - Add project context without breaking the original skill
