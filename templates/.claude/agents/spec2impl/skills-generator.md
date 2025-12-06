@@ -84,6 +84,16 @@ Analyze the specification to identify what skills are needed.
 | Testing | Test requirements exist | Testing skill |
 | Frontend | UI/UX components | Frontend skill |
 | External Integration | External API/services | Integration skill |
+| Content Management | Blog/CMS/articles/posts/content publishing | Content management skill |
+| Static Site Generation | SSG/SSR/Next.js/Nuxt/Hugo/Gatsby/Astro | SSG patterns skill |
+| SEO & Metadata | SEO/meta tags/OGP/sitemap/schema.org | SEO skill |
+| Search | Search/filter/full-text/Algolia/ElasticSearch | Search implementation skill |
+| Comments & Discussion | Comments/replies/discussion/forum | Comment system skill |
+| Feed Generation | RSS/Atom/feed/syndication | Feed generation skill |
+| Image & Media | Image optimization/upload/CDN/media processing | Media handling skill |
+| Internationalization | i18n/l10n/multi-language/translation | i18n skill |
+| Analytics | Analytics/tracking/metrics/Google Analytics | Analytics integration skill |
+| Email | Email/newsletter/notification/SMTP | Email skill |
 
 **Output Format:**
 
