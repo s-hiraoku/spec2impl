@@ -1,6 +1,7 @@
 ---
 name: Progress Dashboard
 description: Generates visual progress reports for spec2impl workflow and implementation tasks. Two modes - "workflow" mode shows spec2impl step progress (Step 1/7, etc.), "tasks" mode shows TASKS.md implementation progress. Called by spec2impl orchestrator after each step and available during implementation phase.
+model: haiku
 tools:
   - Read
   - Glob

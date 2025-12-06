@@ -144,11 +144,12 @@ spec2impl uses specialized sub-agents for each step of the workflow. Below is a 
 
 These agents are called internally by other agents during the workflow:
 
-| Agent | Description |
-|-------|-------------|
-| **Progress Dashboard** | Displays workflow progress after each step. Also tracks TASKS.md progress during implementation. |
-| **Marketplace Plugin Scout** | Searches and evaluates plugins via web search. Provides scored recommendations. Does NOT install. |
-| **Marketplace** | Installs, lists, and removes plugins from GitHub/npm/URLs. Delegates search to Plugin Scout. |
+| Agent | Model | Description |
+|-------|-------|-------------|
+| **Approval Presenter** | haiku | Presents step results for user approval. Shows summary, details, files, risks, and MCP token requirements. |
+| **Progress Dashboard** | haiku | Displays workflow progress after each step. Also tracks TASKS.md progress during implementation. |
+| **Marketplace Plugin Scout** | - | Searches and evaluates plugins via web search. Provides scored recommendations. Does NOT install. |
+| **Marketplace** | - | Installs, lists, and removes plugins from GitHub/npm/URLs. Delegates search to Plugin Scout. |
 
 ---
 
@@ -321,6 +322,36 @@ Internal registry and installer for Claude Code Plugins.
 
 ---
 
+### Approval Presenter
+
+Presents step results in a clear, consistent format for user approval.
+
+| Property | Value |
+|----------|-------|
+| **Type** | Internal Service |
+| **Model** | haiku |
+| **Tools** | Read, Glob |
+
+**Features:**
+- Consistent approval format for all steps
+- Summary, details, files to create/modify
+- Risk and warning highlighting
+- **MCP token requirements** with format, URL, and required scopes
+
+**MCP Token Display (Step 4):**
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  🔑 TOKEN REQUIREMENTS                                                       │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  1. Stripe (STRIPE_API_KEY)                                                  │
+│     Format: sk_live_... or sk_test_...                                       │
+│     Get from: https://dashboard.stripe.com/apikeys                           │
+│     ⚠️ Use test key for development                                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ### Progress Dashboard
 
 Generates visual progress reports with two modes.
@@ -328,6 +359,7 @@ Generates visual progress reports with two modes.
 | Property | Value |
 |----------|-------|
 | **Type** | Internal Service |
+| **Model** | haiku |
 | **Tools** | Read, Glob, Grep |
 | **Modes** | `workflow` (spec2impl steps), `tasks` (TASKS.md progress) |
 

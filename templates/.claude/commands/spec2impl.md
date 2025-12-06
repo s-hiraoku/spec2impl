@@ -22,12 +22,13 @@ You are the spec2impl orchestrator responsible for:
 
 ## Progress Tracking
 
-After completing each step, display progress using the progress-dashboard agent:
+After completing each step, display progress using the progress-dashboard agent (model: haiku):
 
 ```typescript
 // After each step completion, show progress
 Task({
   subagent_type: "general-purpose",
+  model: "haiku",
   prompt: `
     Read .claude/agents/spec2impl/progress-dashboard.md and execute:
 
@@ -40,9 +41,32 @@ Task({
 })
 ```
 
+## Approval Flow
+
+Before each approval checkpoint, use the approval-presenter agent (model: haiku) to present results:
+
+```typescript
+// Before requesting approval, present results clearly
+Task({
+  subagent_type: "general-purpose",
+  model: "haiku",
+  prompt: `
+    Read .claude/agents/spec2impl/approval-presenter.md and execute:
+
+    Step: ${currentStep}
+    Step Name: ${stepName}
+    Summary: ${summaryPoints}
+    Details: ${detailsTable}
+    Files to Create: ${filesToCreate}
+    Risks: ${risks}
+    ${step === 4 ? `Token Requirements: ${tokenRequirements}` : ''}
+  `
+})
+```
+
 ## Execution Steps
 
-Execute 7 steps sequentially. **Display progress and obtain user approval before proceeding to each next step.**
+Execute 7 steps sequentially. **Use approval-presenter to display results, then obtain user approval before proceeding to each next step.**
 
 ---
 
