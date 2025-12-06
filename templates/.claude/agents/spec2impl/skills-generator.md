@@ -73,27 +73,32 @@ Analyze the specification to identify what skills are needed.
 
 **Detection Categories:**
 
-| Category | Detection Condition | Skill Type Needed |
-|----------|---------------------|-------------------|
-| API Implementation | REST/GraphQL endpoints defined | API patterns skill |
-| Data Models | Model/schema definitions exist | Data modeling skill |
-| Authentication | JWT/OAuth/auth-related | Auth implementation skill |
-| Database | DB operations, migrations | Database skill |
-| Validation | Input validation rules | Validation skill |
-| Error Handling | Error codes/formats defined | Error handling skill |
-| Testing | Test requirements exist | Testing skill |
-| Frontend | UI/UX components | Frontend skill |
-| External Integration | External API/services | Integration skill |
-| Content Management | Blog/CMS/articles/posts/content publishing | Content management skill |
-| Static Site Generation | SSG/SSR/Next.js/Nuxt/Hugo/Gatsby/Astro | SSG patterns skill |
-| SEO & Metadata | SEO/meta tags/OGP/sitemap/schema.org | SEO skill |
-| Search | Search/filter/full-text/Algolia/ElasticSearch | Search implementation skill |
-| Comments & Discussion | Comments/replies/discussion/forum | Comment system skill |
-| Feed Generation | RSS/Atom/feed/syndication | Feed generation skill |
-| Image & Media | Image optimization/upload/CDN/media processing | Media handling skill |
-| Internationalization | i18n/l10n/multi-language/translation | i18n skill |
-| Analytics | Analytics/tracking/metrics/Google Analytics | Analytics integration skill |
-| Email | Email/newsletter/notification/SMTP | Email skill |
+| Category | Detection Condition | Skill ID | Search Keywords |
+|----------|---------------------|----------|-----------------|
+| API Implementation | REST/GraphQL endpoints defined | `api-patterns` | "REST API", "GraphQL", "endpoint patterns", "API design" |
+| Data Models | Model/schema definitions exist | `data-modeling` | "data model", "schema design", "ORM", "Prisma", "TypeORM" |
+| Authentication | JWT/OAuth/auth-related | `authentication` | "JWT auth", "OAuth", "session", "passport", "auth0" |
+| Database | DB operations, migrations | `database` | "database", "SQL", "PostgreSQL", "MongoDB", "migration" |
+| Validation | Input validation rules | `validation` | "validation", "Zod", "Yup", "Joi", "input validation" |
+| Error Handling | Error codes/formats defined | `error-handling` | "error handling", "error middleware", "exception" |
+| Testing | Test requirements exist | `testing` | "testing", "Jest", "Vitest", "unit test", "e2e test" |
+| Frontend | UI/UX components | `frontend` | "React", "Vue", "Svelte", "component", "UI library" |
+| External Integration | External API/services | `integration` | "API integration", "third-party", "webhook", "SDK" |
+| Content Management | Blog/CMS/articles/posts | `content-management` | "CMS", "blog", "content", "markdown", "headless CMS" |
+| Static Site Generation | SSG/SSR/Next.js/Hugo/Astro | `ssg` | "SSG", "static site", "Next.js", "Astro", "Hugo", "Gatsby" |
+| SEO & Metadata | SEO/meta tags/OGP/sitemap | `seo` | "SEO", "meta tags", "OGP", "sitemap", "schema.org" |
+| Search | Search/filter/Algolia | `search` | "search", "full-text", "Algolia", "ElasticSearch", "MeiliSearch" |
+| Comments & Discussion | Comments/replies/forum | `comments` | "comments", "discussion", "Disqus", "comment system" |
+| Feed Generation | RSS/Atom/feed | `feed` | "RSS", "Atom", "feed", "syndication" |
+| Image & Media | Image optimization/CDN | `media` | "image optimization", "CDN", "Cloudinary", "sharp", "media" |
+| Internationalization | i18n/l10n/multi-language | `i18n` | "i18n", "internationalization", "translation", "next-intl" |
+| Analytics | Analytics/tracking/metrics | `analytics` | "analytics", "Google Analytics", "Plausible", "tracking" |
+| Email | Email/newsletter/SMTP | `email` | "email", "newsletter", "Resend", "SendGrid", "nodemailer" |
+
+**How to Use This Table:**
+1. **Detection Condition** - Keywords to look for in specifications
+2. **Skill ID** - Unique identifier used for search and file naming
+3. **Search Keywords** - Specific terms passed to marketplace-plugin-scout for accurate search
 
 **Output Format:**
 
@@ -147,19 +152,24 @@ The AI/development ecosystem changes rapidly. The marketplace-plugin-scout agent
 **How to Call marketplace-plugin-scout:**
 
 ```typescript
-// For each required skill category, call marketplace-plugin-scout
+// For each required skill, call marketplace-plugin-scout with structured search parameters
 Task({
   subagent_type: "marketplace-plugin-scout",
   prompt: `
-    Search for skill plugins in Claude Code Marketplace.
+    Search for skill plugin.
 
-    Requirements:
-    - Skill Type: ${skill.category}
-    - Technology Stack: ${skill.techContext.join(', ')}
-    - Use Case: ${skill.reason}
+    Skill ID: ${skill.id}
+    Category: ${skill.category}
+    Search Keywords: ${skill.searchKeywords.join(', ')}
+    Technology Stack: ${skill.techContext.join(', ')}
+    Use Case: ${skill.reason}
 
-    Please search the marketplace, evaluate available options, and provide recommendations.
-    Include: source URL, last updated date, compatibility assessment, and score.
+    Use these search queries:
+    1. "claude code skill ${skill.searchKeywords[0]} github"
+    2. "awesome claude skills ${skill.id}"
+    3. "${skill.techContext[0]} ${skill.searchKeywords[0]} claude skill"
+
+    Return: source URL, last updated date, compatibility score, recommendation.
   `
 });
 ```
@@ -167,24 +177,25 @@ Task({
 **For Multiple Skills (Batch Search):**
 
 ```typescript
-// Search for all required skills at once
+// Search for all required skills at once with specific search keywords
 Task({
   subagent_type: "marketplace-plugin-scout",
   prompt: `
-    Search for the following skill plugins in Claude Code Marketplace:
+    Search for the following skill plugins:
 
     ${requiredSkills.map((s, i) => `
-    ${i + 1}. ${s.name}
+    ${i + 1}. ${s.id}
        - Category: ${s.category}
+       - Search Keywords: ${s.searchKeywords.join(', ')}
        - Tech Stack: ${s.techContext.join(', ')}
        - Reason: ${s.reason}
     `).join('\n')}
 
     For each skill:
-    1. Search the marketplace
-    2. Evaluate available options
+    1. Use the Search Keywords to find relevant plugins
+    2. Evaluate matches against Tech Stack
     3. Provide top recommendation with score
-    4. Note if no suitable plugin found (needs generation)
+    4. Mark as "generate" if no suitable plugin found
   `
 });
 ```
