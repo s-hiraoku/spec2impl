@@ -68,9 +68,9 @@ This analyzes specifications in `docs/` and builds the implementation environmen
 /spec2impl docs/
        |
 Step 1: Specification Analysis -> Approve
-Step 2: Skills Generation -> Approve
+Step 2: Skills Acquisition (Search → Install → Assess Gaps → Generate) -> Approve
 Step 3: Sub-agents Generation -> Approve
-Step 4: MCP Configuration -> Approve
+Step 4: MCP Configuration (Search → Configure) -> Approve
 Step 5: Task List Generation -> Approve
 Step 6: CLAUDE.md Update -> Approve
 Step 7: Cleanup (optional) -> Approve

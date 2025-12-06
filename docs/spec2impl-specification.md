@@ -179,149 +179,78 @@ interface SpecAnalysis {
 
 ### 2. Skills Generator
 
-仕様書から SKILL.md と実装パターンを生成します。
+**Core Principle: Marketplace First, Then Generate**
 
-#### 出力ファイル
+仕様書から必要なスキルを特定し、`marketplace-plugin-scout` で既存スキルを検索してインストール。その後、まだスキルが足りない、または作った方が良いと判断した場合に生成します。
 
-**`.claude/skills/implementation/SKILL.md`**
+#### 処理フロー
 
-```markdown
----
-name: implementation
-description: 仕様書に基づく実装スキル
-version: 1.0.0
-generated_by: spec2impl
-generated_at: <timestamp>
-sources:
-  - docs/user-api.md
-  - docs/payment-api.md
----
-
-# Implementation Skill
-
-## Overview
-
-このスキルは以下の仕様書に基づいています：
-
-- `docs/user-api.md` - User Management API
-- `docs/payment-api.md` - Payment Processing API
-
-## Key Concepts
-
-### User
-
-<User モデルの説明とフィールド>
-
-### Payment
-
-<Payment モデルの説明とフィールド>
-
-## API Reference
-
-### User API
-
-#### POST /users
-
-- **Description**: ユーザーを作成
-- **Parameters**:
-  - email (string, required): メールアドレス
-  - name (string, required): 名前
-- **Response**: User object
-
-#### GET /users/:id
-
-...
-
-### Payment API
-
-...
-
-## Implementation Patterns
-
-実装パターンは以下を参照：
-
-- `patterns/api.md` - API 実装パターン
-- `patterns/validation.md` - バリデーションパターン
-- `patterns/error-handling.md` - エラーハンドリング
-
-## Constraints
-
-1. メールアドレスは一意である必要がある
-2. パスワードは 8 文字以上
-3. 支払い金額は 0 より大きい
-   ...
-
-## Verification Checklist
-
-実装完了時に確認：
-
-- [ ] すべての API エンドポイントが実装されている
-- [ ] バリデーションが仕様通りに動作する
-- [ ] エラーレスポンスが仕様に準拠している
-- [ ] テストがすべてのケースをカバーしている
+```
+1. Identify   → 仕様書から必要なスキルを特定
+2. Search     → marketplace-plugin-scout で Web 検索
+3. Evaluate   → 検索結果を評価（更新日、スコア、互換性）
+4. Install    → 見つかったスキルを marketplace 経由でインストール
+5. Assess     → インストール後、まだ足りないスキルがあるか判断
+6. Generate   → 足りないスキル、または作った方が良いスキルを生成
+7. Customize  → プロジェクト固有の情報でカスタマイズ
 ```
 
-**`.claude/skills/implementation/patterns/api.md`**
+#### marketplace-plugin-scout の呼び出し
 
-```markdown
-# API Implementation Patterns
-
-## RESTful Endpoint Pattern
-
-### Create (POST)
-
-<実装パターンとコード例>
-
-### Read (GET)
-
-<実装パターンとコード例>
-
-### Update (PUT/PATCH)
-
-<実装パターンとコード例>
-
-### Delete (DELETE)
-
-<実装パターンとコード例>
+```typescript
+// スキル検索
+Task({
+  subagent_type: "marketplace-plugin-scout",
+  prompt: `
+    Search for skill plugins:
+    - Category: api-implementation
+    - Tech Stack: Express, TypeScript
+    - Use Case: REST API endpoints
+  `
+});
 ```
 
-**`.claude/skills/implementation/patterns/validation.md`**
+#### marketplace でのインストール
 
-```markdown
-# Validation Patterns
+```typescript
+// 検索結果をインストール
+Task({
+  subagent_type: "general-purpose",
+  prompt: `
+    Read .claude/agents/spec2impl/marketplace.md and execute:
 
-## Input Validation
-
-### Required Fields
-
-<バリデーションパターン>
-
-### Format Validation
-
-<メール、電話番号などのフォーマット検証>
-
-### Business Rule Validation
-
-<ビジネスルールに基づく検証>
+    Action: install
+    Source: github:travisvn/awesome-claude-skills/express-api
+    Type: skill
+    TargetName: api-implementation
+  `
+});
 ```
 
-**`.claude/skills/implementation/patterns/error-handling.md`**
+#### 出力ディレクトリ
 
-```markdown
-# Error Handling Patterns
-
-## Error Response Format
-
-<統一されたエラーレスポンス形式>
-
-## HTTP Status Codes
-
-<各ステータスコードの使い分け>
-
-## Error Types
-
-<エラー種別と対応方法>
 ```
+.claude/skills/
+├── api-implementation/    [installed from GitHub]
+├── data-modeling/         [installed from GitHub]
+├── authentication/        [installed + customized]
+├── input-validation/      [installed from npm]
+├── error-handling/        [generated]
+├── stripe-integration/    [installed from GitHub]
+└── README.md
+```
+
+#### スキル評価基準
+
+| 基準 | スコア |
+|------|--------|
+| Official Anthropic | +50 |
+| travisvn/awesome-claude-* | +30 |
+| 1ヶ月以内に更新 | +30 |
+| 3ヶ月以内に更新 | +20 |
+| Tech Stack 完全一致 | +30 |
+| 1000+ npm downloads/week | +20 |
+| 100+ GitHub stars | +15 |
 
 ---
 
@@ -500,130 +429,47 @@ Help implement features according to the specification.
 
 ### 4. MCP Configurator
 
-実装に役立つ MCP Server を設定します。
+**Core Principle: Marketplace First, Then Configure**
 
-#### MCP レジストリ
+仕様書から外部サービスを検出し、`marketplace-plugin-scout` で最新の MCP サーバーを検索。最適なものを選択して設定します。
+
+#### 処理フロー
+
+```
+1. Extract   → 仕様書から外部サービス要件を抽出
+2. Search    → marketplace-plugin-scout で MCP サーバーを検索
+3. Evaluate  → 公式 vs コミュニティ、更新日、ダウンロード数で評価
+4. Configure → .mcp.json を生成
+5. Document  → docs/mcp-setup/ にセットアップガイドを生成
+```
+
+#### marketplace-plugin-scout の呼び出し
 
 ```typescript
-interface McpServerConfig {
-  name: string;
-  package: string;
-  description: string;
-  requiresAuth: boolean;
-  envVars?: {
-    name: string;
-    description: string;
-    required: boolean;
-  }[];
-  setupInstructions?: string;
-  setupUrl?: string;
-  // どの技術スタックで推奨するか
-  recommendedFor: {
-    frameworks?: string[];
-    databases?: string[];
-    services?: string[];
-  };
-}
-
-const mcpRegistry: McpServerConfig[] = [
-  // 認証不要
-  {
-    name: "context7",
-    package: "@context7/mcp",
-    description: "ライブラリドキュメント参照",
-    requiresAuth: false,
-    recommendedFor: {
-      frameworks: ["react", "next.js", "vue", "typescript"],
-    },
-  },
-  {
-    name: "filesystem",
-    package: "@modelcontextprotocol/server-filesystem",
-    description: "ファイルシステム操作",
-    requiresAuth: false,
-    recommendedFor: {},
-  },
-
-  // 認証必要
-  {
-    name: "slack",
-    package: "slack-mcp-server",
-    description: "Slack ワークスペース連携",
-    requiresAuth: true,
-    envVars: [
-      {
-        name: "SLACK_TOKEN",
-        description: "Slack OAuth User Token (xoxp-...)",
-        required: true,
-      },
-    ],
-    setupUrl: "https://api.slack.com/apps",
-    setupInstructions: `
-1. Slack API (https://api.slack.com/apps) にアクセス
-2. 「Create New App」または既存のアプリを選択
-3. 「OAuth & Permissions」に移動
-4. 「User Token Scopes」で必要なスコープを追加:
-   - channels:history
-   - channels:read
-   - chat:write
-   - search:read
-5. 「Install to Workspace」をクリック
-6. 表示される xoxp- で始まるトークンをコピー
-`,
-    recommendedFor: {
-      services: ["slack"],
-    },
-  },
-  {
-    name: "github",
-    package: "@modelcontextprotocol/server-github",
-    description: "GitHub リポジトリ連携",
-    requiresAuth: true,
-    envVars: [
-      {
-        name: "GITHUB_TOKEN",
-        description: "GitHub Personal Access Token",
-        required: true,
-      },
-    ],
-    setupUrl: "https://github.com/settings/tokens",
-    setupInstructions: `
-1. GitHub Settings > Developer settings > Personal access tokens にアクセス
-2. 「Generate new token (classic)」をクリック
-3. 必要なスコープを選択:
-   - repo (リポジトリアクセス)
-   - read:org (組織情報の読み取り)
-4. トークンを生成してコピー
-`,
-    recommendedFor: {
-      services: ["github"],
-    },
-  },
-  {
-    name: "postgres",
-    package: "@modelcontextprotocol/server-postgres",
-    description: "PostgreSQL データベース操作",
-    requiresAuth: true,
-    envVars: [
-      {
-        name: "POSTGRES_URL",
-        description: "PostgreSQL 接続文字列",
-        required: true,
-      },
-    ],
-    setupInstructions: `
-接続文字列の形式:
-postgresql://[user]:[password]@[host]:[port]/[database]
-
-例:
-export POSTGRES_URL=postgresql://postgres:password@localhost:5432/mydb
-`,
-    recommendedFor: {
-      databases: ["postgresql", "postgres"],
-    },
-  },
-];
+// MCP 検索
+Task({
+  subagent_type: "marketplace-plugin-scout",
+  prompt: `
+    Search for MCP server plugins:
+    - Service: PostgreSQL
+    - Category: Database
+    - Use Case: SQL queries, schema introspection
+  `
+});
 ```
+
+#### MCP 評価基準
+
+| 基準 | スコア |
+|------|--------|
+| Official @modelcontextprotocol | +50 |
+| 公式ベンダー（Stripe, Slackなど） | +40 |
+| 1ヶ月以内に更新 | +30 |
+| 3ヶ月以内に更新 | +20 |
+| 1000+ npm downloads/week | +25 |
+| ドキュメントが充実 | +20 |
+
+**重要**: ハードコードされたレジストリは使用しない。常に Web 検索で最新の MCP を探す。
 
 #### 出力ファイル
 
@@ -974,15 +820,20 @@ spec2impl init                       # 設定ファイルの初期化
 
 - OpenAPI/Swagger 仕様書のサポート
 - GraphQL スキーマのサポート
-- Slash Commands の生成
 - 複数ドメインの分離管理
 
 ### P2: 高度な機能
 
-- Marketplace からの Skills 取得
 - カスタムテンプレート
 - CI/CD 統合
 - Slack 連携（進捗通知など）
+- プライベート Plugin リポジトリのサポート
+
+### 実装済み機能
+
+- ✅ Marketplace からの Skills/MCP 取得 (`marketplace-plugin-scout`)
+- ✅ Web Search による最新プラグイン検索
+- ✅ プラグインのインストール・管理 (`marketplace`)
 
 ---
 

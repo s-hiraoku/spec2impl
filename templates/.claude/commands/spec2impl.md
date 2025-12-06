@@ -65,33 +65,69 @@ Proceed? [y] Yes  [n] Re-analyze  [q] Abort
 
 ---
 
-### Step 2: Skills Generation
+### Step 2: Skills Acquisition
 
 **Sub-agent:** `.claude/agents/spec2impl/skills-generator.md`
 
+**Core Principle:** Marketplace First, Then Generate
+
 **Actions:**
-1. Generate based on Step 1 analysis:
-   - `.claude/skills/implementation/SKILL.md` - Main implementation skill
-   - `.claude/skills/implementation/patterns/api.md` - API patterns
-   - `.claude/skills/implementation/patterns/validation.md` - Validation patterns
-   - `.claude/skills/implementation/patterns/error-handling.md` - Error handling patterns
-2. Display preview and request approval
-3. Write files upon approval
+1. **Identify** required skills from Step 1 analysis (API, validation, auth, etc.)
+2. **Search** via `marketplace-plugin-scout` for existing skill plugins
+3. **Evaluate** search results (freshness, tech stack match, score)
+4. **Install** found skills via `marketplace` agent
+5. **Generate** only missing skills using `skill-creator`
+6. **Customize** installed skills with project-specific context
 
 **Progress Display:**
 ```
 ----------------------------------------------------
-Step 2/7: Skills Generation
+Step 2/7: Skills Acquisition
 ----------------------------------------------------
-Files to Generate:
-  - .claude/skills/implementation/SKILL.md
-  - .claude/skills/implementation/patterns/api.md
-  - .claude/skills/implementation/patterns/validation.md
-  - .claude/skills/implementation/patterns/error-handling.md
+Required Skills: 6 identified
 
-SKILL.md Preview: (show summary)
+Searching marketplace-plugin-scout...
 
-Generate? [y] Yes  [n] Modify  [s] Skip  [q] Abort
+Search Results:
+  ✅ api-implementation    (github:travisvn/awesome-claude-skills/express-api) Score: 85
+  ✅ data-modeling         (github:anthropics/claude-skills/prisma) Score: 92
+  ⚠️ authentication        (github:travisvn/awesome-claude-skills/auth) Score: 65 → customize
+  ✅ input-validation      (npm:claude-skill-zod-validation) Score: 78
+  ❌ error-handling        → will generate
+  ✅ stripe-integration    (github:stripe/claude-stripe-skill) Score: 88
+
+Plan:
+  📦 Install from marketplace: 4 skills
+  🔧 Install + customize: 1 skill
+  ✨ Generate new: 1 skill
+
+Proceed? [y] Yes  [m] Modify  [s] Skip  [q] Abort
+----------------------------------------------------
+```
+
+**After Approval:**
+```
+----------------------------------------------------
+Installing Skills...
+----------------------------------------------------
+[1/5] api-implementation     ✅ Installed from GitHub
+[2/5] data-modeling          ✅ Installed from GitHub
+[3/5] input-validation       ✅ Installed from npm
+[4/5] stripe-integration     ✅ Installed from GitHub
+[5/5] authentication         ✅ Installed + customized
+
+Generating missing skills...
+[1/1] error-handling         ✅ Generated via skill-creator
+
+Files created:
+  .claude/skills/
+  ├── api-implementation/    [installed]
+  ├── data-modeling/         [installed]
+  ├── input-validation/      [installed]
+  ├── stripe-integration/    [installed]
+  ├── authentication/        [installed + customized]
+  ├── error-handling/        [generated]
+  └── README.md
 ----------------------------------------------------
 ```
 
@@ -132,27 +168,45 @@ Generate? [y] Yes  [n] Modify  [s] Skip  [q] Abort
 
 **Sub-agent:** `.claude/agents/spec2impl/mcp-configurator.md`
 
+**Core Principle:** Marketplace First, Then Configure
+
 **Actions:**
-1. Select recommended MCPs based on detected technology stack
-2. Generate `.mcp.json` (merge with existing if present)
-3. Generate setup instructions in `.claude/mcp-setup.md`
-4. Write files upon approval
+1. **Extract** external services from specification (DB, payments, messaging, etc.)
+2. **Search** via `marketplace-plugin-scout` for latest MCP servers
+3. **Evaluate** search results (official packages preferred, freshness, downloads)
+4. **Configure** `.mcp.json` with selected MCPs
+5. **Generate** setup guides in `docs/mcp-setup/`
 
 **Progress Display:**
 ```
 ----------------------------------------------------
 Step 4/7: MCP Configuration
 ----------------------------------------------------
-Recommended MCP Servers:
-  [ok] context7 - Document reference (no auth required)
-  [!] postgres - DB operations (requires: POSTGRES_URL)
-  [!] slack - Slack integration (requires: SLACK_TOKEN)
+Detected Services: 5
+
+Searching marketplace-plugin-scout...
+
+Search Results:
+  ✅ postgres    (@modelcontextprotocol/server-postgres) Score: 95 [Official]
+  ✅ stripe      (@stripe/mcp-server) Score: 92 [Official Stripe]
+  ✅ github      (@modelcontextprotocol/server-github) Score: 95 [Official]
+  ✅ slack       (@anthropic/mcp-slack) Score: 88
+  ⚠️ sentry      (sentry-mcp) Score: 55 → Skip, use SDK
+
+Plan:
+  📦 Configure MCP: 4 servers
+  ⏭️ Skip (use SDK): 1 service
 
 Files to Generate:
   - .mcp.json
-  - .claude/mcp-setup.md
+  - docs/mcp-setup/README.md
+  - docs/mcp-setup/postgres-setup.md
+  - docs/mcp-setup/stripe-setup.md
+  - docs/mcp-setup/github-setup.md
+  - docs/mcp-setup/slack-setup.md
+  - .env.example
 
-Proceed? [y] Yes  [n] Modify  [s] Skip  [q] Abort
+Proceed? [y] Yes  [m] Modify  [s] Skip  [q] Abort
 ----------------------------------------------------
 ```
 
@@ -282,22 +336,41 @@ Delete? [y] Yes  [n] Keep files
 spec2impl Complete
 ====================================================
 
-Generated Files:
-  [+] .claude/skills/implementation/SKILL.md
-  [+] .claude/skills/implementation/patterns/api.md
-  [+] .claude/skills/implementation/patterns/validation.md
-  [+] .claude/skills/implementation/patterns/error-handling.md
-  [+] .claude/agents/implementation-agents.md
-  [+] .mcp.json
-  [+] .claude/mcp-setup.md
+Skills (Marketplace First):
+  📦 Installed: 5 skills
+  ✨ Generated: 1 skill (gap analysis)
+  🔧 Customized: 1 skill
+
+  .claude/skills/
+  ├── api-implementation/     [installed]
+  ├── data-modeling/          [installed]
+  ├── authentication/         [installed + customized]
+  ├── input-validation/       [installed]
+  ├── error-handling/         [generated]
+  └── stripe-integration/     [installed]
+
+Sub-agents:
+  [+] .claude/agents/spec-verifier.md
+  [+] .claude/agents/test-generator.md
+  [+] .claude/agents/implementation-guide.md
+
+MCP Servers (via marketplace-plugin-scout):
+  [+] .mcp.json (4 servers configured)
+  [+] docs/mcp-setup/README.md
+  [+] docs/mcp-setup/*.md (setup guides)
+  [+] .env.example
+
+Tasks:
   [+] docs/TASKS.md
+
+Documentation:
   [+] CLAUDE.md (updated)
 
 Action Required:
-  - MCP configuration needed. See .claude/mcp-setup.md
+  ⚠️ MCP setup needed. See docs/mcp-setup/README.md
 
 Next Steps:
-  1. Configure MCP servers (if needed)
+  1. Configure MCP servers (copy .env.example to .env)
   2. Review tasks in docs/TASKS.md
   3. Start implementation: "Implement T-SPEC-1"
 ====================================================

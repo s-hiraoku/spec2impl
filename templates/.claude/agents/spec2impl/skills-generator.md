@@ -34,16 +34,21 @@ Prepares **all required Skills** for a project by:
 │              ↓                                              │
 │   Step 3: Evaluate & Select Best Options                    │
 │              ↓                                              │
-│   Step 4: Install via marketplace-plugin-scout              │
+│   Step 4: Install Found Skills via marketplace              │
 │              ↓                                              │
-│   Step 5: Generate Missing Skills                           │
+│   Step 5: Assess Gaps                                       │
 │              ↓                                              │
-│   Step 6: Customize for Project Specifics                   │
+│   Step 6: Generate Additional Skills                        │
+│              ↓                                              │
+│   Step 7: Customize for Project Specifics                   │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**IMPORTANT:** Always use the `marketplace-plugin-scout` sub-agent for plugin search and installation. This agent specializes in searching the Claude Code Marketplace and handles the complexity of finding and evaluating plugins.
+**IMPORTANT:**
+- `marketplace-plugin-scout` → **Search & Evaluate** (WebSearch for latest plugins)
+- `marketplace` → **Install** (Install found plugins)
+- After installation, generate additional skills if gaps remain or project-specific skills are needed
 
 ## Input
 
@@ -309,37 +314,34 @@ TO GENERATE (1 skill):
 
 ---
 
-### Step 4: Install Selected Skills via marketplace-plugin-scout
+### Step 4: Install Found Skills via marketplace
 
-**Use marketplace-plugin-scout agent to register and install each skill:**
+**Use the marketplace agent to install each found skill:**
+
+Note: `marketplace-plugin-scout` handles **search only**. For installation, use `marketplace`.
 
 ```typescript
-// Install each selected skill via marketplace-plugin-scout
-Task({
-  subagent_type: "marketplace-plugin-scout",
-  prompt: `
-    Register and install the following skill plugins:
+// Install each found skill via marketplace
+for (const skill of foundSkills) {
+  Task({
+    subagent_type: "general-purpose",
+    prompt: `
+      Read .claude/agents/spec2impl/marketplace.md and execute:
 
-    ${skillsToInstall.map((s, i) => `
-    ${i + 1}. ${s.name}
-       - Source: ${s.source}
-       - Target Directory: .claude/skills/${s.targetName}/
-    `).join('\n')}
-
-    For each plugin:
-    1. Verify the source is valid and accessible
-    2. Register the plugin in the marketplace
-    3. Install to the target directory
-    4. Verify installation completed successfully
-  `
-});
+      Action: install
+      Source: ${skill.source}
+      Type: skill
+      TargetName: ${skill.targetName}
+    `
+  });
+}
 ```
 
 **Output Format:**
 
 ```
 -----------------------------------------------------------
-Step 4/6: Installing Skills
+Step 4/7: Installing Found Skills
 -----------------------------------------------------------
 
 Installing 5 skills from external sources...
@@ -373,19 +375,62 @@ Installing 5 skills from external sources...
       Fetching from GitHub...
       ✅ Installed to .claude/skills/authentication/
       Files: SKILL.md, patterns/jwt.md
-      ⚠️ Marked for customization in Step 6
 
 -----------------------------------------------------------
 Installation complete: 5/5 successful
-Updated: .claude/marketplace.json
+Updated: plugins.json
 -----------------------------------------------------------
 ```
 
 ---
 
-### Step 5: Generate Missing Skills
+### Step 5: Assess Skill Gaps
 
-For skills not found via web search, generate using skill-creator.
+After installation, evaluate if additional skills are needed.
+
+**Assessment Criteria:**
+
+| Check | Action |
+|-------|--------|
+| Installed skill doesn't cover all spec requirements | Generate supplementary skill |
+| Project-specific patterns not in any skill | Generate custom skill |
+| Installed skill is too generic | Generate project-specific version |
+| Critical feature has no skill coverage | Generate new skill |
+
+**Output Format:**
+
+```
+-----------------------------------------------------------
+Step 5/7: Assessing Skill Gaps
+-----------------------------------------------------------
+
+Reviewing installed skills against specification...
+
+Installed Skills:
+  ✅ api-implementation      - Covers 10/12 endpoints
+  ✅ data-modeling           - Covers all models
+  ✅ input-validation        - Covers standard validation
+  ✅ stripe-integration      - Covers payment flow
+  ⚠️ authentication          - Generic, needs project roles
+
+Gap Analysis:
+  ❌ error-handling          - No skill installed, spec defines 8 error codes
+  ⚠️ authentication          - Needs customization for: admin, manager, user roles
+
+Recommendation:
+  ✨ Generate: error-handling (project-specific error codes)
+  🔧 Customize: authentication (add role-based patterns)
+
+-----------------------------------------------------------
+Proceed with generation? [y/n]
+-----------------------------------------------------------
+```
+
+---
+
+### Step 6: Generate Additional Skills
+
+Generate skills for gaps identified in Step 5.
 
 **Research best practices before generating:**
 
@@ -395,14 +440,14 @@ WebSearch(`${skill.techContext} best practices implementation patterns 2024`);
 WebSearch(`${skill.name} design patterns ${skill.techContext}`);
 ```
 
-**Generation Process:**
+**Output Format:**
 
 ```
 -----------------------------------------------------------
-Step 5/6: Generating Missing Skills
+Step 6/7: Generating Additional Skills
 -----------------------------------------------------------
 
-Generating 1 skill...
+Generating 1 skill based on gap analysis...
 
 [1/1] error-handling
 
@@ -434,7 +479,7 @@ Generation complete: 1/1 successful
 
 ---
 
-### Step 6: Customize for Project
+### Step 7: Customize for Project
 
 Add project-specific information to installed skills.
 
@@ -473,39 +518,40 @@ Creating skills index...
 
 ```
 ═══════════════════════════════════════════════════════════════
-  Skills Generation Complete
+  Skills Acquisition Complete
 ═══════════════════════════════════════════════════════════════
 
-  Research Summary:
-  ─────────────────
-  Web searches performed: 24
+  Search Summary:
+  ───────────────
+  marketplace-plugin-scout searches: 6
   Skills evaluated: 18
 
-  Installation Summary:
-  ─────────────────────
-  📦 Installed from external: 5 (83%)
-  ✨ Generated new: 1 (17%)
+  Acquisition Summary:
+  ────────────────────
+  📦 Installed from marketplace: 5
+  ✨ Generated (gap analysis): 1
   🔧 Customized: 1
 
-  Sources used:
+  Sources:
+  ────────
   - GitHub (travisvn/awesome-claude-skills): 2 skills
   - GitHub (anthropics/claude-skills): 1 skill
   - GitHub (stripe/claude-stripe-skill): 1 skill
   - npm: 1 skill
-  - Generated: 1 skill
+  - Generated (after gap assessment): 1 skill
 
   Files created:
-  ─────────────
+  ──────────────
   .claude/skills/
-  ├── api-implementation/     [GitHub - updated 3 weeks ago]
-  ├── data-modeling/          [GitHub/Anthropic - updated 5 days ago]
-  ├── authentication/         [GitHub + customized]
-  ├── input-validation/       [npm]
-  ├── error-handling/         [Generated]
-  ├── stripe-integration/     [GitHub/Official]
+  ├── api-implementation/     [installed - GitHub]
+  ├── data-modeling/          [installed - GitHub/Anthropic]
+  ├── authentication/         [installed + customized]
+  ├── input-validation/       [installed - npm]
+  ├── error-handling/         [generated - gap analysis]
+  ├── stripe-integration/     [installed - GitHub/Official]
   └── README.md
 
-  .claude/marketplace.json (updated)
+  plugins.json (updated)
 
 ═══════════════════════════════════════════════════════════════
 ```
