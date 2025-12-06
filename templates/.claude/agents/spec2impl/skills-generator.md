@@ -67,108 +67,142 @@ Multiple Skills installed in `.claude/skills/`:
 
 ## Execution Steps
 
-### Step 1: Identify Required Skills
+### Step 1: Identify Required Skills (AI-Driven)
 
-Analyze the specification to identify what skills are needed.
+**CRITICAL: Do NOT use hardcoded categories. Analyze the specification dynamically.**
 
-**Detection Categories:**
+Read the specification and identify what implementation skills would be helpful. Consider:
 
-| Category | Detection Condition | Skill ID | Search Keywords |
-|----------|---------------------|----------|-----------------|
-| API Implementation | REST/GraphQL endpoints defined | `api-patterns` | "REST API", "GraphQL", "endpoint patterns", "API design" |
-| Data Models | Model/schema definitions exist | `data-modeling` | "data model", "schema design", "ORM", "Prisma", "TypeORM" |
-| Authentication | JWT/OAuth/auth-related | `authentication` | "JWT auth", "OAuth", "session", "passport", "auth0" |
-| Database | DB operations, migrations | `database` | "database", "SQL", "PostgreSQL", "MongoDB", "migration" |
-| Validation | Input validation rules | `validation` | "validation", "Zod", "Yup", "Joi", "input validation" |
-| Error Handling | Error codes/formats defined | `error-handling` | "error handling", "error middleware", "exception" |
-| Testing | Test requirements exist | `testing` | "testing", "Jest", "Vitest", "unit test", "e2e test" |
-| Frontend | UI/UX components | `frontend` | "React", "Vue", "Svelte", "component", "UI library" |
-| External Integration | External API/services | `integration` | "API integration", "third-party", "webhook", "SDK" |
-| Content Management | Blog/CMS/articles/posts | `content-management` | "CMS", "blog", "content", "markdown", "headless CMS" |
-| Static Site Generation | SSG/SSR/Next.js/Hugo/Astro | `ssg` | "SSG", "static site", "Next.js", "Astro", "Hugo", "Gatsby" |
-| SEO & Metadata | SEO/meta tags/OGP/sitemap | `seo` | "SEO", "meta tags", "OGP", "sitemap", "schema.org" |
-| Search | Search/filter/Algolia | `search` | "search", "full-text", "Algolia", "ElasticSearch", "MeiliSearch" |
-| Comments & Discussion | Comments/replies/forum | `comments` | "comments", "discussion", "Disqus", "comment system" |
-| Feed Generation | RSS/Atom/feed | `feed` | "RSS", "Atom", "feed", "syndication" |
-| Image & Media | Image optimization/CDN | `media` | "image optimization", "CDN", "Cloudinary", "sharp", "media" |
-| Internationalization | i18n/l10n/multi-language | `i18n` | "i18n", "internationalization", "translation", "next-intl" |
-| Analytics | Analytics/tracking/metrics | `analytics` | "analytics", "Google Analytics", "Plausible", "tracking" |
-| Email | Email/newsletter/SMTP | `email` | "email", "newsletter", "Resend", "SendGrid", "nodemailer" |
+1. **Technologies mentioned** - Frameworks, libraries, languages
+2. **Features required** - What the application needs to do
+3. **Patterns implied** - Architecture, design patterns, best practices
+4. **Integrations needed** - External services, APIs, databases
 
-**How to Use This Table:**
-1. **Detection Condition** - Keywords to look for in specifications
-2. **Skill ID** - Unique identifier used for search and file naming
-3. **Search Keywords** - Specific terms passed to marketplace-plugin-scout for accurate search
+**Your Analysis Process:**
+
+```
+1. Read specification thoroughly
+2. List all technologies explicitly mentioned
+3. Identify features and their implementation needs
+4. Consider best practices for the tech stack
+5. Generate specific skill names and search keywords
+```
+
+**Skill Identification Guidelines:**
+
+- **Be specific** - "Next.js App Router patterns" not just "frontend"
+- **Include versions** - "Next.js 14" not just "Next.js"
+- **Consider ecosystem** - If React mentioned, consider state management, styling, etc.
+- **Think about best practices** - Testing, error handling, performance for the stack
+
+**Example Analysis:**
+
+Specification says: "Build a tech blog with Next.js 14, App Router, MDX for content"
+
+Your analysis:
+```
+Technologies: Next.js 14, App Router, MDX, React
+Features: Blog posts, content rendering, routing
+Implied needs:
+  - Next.js App Router patterns (new paradigm)
+  - MDX processing and rendering
+  - Static generation for blog posts
+  - SEO for blog content
+  - Possibly: styling (Tailwind?), syntax highlighting for code
+```
 
 **Output Format:**
 
 ```
 -----------------------------------------------------------
-Step 1/6: Required Skills Identification
+Step 1/7: Required Skills Identification
 -----------------------------------------------------------
 
 Analyzing specification...
 
+Detected Technologies:
+  - Next.js 14 (App Router)
+  - MDX
+  - Tailwind CSS
+  - TypeScript
+
 Required Skills:
 
-1. api-implementation
-   Reason: 12 REST endpoints detected
-   Tech context: Express, TypeScript
+1. next-app-router
+   Reason: App Router architecture required
+   Search: "Next.js 14 App Router patterns Server Components"
+   Tech: Next.js 14, React 18
 
-2. data-modeling
-   Reason: 5 data models with relationships
-   Tech context: PostgreSQL, Prisma
+2. mdx-content
+   Reason: MDX content processing needed
+   Search: "MDX Next.js content blog processing"
+   Tech: MDX, next-mdx-remote, contentlayer
 
-3. authentication
-   Reason: JWT auth requirements found
-   Tech context: JWT, bcrypt
+3. tailwind-patterns
+   Reason: Styling with Tailwind mentioned
+   Search: "Tailwind CSS Next.js patterns components"
+   Tech: Tailwind CSS, PostCSS
 
-4. input-validation
-   Reason: 15 validation rules specified
-   Tech context: Zod
+4. blog-seo
+   Reason: Blog needs SEO optimization
+   Search: "Next.js SEO blog meta tags OGP sitemap"
+   Tech: next-seo, metadata API
 
-5. error-handling
-   Reason: 8 error codes defined
-   Tech context: Express middleware
-
-6. stripe-integration
-   Reason: Payment processing required
-   Tech context: Stripe API
+5. syntax-highlighting
+   Reason: Tech blog needs code highlighting
+   Search: "code syntax highlighting MDX Next.js"
+   Tech: shiki, rehype-pretty-code, prism
 
 -----------------------------------------------------------
-Identified: 6 skills needed
-Proceed to web search? [y/n]
+Identified: 5 skills needed
+Proceed to marketplace search? [y/n]
 -----------------------------------------------------------
 ```
+
+**Key Principle:** Generate search keywords that will find the most relevant, up-to-date skills for the SPECIFIC technologies and features in the specification.
 
 ---
 
 ### Step 2: Search Marketplace via marketplace-plugin-scout
 
-**CRITICAL: Always use the marketplace-plugin-scout sub-agent for skill plugin search.**
+**CRITICAL: Pass the AI-generated search keywords to marketplace-plugin-scout.**
 
-The AI/development ecosystem changes rapidly. The marketplace-plugin-scout agent handles the complexity of searching, evaluating, and comparing plugins from the Claude Code Marketplace.
+The marketplace-plugin-scout agent will use YOUR generated search keywords to find relevant skills.
 
 **How to Call marketplace-plugin-scout:**
 
 ```typescript
-// For each required skill, call marketplace-plugin-scout with structured search parameters
+// Pass the skill name, search query, and tech stack you identified in Step 1
 Task({
   subagent_type: "marketplace-plugin-scout",
   prompt: `
     Search for skill plugin.
 
-    Skill ID: ${skill.id}
-    Category: ${skill.category}
-    Search Keywords: ${skill.searchKeywords.join(', ')}
-    Technology Stack: ${skill.techContext.join(', ')}
-    Use Case: ${skill.reason}
+    Skill Name: ${skill.name}
+    Search Query: ${skill.searchQuery}
+    Technology Stack: ${skill.techStack.join(', ')}
+    Reason Needed: ${skill.reason}
 
-    Use these search queries:
-    1. "claude code skill ${skill.searchKeywords[0]} github"
-    2. "awesome claude skills ${skill.id}"
-    3. "${skill.techContext[0]} ${skill.searchKeywords[0]} claude skill"
+    Execute web searches using the Search Query provided.
+    Return: source URL, last updated date, compatibility score, recommendation.
+  `
+});
+```
 
+**Example (from Step 1 output):**
+
+```typescript
+Task({
+  subagent_type: "marketplace-plugin-scout",
+  prompt: `
+    Search for skill plugin.
+
+    Skill Name: next-app-router
+    Search Query: "Next.js 14 App Router patterns Server Components"
+    Technology Stack: Next.js 14, React 18
+    Reason Needed: App Router architecture required
+
+    Execute web searches using the Search Query provided.
     Return: source URL, last updated date, compatibility score, recommendation.
   `
 });
@@ -177,17 +211,16 @@ Task({
 **For Multiple Skills (Batch Search):**
 
 ```typescript
-// Search for all required skills at once with specific search keywords
+// Pass all skills identified in Step 1
 Task({
   subagent_type: "marketplace-plugin-scout",
   prompt: `
     Search for the following skill plugins:
 
-    ${requiredSkills.map((s, i) => `
-    ${i + 1}. ${s.id}
-       - Category: ${s.category}
-       - Search Keywords: ${s.searchKeywords.join(', ')}
-       - Tech Stack: ${s.techContext.join(', ')}
+    ${skills.map((s, i) => `
+    ${i + 1}. ${s.name}
+       - Search: ${s.searchQuery}
+       - Tech: ${s.techStack.join(', ')}
        - Reason: ${s.reason}
     `).join('\n')}
 

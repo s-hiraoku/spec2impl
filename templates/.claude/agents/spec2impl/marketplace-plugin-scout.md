@@ -36,44 +36,63 @@ The AI/development ecosystem changes daily. Your job is to find what's current a
 
 ### For Skill Plugins
 
-When called by Skills Generator, you receive structured search parameters:
-- **Skill ID** - Unique identifier (e.g., `content-management`, `seo`, `api-patterns`)
-- **Search Keywords** - Specific terms for accurate search
+When called by Skills Generator, you receive **AI-generated search parameters**:
+- **Skill Name** - Descriptive name (e.g., `next-app-router`, `mdx-content`)
+- **Search Query** - AI-generated search terms specific to the need
 - **Tech Stack** - Technologies to match
 
+**CRITICAL: Use the provided Search Query directly. It was crafted by the AI to find the most relevant skills.**
+
 ```typescript
-// Primary search using provided Search Keywords
-WebSearch(`claude code skill ${searchKeywords[0]} github`);
-WebSearch(`awesome claude skills ${skillId}`);
+// 1. Use the provided Search Query directly
+WebSearch(`claude skill ${searchQuery}`);
+WebSearch(`${searchQuery} claude code github`);
 
-// Tech stack specific search
-WebSearch(`${techStack[0]} ${searchKeywords[0]} claude skill`);
+// 2. Search awesome-claude-skills with skill name
+WebSearch(`awesome claude skills ${skillName}`);
 
-// Fallback: broader category search
-WebSearch(`claude skill ${category} ${techStack[0]}`);
+// 3. Tech stack specific search
+WebSearch(`${techStack[0]} ${searchQuery} skill`);
 ```
 
 **Search Priority Order:**
-1. Exact Skill ID match in awesome-claude-skills
-2. Search Keywords + Tech Stack combination
-3. Category + Tech Stack fallback
+1. Provided Search Query + "claude skill"
+2. awesome-claude-skills repository
+3. Tech Stack + Search Query combination
 
-### Skill Category Search Examples
+### Example Searches
 
-| Skill ID | Primary Search Query | Secondary Search Query |
-|----------|---------------------|------------------------|
-| `content-management` | "claude skill CMS blog markdown" | "awesome claude skills content-management" |
-| `seo` | "claude skill SEO meta tags OGP" | "claude code SEO sitemap skill" |
-| `ssg` | "claude skill Next.js Astro static site" | "awesome claude skills SSG" |
-| `api-patterns` | "claude skill REST API GraphQL" | "claude code API patterns skill" |
-| `authentication` | "claude skill JWT OAuth auth" | "awesome claude skills authentication" |
-| `search` | "claude skill Algolia ElasticSearch" | "claude code search implementation skill" |
-| `comments` | "claude skill comment system Disqus" | "awesome claude skills comments" |
-| `feed` | "claude skill RSS Atom feed" | "claude code feed generation skill" |
-| `media` | "claude skill image optimization CDN" | "awesome claude skills media" |
-| `i18n` | "claude skill i18n internationalization" | "claude code translation skill" |
-| `analytics` | "claude skill Google Analytics Plausible" | "awesome claude skills analytics" |
-| `email` | "claude skill email Resend SendGrid" | "claude code newsletter skill" |
+The Skills Generator provides specific search queries. Use them directly:
+
+**Input from Skills Generator:**
+```
+Skill Name: next-app-router
+Search Query: "Next.js 14 App Router patterns Server Components"
+Tech Stack: Next.js 14, React 18
+```
+
+**Your searches:**
+```typescript
+WebSearch(`claude skill Next.js 14 App Router patterns Server Components`);
+WebSearch(`Next.js 14 App Router patterns Server Components claude code github`);
+WebSearch(`awesome claude skills next-app-router`);
+WebSearch(`Next.js 14 App Router skill`);
+```
+
+**Input from Skills Generator:**
+```
+Skill Name: mdx-content
+Search Query: "MDX Next.js content blog processing"
+Tech Stack: MDX, next-mdx-remote, contentlayer
+```
+
+**Your searches:**
+```typescript
+WebSearch(`claude skill MDX Next.js content blog processing`);
+WebSearch(`MDX Next.js content blog processing claude code github`);
+WebSearch(`awesome claude skills mdx-content`);
+WebSearch(`MDX contentlayer skill`);
+```
 
 ### For MCP Plugins
 
@@ -154,25 +173,22 @@ RECOMMENDATION:
 
 ## How You Are Called
 
-Called by Skills Generator and MCP Configurator with structured parameters:
+Called by Skills Generator and MCP Configurator with AI-generated parameters:
 
 ```typescript
-// Skills Generator calls you with Skill ID and Search Keywords
+// Skills Generator calls you with AI-generated search query
 Task({
   subagent_type: "marketplace-plugin-scout",
   prompt: `
     Search for skill plugin.
 
-    Skill ID: content-management
-    Category: Content Management
-    Search Keywords: CMS, blog, content, markdown, headless CMS
-    Technology Stack: Next.js, MDX
-    Use Case: Tech blog with markdown articles
+    Skill Name: next-app-router
+    Search Query: "Next.js 14 App Router patterns Server Components"
+    Technology Stack: Next.js 14, React 18
+    Reason Needed: App Router architecture required
 
-    Use these search queries:
-    1. "claude code skill CMS blog github"
-    2. "awesome claude skills content-management"
-    3. "Next.js markdown blog claude skill"
+    Execute web searches using the Search Query provided.
+    Return: source URL, last updated date, compatibility score, recommendation.
   `
 });
 
