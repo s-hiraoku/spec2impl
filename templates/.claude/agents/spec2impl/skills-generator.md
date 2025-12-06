@@ -486,26 +486,43 @@ Proceed with generation? [y/n]
 
 Generate skills for gaps identified in Step 5 using the **skill-creator** skill.
 
-**IMPORTANT: Use the skill-creator skill for all skill generation.**
+**IMPORTANT: Use the skill-creator skill and its scripts for all skill generation.**
 
-The skill-creator skill (located at `.claude/skills/skill-creator/`) provides comprehensive guidance for creating effective skills. Always reference it when generating new skills.
+The skill-creator skill (located at `.claude/skills/skill-creator/`) provides:
+- **SKILL.md** - Guidelines for creating effective skills
+- **scripts/init_skill.py** - Script to initialize a new skill directory
+- **scripts/package_skill.py** - Script to validate and package skills
 
 **How to Generate Skills:**
 
 ```typescript
-// Step 1: Read the skill-creator for guidance
+// Step 1: Read skill-creator guidelines
 Read(".claude/skills/skill-creator/SKILL.md");
 
-// Step 2: Research best practices for the specific skill
+// Step 2: Initialize the skill using init_skill.py
+Bash(`python .claude/skills/skill-creator/scripts/init_skill.py ${skill.name} --path .claude/skills`);
+// This creates:
+// .claude/skills/{skill-name}/
+// ├── SKILL.md (template with TODOs)
+// ├── scripts/ (example files)
+// ├── references/ (example files)
+// └── assets/ (example files)
+
+// Step 3: Research best practices for the specific skill
 WebSearch(`${skill.techContext} best practices implementation patterns 2024`);
 WebSearch(`${skill.name} design patterns ${skill.techContext}`);
 
-// Step 3: Generate the skill following skill-creator guidelines
-// - Create SKILL.md with proper YAML frontmatter (name, description)
+// Step 4: Edit the generated SKILL.md and resources
+// - Update YAML frontmatter (name, description)
 // - Add concise markdown instructions
-// - Include scripts/ for deterministic operations
-// - Include references/ for detailed documentation
-// - Include assets/ for templates and resources
+// - Populate scripts/ with deterministic code if needed
+// - Populate references/ with detailed documentation
+// - Populate assets/ with templates and resources
+// - Delete example files that are not needed
+Edit(".claude/skills/${skill.name}/SKILL.md", ...);
+
+// Step 5: Validate and package the skill (optional, for distribution)
+Bash(`python .claude/skills/skill-creator/scripts/package_skill.py .claude/skills/${skill.name}`);
 ```
 
 **Output Format:**
@@ -522,6 +539,14 @@ Generating 1 skill based on gap analysis...
    Reading skill-creator guidelines...
    ✓ Loaded .claude/skills/skill-creator/SKILL.md
 
+   Initializing skill with init_skill.py...
+   $ python .claude/skills/skill-creator/scripts/init_skill.py error-handling --path .claude/skills
+   ✓ Created .claude/skills/error-handling/
+      ├── SKILL.md          (template)
+      ├── scripts/          (example files)
+      ├── references/       (example files)
+      └── assets/           (example files)
+
    Researching best practices...
    WebSearch: "express error handling best practices 2024"
    WebSearch: "typescript error handling patterns"
@@ -532,19 +557,19 @@ Generating 1 skill based on gap analysis...
    - Async error wrapper
    - Structured error response format
 
-   Generating skill following skill-creator structure...
+   Editing skill files...
+   ✓ Updated SKILL.md with:
+     - Error handling patterns for Express + TypeScript
+     - 8 error codes from specification
+     - Logging patterns
+   ✓ Added references/error-codes.md
+   ✓ Added scripts/error-handler.ts
+   ✓ Removed unused example files
 
-   ✅ Created .claude/skills/error-handling/
+   ✅ Skill generation complete: .claude/skills/error-handling/
       ├── SKILL.md          (main skill file)
       ├── references/       (error code documentation)
       └── scripts/          (error handler utilities)
-
-   Contents:
-   - Custom error class hierarchy
-   - Global error handler middleware
-   - Error response format matching spec
-   - Logging patterns
-   - 8 error codes from specification
 
 -----------------------------------------------------------
 Generation complete: 1/1 successful
