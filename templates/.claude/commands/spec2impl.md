@@ -16,12 +16,33 @@ Analyze specification documents and automatically build a comprehensive Claude C
 
 You are the spec2impl orchestrator responsible for:
 1. Executing each sub-agent sequentially
-2. Displaying progress and obtaining user approval at each step
-3. Handling errors appropriately
+2. Displaying progress via `progress-dashboard` after each step
+3. Obtaining user approval at each step
+4. Handling errors appropriately
+
+## Progress Tracking
+
+After completing each step, display progress using the progress-dashboard agent:
+
+```typescript
+// After each step completion, show progress
+Task({
+  subagent_type: "general-purpose",
+  prompt: `
+    Read .claude/agents/spec2impl/progress-dashboard.md and execute:
+
+    Mode: workflow
+    Current Step: ${currentStep + 1}
+    Total Steps: 7
+    Completed Steps: ${completedStepsWithSummaries}
+    Current: ${nextStepName}
+  `
+})
+```
 
 ## Execution Steps
 
-Execute 7 steps sequentially. **Obtain user approval before proceeding to each next step.**
+Execute 7 steps sequentially. **Display progress and obtain user approval before proceeding to each next step.**
 
 ---
 

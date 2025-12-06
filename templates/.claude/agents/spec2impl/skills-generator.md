@@ -1,6 +1,6 @@
 ---
 name: Skills Generator
-description: Identifies required skills from specification analysis, researches latest skills via web search, and generates/installs optimal skills for the project. Always uses web search to find the most current and best-suited skills.
+description: Identifies required skills from specification analysis, searches marketplace for existing skills, installs found skills, assesses gaps, and generates missing skills using skill-creator. Follows "Marketplace First, Then Generate" principle. Called by spec2impl orchestrator as Step 2 of the workflow.
 tools:
   - Read
   - Write
@@ -430,14 +430,28 @@ Proceed with generation? [y/n]
 
 ### Step 6: Generate Additional Skills
 
-Generate skills for gaps identified in Step 5.
+Generate skills for gaps identified in Step 5 using the **skill-creator** skill.
 
-**Research best practices before generating:**
+**IMPORTANT: Use the skill-creator skill for all skill generation.**
+
+The skill-creator skill (located at `.claude/skills/skill-creator/`) provides comprehensive guidance for creating effective skills. Always reference it when generating new skills.
+
+**How to Generate Skills:**
 
 ```typescript
-// Before generating, search for best practices
+// Step 1: Read the skill-creator for guidance
+Read(".claude/skills/skill-creator/SKILL.md");
+
+// Step 2: Research best practices for the specific skill
 WebSearch(`${skill.techContext} best practices implementation patterns 2024`);
 WebSearch(`${skill.name} design patterns ${skill.techContext}`);
+
+// Step 3: Generate the skill following skill-creator guidelines
+// - Create SKILL.md with proper YAML frontmatter (name, description)
+// - Add concise markdown instructions
+// - Include scripts/ for deterministic operations
+// - Include references/ for detailed documentation
+// - Include assets/ for templates and resources
 ```
 
 **Output Format:**
@@ -451,6 +465,9 @@ Generating 1 skill based on gap analysis...
 
 [1/1] error-handling
 
+   Reading skill-creator guidelines...
+   ✓ Loaded .claude/skills/skill-creator/SKILL.md
+
    Researching best practices...
    WebSearch: "express error handling best practices 2024"
    WebSearch: "typescript error handling patterns"
@@ -461,9 +478,12 @@ Generating 1 skill based on gap analysis...
    - Async error wrapper
    - Structured error response format
 
-   Generating with skill-creator...
+   Generating skill following skill-creator structure...
 
-   ✅ Created .claude/skills/error-handling/SKILL.md
+   ✅ Created .claude/skills/error-handling/
+      ├── SKILL.md          (main skill file)
+      ├── references/       (error code documentation)
+      └── scripts/          (error handler utilities)
 
    Contents:
    - Custom error class hierarchy

@@ -1,6 +1,6 @@
 ---
 name: Progress Dashboard
-description: Generates visual progress reports comparing specification requirements against implementation status. Shows overall progress with visual bars, category breakdown, current focus, next recommended tasks with dependency analysis, and blockers. Internal service called by other agents during implementation.
+description: Generates visual progress reports for spec2impl workflow and implementation tasks. Two modes - "workflow" mode shows spec2impl step progress (Step 1/7, etc.), "tasks" mode shows TASKS.md implementation progress. Called by spec2impl orchestrator after each step and available during implementation phase.
 tools:
   - Read
   - Glob
@@ -9,24 +9,142 @@ tools:
 
 # Progress Dashboard Agent
 
-You are a Progress Tracking Specialist who analyzes implementation progress and generates comprehensive visual dashboards. You compare specification requirements against current implementation status to provide clear, actionable progress reports.
+You are a Progress Tracking Specialist who generates comprehensive visual dashboards. You support two modes:
+
+1. **Workflow Mode** - Track spec2impl environment generation progress
+2. **Tasks Mode** - Track implementation progress from TASKS.md
 
 ## How You Are Invoked
 
-This agent is called internally by the main orchestrator or other agents via the Task tool:
+### Workflow Mode (during spec2impl execution)
 
 ```typescript
-// Example: Main orchestrator calls dashboard to show progress
 Task({
   subagent_type: "general-purpose",
   prompt: `
     Read .claude/agents/spec2impl/progress-dashboard.md and execute:
-    Generate progress dashboard from docs/TASKS.md
+
+    Mode: workflow
+    Current Step: 3
+    Total Steps: 7
+    Completed Steps:
+      - Step 1: Specification Analysis ✓
+      - Step 2: Skills Acquisition ✓
+    Current: Step 3: Sub-agents Generation
+    Results:
+      - specs: 5 files analyzed
+      - skills: 4 installed, 1 generated
   `
 })
 ```
 
-## Your Role
+### Tasks Mode (during implementation)
+
+```typescript
+Task({
+  subagent_type: "general-purpose",
+  prompt: `
+    Read .claude/agents/spec2impl/progress-dashboard.md and execute:
+
+    Mode: tasks
+    Source: docs/TASKS.md
+  `
+})
+```
+
+---
+
+## Mode 1: Workflow Progress (spec2impl execution)
+
+### Workflow Dashboard Format
+
+```
+================================================================================
+  spec2impl Progress
+================================================================================
+
+[████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]  28% (2/7 steps)
+
+Step 1: Specification Analysis    ✅ Complete
+        └─ 5 spec files analyzed, 12 APIs, 8 models detected
+
+Step 2: Skills Acquisition        ✅ Complete
+        └─ 4 installed, 1 generated, 1 customized
+
+Step 3: Sub-agents Generation     🔄 In Progress
+        └─ Researching agent patterns...
+
+Step 4: MCP Configuration         ⏳ Pending
+Step 5: Task List Generation      ⏳ Pending
+Step 6: CLAUDE.md Update          ⏳ Pending
+Step 7: Cleanup                   ⏳ Pending
+
+--------------------------------------------------------------------------------
+Current: Generating sub-agents based on specification requirements
+Next: MCP server configuration
+================================================================================
+```
+
+### Workflow Progress Function
+
+```typescript
+function generateWorkflowDashboard(
+  currentStep: number,
+  totalSteps: number,
+  completedSteps: StepResult[],
+  currentStepName: string
+): string {
+  const percentage = Math.round((currentStep - 1) / totalSteps * 100);
+  const progressBar = generateProgressBar(percentage, 50);
+
+  const steps = [
+    "Specification Analysis",
+    "Skills Acquisition",
+    "Sub-agents Generation",
+    "MCP Configuration",
+    "Task List Generation",
+    "CLAUDE.md Update",
+    "Cleanup"
+  ];
+
+  let output = `
+================================================================================
+  spec2impl Progress
+================================================================================
+
+${progressBar}  ${percentage}% (${currentStep - 1}/${totalSteps} steps)
+
+`;
+
+  for (let i = 0; i < steps.length; i++) {
+    const stepNum = i + 1;
+    let status = "⏳ Pending";
+    let detail = "";
+
+    if (stepNum < currentStep) {
+      status = "✅ Complete";
+      detail = completedSteps[i]?.summary || "";
+    } else if (stepNum === currentStep) {
+      status = "🔄 In Progress";
+      detail = currentStepName;
+    }
+
+    output += `Step ${stepNum}: ${steps[i].padEnd(25)} ${status}\n`;
+    if (detail) {
+      output += `        └─ ${detail}\n`;
+    }
+    output += "\n";
+  }
+
+  return output;
+}
+```
+
+---
+
+## Mode 2: Tasks Progress (implementation phase)
+
+### Your Role
 
 1. Read task progress from `docs/TASKS.md`
 2. Analyze implementation status

@@ -146,9 +146,9 @@ These agents are called internally by other agents during the workflow:
 
 | Agent | Description |
 |-------|-------------|
+| **Progress Dashboard** | Displays workflow progress after each step. Also tracks TASKS.md progress during implementation. |
 | **Marketplace Plugin Scout** | Searches and evaluates plugins via web search. Provides scored recommendations. Does NOT install. |
 | **Marketplace** | Installs, lists, and removes plugins from GitHub/npm/URLs. Delegates search to Plugin Scout. |
-| **Progress Dashboard** | Generates visual progress reports with task breakdown, recommendations, and blockers. |
 
 ---
 
@@ -323,17 +323,22 @@ Internal registry and installer for Claude Code Plugins.
 
 ### Progress Dashboard
 
-Generates visual progress reports comparing specification requirements against implementation status.
+Generates visual progress reports with two modes.
 
 | Property | Value |
 |----------|-------|
 | **Type** | Internal Service |
 | **Tools** | Read, Glob, Grep |
-| **Input** | `docs/TASKS.md` |
-| **Output** | Visual dashboard with progress bars |
+| **Modes** | `workflow` (spec2impl steps), `tasks` (TASKS.md progress) |
 
-**Dashboard Sections:**
-- Overall progress with visual bar
+**Workflow Mode (during spec2impl):**
+- Step-by-step progress (Step 1/7, Step 2/7, etc.)
+- Completed step summaries
+- Current step status
+- Visual progress bar
+
+**Tasks Mode (during implementation):**
+- Overall task progress with visual bar
 - Category breakdown (Spec-Defined, Models, APIs, Verification)
 - Current focus and recent activity
 - Next recommended tasks with dependency analysis
