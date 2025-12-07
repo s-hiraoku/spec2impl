@@ -368,72 +368,77 @@ TO GENERATE (1 skill):
 
 ---
 
-### Step 4: Install Found Skills via marketplace
+### Step 4: Install Found Skills
 
-**Use the marketplace agent to install each found skill:**
+**Use aitmpl-downloader for aitmpl.com sources, marketplace for others:**
 
-Note: `marketplace-plugin-scout` handles **search only**. For installation, use `marketplace`.
+Note: `marketplace-plugin-scout` handles **search only**. For installation:
+- **aitmpl-downloader** → For skills found on aitmpl.com
+- **marketplace** → For skills found on GitHub/npm
 
 ```typescript
-// Install each found skill via marketplace
-for (const skill of foundSkills) {
-  Task({
-    subagent_type: "general-purpose",
-    prompt: `
-      Read .claude/agents/spec2impl/marketplace.md and execute:
+// For skills found on aitmpl.com
+Task({
+  subagent_type: "aitmpl-downloader",
+  prompt: `Download skill from aitmpl.com: ${skill.sourceUrl}`
+});
 
-      Action: install
-      Source: ${skill.source}
-      Type: skill
-      TargetName: ${skill.targetName}
-    `
-  });
-}
+// For skills found elsewhere (GitHub, npm)
+Task({
+  subagent_type: "general-purpose",
+  prompt: `
+    Read .claude/agents/spec2impl/marketplace.md and execute:
+
+    Action: install
+    Source: ${skill.source}
+    Type: skill
+    TargetName: ${skill.targetName}
+  `
+});
 ```
 
 **Output Format:**
 
 ```
------------------------------------------------------------
-Step 4/7: Installing Found Skills
------------------------------------------------------------
+═══════════════════════════════════════════════════════════════
+  Step 4/7: Installing Found Skills
+═══════════════════════════════════════════════════════════════
 
-Installing 5 skills from external sources...
+  Installing 5 skills from external sources...
 
-[1/5] api-implementation
-      Source: github:travisvn/awesome-claude-skills/express-api
-      Fetching from GitHub...
-      ✅ Installed to .claude/skills/api-implementation/
-      Files: SKILL.md, patterns/routes.md, patterns/controllers.md
+  [1/5] next-app-router
+        Source: aitmpl.com/skills/next-app-router
+        Downloading via aitmpl-downloader...
+        ✅ Installed to .claude/skills/next-app-router/
 
-[2/5] data-modeling
-      Source: github:anthropics/claude-skills/prisma
-      Fetching from GitHub...
-      ✅ Installed to .claude/skills/data-modeling/
-      Files: SKILL.md, patterns/schema.md, patterns/queries.md
+  [2/5] mdx-content
+        Source: github:travisvn/awesome-claude-skills/mdx
+        Fetching from GitHub via marketplace...
+        ✅ Installed to .claude/skills/mdx-content/
 
-[3/5] input-validation
-      Source: npm:claude-skill-zod-validation
-      Installing from npm...
-      ✅ Installed to .claude/skills/input-validation/
-      Files: SKILL.md
+  [3/5] tailwind-patterns
+        Source: aitmpl.com/skills/tailwind
+        Downloading via aitmpl-downloader...
+        ✅ Installed to .claude/skills/tailwind-patterns/
 
-[4/5] stripe-integration
-      Source: github:stripe/claude-stripe-skill
-      Fetching from GitHub...
-      ✅ Installed to .claude/skills/stripe-integration/
-      Files: SKILL.md, patterns/payments.md, patterns/webhooks.md
+  [4/5] blog-seo
+        Source: npm:claude-skill-seo
+        Installing from npm via marketplace...
+        ✅ Installed to .claude/skills/blog-seo/
 
-[5/5] authentication
-      Source: github:travisvn/awesome-claude-skills/auth
-      Fetching from GitHub...
-      ✅ Installed to .claude/skills/authentication/
-      Files: SKILL.md, patterns/jwt.md
+  [5/5] syntax-highlighting
+        Source: github:example/shiki-skill
+        Fetching from GitHub via marketplace...
+        ✅ Installed to .claude/skills/syntax-highlighting/
 
------------------------------------------------------------
-Installation complete: 5/5 successful
-Updated: plugins.json
------------------------------------------------------------
+  ─────────────────────────────────────────────────────────────
+  Installation complete: 5/5 successful
+    - aitmpl.com: 2 skills
+    - GitHub: 2 skills
+    - npm: 1 skill
+  ─────────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════════
 ```
 
 ---
@@ -620,34 +625,32 @@ Creating skills index...
   Skills Acquisition Complete
 ═══════════════════════════════════════════════════════════════
 
-  Search Summary:
-  ───────────────
-  marketplace-plugin-scout searches: 6
-  Skills evaluated: 18
-
   Acquisition Summary:
   ────────────────────
-  📦 Installed from marketplace: 5
+  📦 Installed from aitmpl.com: 2
+  📦 Installed from GitHub: 2
+  📦 Installed from npm: 1
   ✨ Generated (gap analysis): 1
   🔧 Customized: 1
+  ────────────────────────────
+  Total: 6 skills
 
   Sources:
   ────────
-  - GitHub (travisvn/awesome-claude-skills): 2 skills
-  - GitHub (anthropics/claude-skills): 1 skill
-  - GitHub (stripe/claude-stripe-skill): 1 skill
-  - npm: 1 skill
-  - Generated (after gap assessment): 1 skill
+  - aitmpl.com: next-app-router, tailwind-patterns
+  - GitHub: mdx-content, syntax-highlighting
+  - npm: blog-seo
+  - Generated: error-handling
 
   Files created:
   ──────────────
   .claude/skills/
-  ├── api-implementation/     [installed - GitHub]
-  ├── data-modeling/          [installed - GitHub/Anthropic]
-  ├── authentication/         [installed + customized]
-  ├── input-validation/       [installed - npm]
-  ├── error-handling/         [generated - gap analysis]
-  ├── stripe-integration/     [installed - GitHub/Official]
+  ├── next-app-router/        [installed - aitmpl.com]
+  ├── tailwind-patterns/      [installed - aitmpl.com]
+  ├── mdx-content/            [installed - GitHub]
+  ├── blog-seo/               [installed - npm]
+  ├── syntax-highlighting/    [installed - GitHub]
+  ├── error-handling/         [generated]
   └── README.md
 
   plugins.json (updated)
@@ -659,9 +662,10 @@ Creating skills index...
 
 ## Important Notes
 
-1. **Always Web Search First** - Never rely on static lists; the ecosystem evolves rapidly
-2. **Evaluate Freshness** - Prefer resources updated within the last 6 months
-3. **Verify Sources** - Prefer official/well-maintained repositories
-4. **Tech Stack Match** - Ensure skills match your project's technology
-5. **Document Sources** - Record where each skill came from for reproducibility
-6. **Customize Thoughtfully** - Add project context without breaking the original skill
+1. **Marketplace First** - Always search aitmpl.com and GitHub before generating
+2. **Use aitmpl-downloader** - For skills found on aitmpl.com
+3. **Use marketplace** - For skills found on GitHub/npm
+4. **Use skill-creator scripts** - For generating new skills (init_skill.py, package_skill.py)
+5. **Evaluate Freshness** - Prefer resources updated within the last 6 months
+6. **Tech Stack Match** - Ensure skills match your project's technology
+7. **Customize Thoughtfully** - Add project context without breaking the original skill
