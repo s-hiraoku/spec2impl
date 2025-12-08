@@ -133,6 +133,83 @@ Analyze the specification and identify what agents are needed:
 
 ---
 
+### Step 1.5: Skill-Linked Agent Discovery (NEW)
+
+**CRITICAL: Auto-discover agents that complement installed skills.**
+
+Before searching marketplace for new agents, check if any installed skills have companion agents that should be automatically included.
+
+#### Auto-Discovery Logic
+
+```bash
+# For each skill in .claude/skills/
+for skill_dir in .claude/skills/*/; do
+  skill_name=$(basename "$skill_dir")
+
+  # Check for companion agent in multiple locations
+  agent_patterns=(
+    ".claude/agents/${skill_name}.md"
+    ".claude/agents/${skill_name}-*.md"
+    ".claude/agents/*/${skill_name}*.md"
+  )
+
+  # If found, add to required agents automatically
+done
+```
+
+#### Why This Matters
+
+Skills provide knowledge and patterns, but companion agents provide:
+- Specialized workflows using that skill
+- Prompt engineering optimized for the skill's domain
+- Tool configurations tailored to the skill
+
+**Example:**
+- `ux-psychology` skill provides 43 UX concepts
+- `ux-psychology-advisor` agent knows HOW to apply those concepts to designs
+
+#### Naming Convention for Skill-Agent Pairs
+
+| Skill Name | Expected Agent Patterns |
+|------------|------------------------|
+| `{skill}` | `{skill}.md`, `{skill}-advisor.md`, `{skill}-handler.md` |
+| `ux-psychology` | `ux-psychology-advisor.md` |
+| `aitmpl-downloader` | `aitmpl-downloader.md` |
+| `stripe-integration` | `stripe-handler.md`, `payment-handler.md` |
+
+#### Output Format
+
+```
+═══════════════════════════════════════════════════════════════
+  Step 1.5: Skill-Linked Agent Discovery
+═══════════════════════════════════════════════════════════════
+
+  Checking installed skills for companion agents...
+
+  ┌────────────────────┬──────────────────────────┬─────────────────┐
+  │ Skill              │ Companion Agent          │ Status          │
+  ├────────────────────┼──────────────────────────┼─────────────────┤
+  │ ux-psychology      │ ux-psychology-advisor    │ ✅ Auto-include │
+  │ aitmpl-downloader  │ aitmpl-downloader        │ ✅ Auto-include │
+  │ skill-creator      │ (none found)             │ ⚪ Skill only   │
+  │ stripe-integration │ payment-handler          │ ✅ Auto-include │
+  └────────────────────┴──────────────────────────┴─────────────────┘
+
+  Auto-included: 3 agents from skill companions
+
+  These agents will be added to the agent list automatically.
+
+═══════════════════════════════════════════════════════════════
+```
+
+#### Integration with Step 2
+
+When proceeding to marketplace search (Step 2):
+- Skip searching for agents that were already auto-discovered
+- Focus search on agents for features without companion skills
+
+---
+
 ### Step 2: Search Marketplace for Existing Agents
 
 **CRITICAL: Search for existing agents before generating.**

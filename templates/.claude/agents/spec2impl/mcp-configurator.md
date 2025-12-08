@@ -121,6 +121,78 @@ Analyze the specification and detect all external service requirements:
 
 ---
 
+### Step 1.5: Generic MCP Recommendations with Levels (NEW)
+
+**CRITICAL: Apply 3-level recommendation for MCPs beyond explicit services.**
+
+After detecting explicit services, apply generic rules to recommend additional MCPs that improve development efficiency.
+
+#### Recommendation Levels
+
+| Level | Description | Criteria |
+|-------|-------------|----------|
+| **REQUIRED** | Needed for core functionality | Explicitly mentioned services (Stripe, AWS, etc.) |
+| **RECOMMENDED** | Improves development efficiency | Matches project characteristics |
+| **OPTIONAL** | Nice to have | Enhanced capabilities |
+
+#### Generic MCP Matching Rules
+
+Detect project characteristics and recommend MCPs:
+
+```
+Characteristic Detection → Recommended MCP → Level
+─────────────────────────────────────────────────────────────────────────────
+Git repository exists?      → git MCP                → RECOMMENDED
+Has file operations?        → filesystem MCP         → RECOMMENDED
+Multi-file project?         → memory MCP             → OPTIONAL
+Complex architecture?       → sequential-thinking    → OPTIONAL
+Has database?               → {db-type} MCP          → REQUIRED
+Has external APIs?          → {service} MCP          → REQUIRED
+```
+
+**IMPORTANT:** Do NOT skip RECOMMENDED MCPs just because the project is "simple". Development efficiency MCPs (git, filesystem) add value to almost every project.
+
+#### Output Format
+
+```
+═══════════════════════════════════════════════════════════════
+  Step 1.5: Generic MCP Recommendations
+═══════════════════════════════════════════════════════════════
+
+  Project Characteristics:
+    ✓ Git repository detected
+    ✓ Multi-file project
+    ✗ Database required
+
+  ┌──────────────────────┬─────────────┬─────────────────────────────────┐
+  │ MCP                  │ Level       │ Reason                          │
+  ├──────────────────────┼─────────────┼─────────────────────────────────┤
+  │ stripe               │ REQUIRED    │ Explicitly in spec              │
+  │ postgres             │ REQUIRED    │ Database mentioned              │
+  │ git                  │ RECOMMENDED │ Git repo detected               │
+  │ filesystem           │ RECOMMENDED │ File operations needed          │
+  │ sequential-thinking  │ OPTIONAL    │ Complex reasoning tasks         │
+  └──────────────────────┴─────────────┴─────────────────────────────────┘
+
+  Summary:
+    REQUIRED: 2 MCPs (from spec)
+    RECOMMENDED: 2 MCPs (development efficiency)
+    OPTIONAL: 1 MCP (enhanced capabilities)
+
+═══════════════════════════════════════════════════════════════
+```
+
+#### Common Development MCPs
+
+| MCP | When to Recommend | Benefits |
+|-----|------------------|----------|
+| `filesystem` | File read/write needed | Direct file access |
+| `git` | Git repository detected | Version control operations |
+| `memory` | Multi-session or complex state | Persistent context |
+| `sequential-thinking` | Architecture decisions | Structured reasoning |
+
+---
+
 ### Step 2: Search Marketplace via marketplace-plugin-scout
 
 **CRITICAL: Search aitmpl.com first, then web.**

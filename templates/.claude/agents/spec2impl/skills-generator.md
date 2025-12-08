@@ -163,6 +163,86 @@ Proceed to marketplace search? [y/n]
 
 ---
 
+### Step 1.5: Skill Recommendation with Levels & Agent Discovery (NEW)
+
+**CRITICAL: Apply 3-level recommendation AND discover companion agents.**
+
+After identifying technologies, apply this GENERIC matching logic to find quality-enhancing skills:
+
+#### Recommendation Levels
+
+| Level | Description | Criteria |
+|-------|-------------|----------|
+| **REQUIRED** | Needed for core functionality | Explicitly mentioned in spec (e.g., "use Stripe" → stripe-integration) |
+| **RECOMMENDED** | Improves quality significantly | Matches project characteristics (see below) |
+| **OPTIONAL** | Nice to have | General best practices |
+
+#### Generic Matching Rules (Do NOT hardcode project types)
+
+Detect project characteristics and search for matching skills:
+
+```
+Characteristic Detection → Search Query
+─────────────────────────────────────────────────────────────
+Has UI/frontend components?     → "UX psychology" "UI patterns" "user experience"
+Has content/blog/CMS?           → "SEO optimization" "content strategy"
+Has user data/forms?            → "security" "validation" "privacy"
+Has authentication?             → "auth patterns" "session management"
+Has payments?                   → "payment integration" "checkout UX"
+Has API endpoints?              → "API design" "REST patterns"
+Has database?                   → "data modeling" "query optimization"
+```
+
+**IMPORTANT:** Do NOT skip RECOMMENDED skills just because the project is "simple" or "static". Quality-enhancing skills ALWAYS add value to user-facing projects.
+
+#### Skill + Companion Agent Discovery
+
+**CRITICAL: When a skill is found, check for its companion agent:**
+
+```bash
+# After finding skill at .claude/skills/{skill-name}/
+# Check for companion agent in these locations:
+.claude/agents/{skill-name}.md
+.claude/agents/{skill-name}-*.md
+.claude/agents/*/{skill-name}*.md
+```
+
+If companion agent exists:
+- Include BOTH skill AND agent in recommendations
+- The agent helps Claude use the skill more effectively
+
+#### Output Format
+
+```
+═══════════════════════════════════════════════════════════════
+  Step 1.5: Skill Recommendations with Levels
+═══════════════════════════════════════════════════════════════
+
+  Project Characteristics Detected:
+    ✓ Has UI/frontend (Next.js, Tailwind)
+    ✓ Has content (MDX, blog)
+    ✗ Has user data
+    ✗ Has authentication
+
+  ┌──────────────────┬─────────────┬────────────────────────┬─────────────────────────┐
+  │ Skill            │ Level       │ Companion Agent        │ Reason                  │
+  ├──────────────────┼─────────────┼────────────────────────┼─────────────────────────┤
+  │ stripe-integration│ REQUIRED   │ -                      │ Explicitly in spec      │
+  │ ux-psychology    │ RECOMMENDED │ ux-psychology-advisor  │ UI components detected  │
+  │ seo-optimization │ RECOMMENDED │ -                      │ Content site detected   │
+  │ accessibility    │ OPTIONAL    │ -                      │ Best practice for UI    │
+  └──────────────────┴─────────────┴────────────────────────┴─────────────────────────┘
+
+  Summary:
+    REQUIRED: 1 skill
+    RECOMMENDED: 2 skills (+ 1 companion agent)
+    OPTIONAL: 1 skill
+
+═══════════════════════════════════════════════════════════════
+```
+
+---
+
 ### Step 2: Search Marketplace via marketplace-plugin-scout
 
 **CRITICAL: Pass the AI-generated search keywords to marketplace-plugin-scout.**
