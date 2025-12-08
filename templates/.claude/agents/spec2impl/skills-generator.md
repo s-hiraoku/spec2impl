@@ -1,5 +1,5 @@
 ---
-name: Skills Generator
+name: skills-generator
 description: Identifies required skills from specification analysis, searches marketplace for existing skills, installs found skills, assesses gaps, and generates missing skills using skill-creator. Follows "Marketplace First, Then Generate" principle. Called by spec2impl orchestrator as Step 2 of the workflow.
 tools:
   - Read

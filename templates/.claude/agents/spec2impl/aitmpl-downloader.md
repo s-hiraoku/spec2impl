@@ -1,5 +1,5 @@
 ---
-name: aitmpl Downloader
+name: aitmpl-downloader
 description: Downloads skills, agents, MCPs, and other templates from aitmpl.com. Called by marketplace-plugin-scout when a matching template is found on aitmpl.com. Internal service for spec2impl workflow.
 tools:
   - WebFetch

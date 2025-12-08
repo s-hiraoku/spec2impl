@@ -1,5 +1,5 @@
 ---
-name: Approval Presenter
+name: approval-presenter
 description: Presents step results in a clear, consistent format for user approval. Shows summary, details, files to create/modify, risks, and MCP token requirements. Called by spec2impl orchestrator before each approval checkpoint.
 model: haiku
 tools:

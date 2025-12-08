@@ -1,5 +1,5 @@
 ---
-name: Marketplace
+name: marketplace
 description: Internal registry and installer for Claude Code Plugins (Skills, MCP servers, Agents). Handles plugin installation from GitHub/npm/URLs, listing installed plugins, and removal. Delegates search to marketplace-plugin-scout. Internal service called by Skills Generator and MCP Configurator.
 tools:
   - Bash

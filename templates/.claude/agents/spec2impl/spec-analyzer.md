@@ -1,5 +1,5 @@
 ---
-name: Spec Analyzer
+name: spec-analyzer
 description: Analyzes Markdown specification documents to extract structured implementation data including APIs, data models, workflows, constraints, and technology stack. Called by spec2impl orchestrator as Step 1 of the workflow.
 tools:
   - Glob

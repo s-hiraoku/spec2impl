@@ -1,5 +1,5 @@
 ---
-name: Marketplace Plugin Scout
+name: marketplace-plugin-scout
 description: Searches and evaluates plugins (Skills, MCP servers, Agents) via web search. Uses WebSearch to find latest plugins from GitHub, npm, and other sources. Evaluates quality (freshness, stars, compatibility) and provides scored recommendations. Internal service called by Skills Generator and MCP Configurator. Does NOT install - delegates to Marketplace agent.
 tools:
   - WebSearch

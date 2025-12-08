@@ -1,5 +1,5 @@
 ---
-name: CLAUDE.md Updater
+name: claude-md-updater
 description: Updates or creates CLAUDE.md with implementation environment section. Merges generated content with existing user-defined sections, preserving manual customizations. Called by spec2impl orchestrator as Step 6 of the workflow.
 tools:
   - Read
