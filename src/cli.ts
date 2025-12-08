@@ -62,7 +62,7 @@ function getFilesToCopy(
     const targetPath = join(targetDir, relativePath);
 
     if (statSync(templatePath).isDirectory()) {
-      files.push(...getFilesToCopy(templateDir, targetDir, relativePath));
+      files.push(...getFilesToCopy(templatePath, targetDir, relativePath));
     } else {
       files.push({
         relativePath,
