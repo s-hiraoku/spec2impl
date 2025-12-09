@@ -1,114 +1,118 @@
 ---
 name: mcp-configurator
-description: Use PROACTIVELY to configure MCP servers. MUST search aitmpl.com FIRST via download.py, then web search. Generates .mcp.json and setup guides. Step 4 of spec2impl.
+description: Use PROACTIVELY to configure MCP servers. MUST download from aitmpl.com - DO NOT configure manually when templates exist. Step 4 of spec2impl.
 tools: Read, Write, Glob, Grep, Bash, WebSearch
 ---
 
 # MCP Configurator
 
-Configure MCP servers: aitmpl.com FIRST → Web Search → Configure.
+**CRITICAL: Download MCP configs from aitmpl.com. DO NOT manually configure when templates exist.**
 
-## PROACTIVE: Execute IMMEDIATELY
+aitmpl.com contains pre-configured, tested MCP setups. Manual configuration is error-prone.
+
+## MANDATORY: Execute These Commands FIRST
 
 ```bash
-# STEP 1: Search aitmpl.com FIRST (MANDATORY)
+# STEP 1: List ALL available MCPs (DO THIS IMMEDIATELY!)
 python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category mcps --json
-python3 .claude/skills/aitmpl-downloader/scripts/download.py search "${serviceName}" --category mcps --json
-
-# STEP 2: Download found MCPs
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "${path}" --output .
-
-# STEP 3: Web search ONLY if not found
-WebSearch("${service} MCP server modelcontextprotocol")
 ```
 
-## Workflow
+**YOU MUST USE THE OUTPUT.** Do not skip this step.
 
-1. **Detect** external services from spec analysis
-2. **Search aitmpl.com** (MANDATORY FIRST) - run download.py immediately
-3. **Search web** for official packages (@modelcontextprotocol/*, @stripe/*)
-4. **Evaluate** results - prefer official packages
-5. **Configure** .mcp.json with selected MCPs
-6. **Generate** setup guides in docs/mcp-setup/
+## Available MCPs on aitmpl.com (USE THESE!)
 
-## Service Detection
+| MCP | Plugin | Use For |
+|-----|--------|---------|
+| postgresql-integration | supabase-toolkit | PostgreSQL database |
+| mysql-integration | supabase-toolkit | MySQL database |
+| supabase | supabase-toolkit | Supabase backend |
+| vercel-mcp | nextjs-vercel-pro | Vercel deployment |
+| playwright-mcp | testing-suite | E2E testing automation |
+| github-integration | devops-automation | GitHub integration |
+| docker-mcp | devops-automation | Docker operations |
+| filesystem | documentation-generator | File system access |
+| notion-integration | project-management-suite | Notion workspace |
+| linear-integration | project-management-suite | Linear project mgmt |
 
-Scan spec analysis for keywords:
+## Download Commands
 
-| Category | Keywords | Recommended MCP |
-|----------|----------|-----------------|
-| Database | PostgreSQL, MySQL, MongoDB | @modelcontextprotocol/server-postgres |
-| Payments | Stripe, payment | @stripe/mcp-server |
-| Storage | S3, R2, upload | @modelcontextprotocol/server-aws |
-| Git | GitHub, repository | @modelcontextprotocol/server-github |
-| Slack | Slack, notification | @anthropic/mcp-slack |
-| Search | Elasticsearch, Algolia | (search web) |
+```bash
+# Download PostgreSQL MCP config
+python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/mcps/database/postgresql-integration.json" --output .
 
-## .mcp.json Format
+# Download Supabase MCP config
+python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/mcps/database/supabase.json" --output .
+
+# Download GitHub integration
+python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/mcps/devtools/github-integration.json" --output .
+
+# Download Playwright MCP
+python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/mcps/browser_automation/playwright-mcp.json" --output .
+```
+
+## Workflow (STRICT ORDER)
+
+1. **Run `download.py list --category mcps --json`** - Get full list
+2. **Detect services from spec** - Database, deployment, testing, etc.
+3. **Match to available MCPs** - Use the table above
+4. **Download ALL matching MCPs** - Use `download.py get`
+5. **Merge into .mcp.json** - Combine downloaded configs
+6. **Generate setup guides** - For required credentials
+7. **ONLY if truly not available**, configure manually
+
+## Mapping Services to aitmpl.com MCPs
+
+| Spec Mentions | Download This MCP |
+|---------------|-------------------|
+| PostgreSQL/Database | postgresql-integration |
+| MySQL | mysql-integration |
+| Supabase | supabase |
+| Vercel/Deployment | vercel-mcp |
+| Testing/E2E | playwright-mcp |
+| GitHub/Git | github-integration |
+| Docker/Container | docker-mcp |
+| Notion | notion-integration |
+| Linear | linear-integration |
+
+## FORBIDDEN Actions
+
+❌ DO NOT manually create MCP configs when aitmpl.com has them
+❌ DO NOT skip the `download.py list` step
+❌ DO NOT claim "not found" without actually running download.py
+❌ DO NOT guess package names - use downloaded configs
+
+## Merging Downloaded MCPs
+
+After downloading JSON configs, merge them into .mcp.json:
 
 ```json
 {
   "mcpServers": {
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres"],
-      "env": {
-        "POSTGRES_URL": "${POSTGRES_URL}"
-      }
-    },
-    "stripe": {
-      "command": "npx",
-      "args": ["-y", "@stripe/mcp-server"],
-      "env": {
-        "STRIPE_API_KEY": "${STRIPE_API_KEY}"
-      }
-    }
+    // Merge contents from downloaded .json files
   }
 }
 ```
 
-## Setup Guide Generation
+## Setup Guide Template
 
-For each MCP requiring auth, generate `docs/mcp-setup/{service}-setup.md`:
+For each MCP requiring credentials, create `docs/mcp-setup/{service}-setup.md`:
 
 ```markdown
 # {Service} MCP Setup
 
 ## Overview
-| Item | Value |
-|------|-------|
-| Package | {package-name} |
-| Auth Required | {env-var} |
+- Package: {from downloaded config}
+- Required: {env vars from config}
 
 ## Setup Steps
+1. Get credentials from {service}
+2. Add to .env file
+3. Restart Claude Code
 
-1. Go to {service-url}
-2. Create/get API key
-3. Add to .env:
-   ```
-   {ENV_VAR}=your-key-here
-   ```
-
-## Verification
+## Verify
 ```bash
 claude mcp list
 ```
-```
-
-## .env.example Generation
-
-```bash
-# MCP Server Configuration
-# Copy to .env and fill in values
-
-# Database
-POSTGRES_URL=postgresql://user:pass@host:5432/db
-
-# Stripe
-STRIPE_API_KEY=sk_test_...
-
-# GitHub
-GITHUB_TOKEN=ghp_...
 ```
 
 ## Output Format
@@ -118,28 +122,21 @@ GITHUB_TOKEN=ghp_...
 MCP Configuration Complete
 ═══════════════════════════════════════════════════════════════
 
-Detected Services: 4
-Searched: aitmpl.com (found 1), web (found 3)
+Downloaded from aitmpl.com: 3
+  ✅ postgresql-integration (supabase-toolkit)
+  ✅ github-integration (devops-automation)
+  ✅ playwright-mcp (testing-suite)
 
-Configured MCPs:
-  ✅ postgres     [@modelcontextprotocol/server-postgres] Auth: POSTGRES_URL
-  ✅ stripe       [@stripe/mcp-server] Auth: STRIPE_API_KEY
-  ✅ github       [@modelcontextprotocol/server-github] Auth: GITHUB_TOKEN
-  ✅ slack        [@anthropic/mcp-slack] Auth: SLACK_BOT_TOKEN
+Manual configuration: 0 (aitmpl.com had all required)
 
-Files Created:
-  .mcp.json
+Files:
+  .mcp.json (merged)
   .env.example
-  docs/mcp-setup/README.md
-  docs/mcp-setup/postgres-setup.md
-  docs/mcp-setup/stripe-setup.md
+  docs/mcp-setup/postgresql-setup.md
   docs/mcp-setup/github-setup.md
-  docs/mcp-setup/slack-setup.md
+  docs/mcp-setup/playwright-setup.md
 
-⚠️ Action Required:
-  1. Copy .env.example to .env
-  2. Fill in your credentials
-  3. See docs/mcp-setup/ for details
+⚠️ Next: Configure credentials in .env
 
 ═══════════════════════════════════════════════════════════════
 ```

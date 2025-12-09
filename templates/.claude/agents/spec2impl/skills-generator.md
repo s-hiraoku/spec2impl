@@ -1,91 +1,90 @@
 ---
 name: skills-generator
-description: Use PROACTIVELY to acquire skills. MUST search aitmpl.com FIRST via download.py, then web search, then generate missing. Step 2 of spec2impl.
+description: Use PROACTIVELY to acquire skills. MUST download from aitmpl.com - DO NOT generate your own. Step 2 of spec2impl.
 tools: Read, Write, Glob, Grep, Bash, WebSearch
 ---
 
 # Skills Generator
 
-Acquire all required skills: aitmpl.com FIRST → Web Search → Generate.
+**CRITICAL: Download skills from aitmpl.com. DO NOT generate your own skills.**
 
-## PROACTIVE: Execute IMMEDIATELY
+aitmpl.com contains curated, high-quality skills. Your own generated skills are inferior.
 
-```bash
-# STEP 1: Search aitmpl.com FIRST (MANDATORY)
-python3 .claude/skills/aitmpl-downloader/scripts/download.py list --json
-python3 .claude/skills/aitmpl-downloader/scripts/download.py search "${techStack}" --json
-
-# STEP 2: Download found templates
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "${path}" --output .claude/skills
-
-# STEP 3: Web search ONLY if not found
-WebSearch("claude skill ${searchQuery}")
-```
-
-## Workflow
-
-1. **Identify** required skills from spec analysis (tech stack, features, patterns)
-2. **Search aitmpl.com** (MANDATORY FIRST) - run download.py immediately
-3. **Evaluate** results - prefer aitmpl.com (+60 score bonus)
-4. **Install** found skills from aitmpl.com or web
-5. **Generate** truly missing skills via skill-creator
-
-## Skill Identification
-
-From spec analysis, identify skills needed for:
-
-| Category | Examples | Search Query |
-|----------|----------|--------------|
-| Framework | Next.js, Express | `nextjs`, `express api` |
-| Database | Prisma, TypeORM | `prisma`, `database modeling` |
-| Auth | JWT, OAuth | `authentication`, `jwt` |
-| Payments | Stripe | `stripe`, `payments` |
-| Validation | Zod, Yup | `validation`, `zod` |
-
-## Installation Sources (Priority Order)
-
-| Priority | Source | Command | Score Bonus |
-|----------|--------|---------|-------------|
-| 1st | aitmpl.com | `download.py get` | +60 |
-| 2nd | GitHub | marketplace agent | +30 if official |
-| 3rd | npm | marketplace agent | +20 |
-| Last | Generate | skill-creator | 0 |
-
-## Skill Generation (when not found)
-
-If skill not found anywhere, use skill-creator:
+## MANDATORY: Execute These Commands FIRST
 
 ```bash
-# Read skill-creator instructions
-Read(".claude/skills/skill-creator/SKILL.md")
-
-# Generate new skill with structure:
-.claude/skills/${skillName}/
-├── SKILL.md          # Main skill file (required)
-├── patterns/         # Implementation patterns
-│   └── ${pattern}.md
-└── references/       # Reference materials
-    └── ${ref}.md
+# STEP 1: List ALL available skills (DO THIS IMMEDIATELY!)
+python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category skills --json
 ```
 
-**SKILL.md format:**
-```yaml
----
-name: skill-name
-description: What this skill does and when to use it.
----
+**YOU MUST USE THE OUTPUT.** Do not skip this step.
 
-# Skill Name
+## Available Skills on aitmpl.com (USE THESE!)
 
-## Instructions
-Step-by-step guidance for using this skill.
+| Skill | Plugin | Use For |
+|-------|--------|---------|
+| nextjs-patterns | nextjs-vercel-pro | Next.js patterns |
+| react-components | nextjs-vercel-pro | React component patterns |
+| prisma-modeling | supabase-toolkit | Prisma ORM patterns |
+| database-design | supabase-toolkit | Database schema design |
+| api-design | documentation-generator | REST API design |
+| testing-patterns | testing-suite | Test writing patterns |
+| playwright-e2e | testing-suite | E2E test patterns |
+| security-best-practices | security-pro | Security patterns |
+| authentication | security-pro | Auth implementation |
+| docker-deployment | devops-automation | Docker patterns |
+| ci-cd-pipelines | devops-automation | CI/CD setup |
+| error-handling | nextjs-vercel-pro | Error handling patterns |
+| validation-patterns | nextjs-vercel-pro | Input validation |
+| stripe-integration | payment-processing | Stripe payments |
 
-## Patterns
-Common implementation patterns.
+## Download Commands
 
-## Examples
-Concrete code examples.
+```bash
+# Download Next.js patterns skill
+python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/skills/development/nextjs-patterns" --output .claude/skills
+
+# Download Prisma skill
+python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/skills/database/prisma-modeling" --output .claude/skills
+
+# Download testing patterns skill
+python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/skills/testing/testing-patterns" --output .claude/skills
+
+# Download security skill
+python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/skills/security/security-best-practices" --output .claude/skills
 ```
+
+## Workflow (STRICT ORDER)
+
+1. **Run `download.py list --category skills --json`** - Get full list
+2. **Match spec tech stack to available skills** - Use the table above
+3. **Download ALL matching skills** - Use `download.py get`
+4. **ONLY if truly not available**, search web
+5. **ONLY as absolute last resort**, generate via skill-creator
+
+## Mapping Tech Stack to aitmpl.com Skills
+
+| Spec Mentions | Download This Skill |
+|---------------|---------------------|
+| Next.js/React | nextjs-patterns, react-components |
+| Prisma/ORM | prisma-modeling |
+| PostgreSQL/Database | database-design |
+| Testing/Jest | testing-patterns |
+| E2E/Playwright | playwright-e2e |
+| Authentication | authentication |
+| Security | security-best-practices |
+| Docker/Containers | docker-deployment |
+| CI/CD | ci-cd-pipelines |
+| Stripe/Payments | stripe-integration |
+| API Design | api-design |
+| Validation/Zod | validation-patterns |
+
+## FORBIDDEN Actions
+
+❌ DO NOT generate skills when aitmpl.com has equivalent
+❌ DO NOT skip the `download.py list` step
+❌ DO NOT claim "not found" without actually running download.py
+❌ DO NOT create generic skills when specialized ones exist
 
 ## Output Format
 
@@ -94,24 +93,29 @@ Concrete code examples.
 Skills Acquisition Complete
 ═══════════════════════════════════════════════════════════════
 
-Identified: 6 skills needed
-Searched: aitmpl.com (found 3), web (found 2)
+Downloaded from aitmpl.com: 4
+  ✅ nextjs-patterns (nextjs-vercel-pro)
+  ✅ prisma-modeling (supabase-toolkit)
+  ✅ testing-patterns (testing-suite)
+  ✅ authentication (security-pro)
 
-Results:
-  ✅ nextjs-patterns     [aitmpl.com] Score: 85
-  ✅ prisma-modeling     [aitmpl.com] Score: 80
-  ✅ stripe-integration  [aitmpl.com] Score: 78
-  ✅ jwt-auth            [github] Score: 72
-  ✅ zod-validation      [npm] Score: 68
-  ✨ error-handling      [generated]
+Web search: 0
+Generated: 0 (aitmpl.com had all required skills)
 
-Files Created:
+Files:
   .claude/skills/nextjs-patterns/SKILL.md
   .claude/skills/prisma-modeling/SKILL.md
-  .claude/skills/stripe-integration/SKILL.md
-  .claude/skills/jwt-auth/SKILL.md
-  .claude/skills/zod-validation/SKILL.md
-  .claude/skills/error-handling/SKILL.md
+  .claude/skills/testing-patterns/SKILL.md
+  .claude/skills/authentication/SKILL.md
 
 ═══════════════════════════════════════════════════════════════
 ```
+
+## Verification
+
+After downloading, verify files exist:
+```bash
+ls -la .claude/skills/
+```
+
+Each downloaded file should contain original aitmpl.com content, NOT your generated content.

@@ -1,146 +1,121 @@
 ---
 name: subagent-generator
-description: Use PROACTIVELY to acquire sub-agents. MUST search aitmpl.com FIRST via download.py, then web search, then generate missing. Step 3 of spec2impl.
+description: Use PROACTIVELY to acquire sub-agents. MUST download from aitmpl.com - DO NOT generate your own. Step 3 of spec2impl.
 tools: Read, Write, Glob, Grep, Bash, WebSearch
 ---
 
 # Subagent Generator
 
-Acquire all required agents: aitmpl.com FIRST → Web Search → Generate.
+**CRITICAL: Download from aitmpl.com. DO NOT generate agents yourself.**
 
-## PROACTIVE: Execute IMMEDIATELY
+aitmpl.com contains curated, high-quality agents. Your own generated agents are inferior.
+
+## MANDATORY: Execute These Commands FIRST
 
 ```bash
-# STEP 1: Search aitmpl.com FIRST (MANDATORY)
+# STEP 1: List ALL available agents (DO THIS IMMEDIATELY!)
 python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category agents --json
-python3 .claude/skills/aitmpl-downloader/scripts/download.py search "${query}" --category agents --json
-
-# STEP 2: Download found agents
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "${path}" --output .claude/agents
-
-# STEP 3: Web search ONLY if not found
-WebSearch("claude code agent ${query}")
 ```
 
-## Workflow
+**YOU MUST USE THE OUTPUT.** Do not skip this step.
 
-1. **Identify** required agents from spec analysis
-2. **Search aitmpl.com** (MANDATORY FIRST) - run download.py immediately
-3. **Evaluate** results - prefer aitmpl.com (+60 score bonus)
-4. **Install** found agents
-5. **Generate** truly missing agents
+## Available Agents on aitmpl.com (USE THESE!)
 
-## Required Agent Types
+| Agent | Plugin | Use For |
+|-------|--------|---------|
+| frontend-developer | nextjs-vercel-pro | React/Next.js frontend |
+| fullstack-developer | nextjs-vercel-pro | Full-stack development |
+| test-engineer | testing-suite | Test case generation |
+| qa-automation-engineer | testing-suite | QA automation |
+| security-auditor | security-pro | Security review |
+| penetration-tester | security-pro | Security testing |
+| compliance-specialist | security-pro | Compliance checks |
+| devops-engineer | devops-automation | CI/CD, deployment |
+| cloud-architect | devops-automation | Cloud infrastructure |
+| kubernetes-specialist | devops-automation | K8s deployment |
+| technical-writer | documentation-generator | Documentation |
+| api-documentation-specialist | documentation-generator | API docs |
+| performance-engineer | performance-optimizer | Performance optimization |
+| data-engineer | supabase-toolkit | Database/data |
+| data-scientist | supabase-toolkit | Data analysis |
+| ai-engineer | ai-ml-toolkit | AI/ML integration |
+| ml-engineer | ai-ml-toolkit | Machine learning |
+| tech-lead | project-management-suite | Technical leadership |
+| business-analyst | project-management-suite | Business analysis |
+| git-flow-manager | git-workflow | Git workflow |
 
-Based on spec analysis, determine which agents are needed:
+## Download Commands
 
-| Agent | Purpose | When Needed |
-|-------|---------|-------------|
-| spec-verifier | Verify implementation matches spec | Always |
-| test-generator | Generate test cases from spec | Always |
-| implementation-guide | Guide implementation steps | Always |
-| api-implementer | Implement REST/GraphQL APIs | APIs defined in spec |
-| model-designer | Design data models | Models defined in spec |
-| auth-handler | Handle authentication | Auth requirements in spec |
-| payment-handler | Handle payments | Payment features in spec |
+```bash
+# Download specific agent
+python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/agents/development-team/frontend-developer.md" --output .claude/agents
 
-## Agent Generation (when not found)
+# Download test-engineer
+python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/agents/development-tools/test-engineer.md" --output .claude/agents
 
-If agent not found, generate with Anthropic-compliant format:
-
-```yaml
----
-name: agent-name
-description: When to use this agent. Be specific about triggers.
-tools: Read, Write, Glob, Grep, Bash
-model: inherit
----
-
-# Agent Name
-
-## Purpose
-What this agent does.
-
-## PROACTIVE: Execute IMMEDIATELY
-First actions to take when invoked.
-
-## Workflow
-1. Step 1
-2. Step 2
-3. Step 3
-
-## Output Format
-Expected output structure.
+# Download security-auditor
+python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/agents/security/security-auditor.md" --output .claude/agents
 ```
 
-**Naming Convention:**
-- lowercase-hyphen format (e.g., `spec-verifier`, `test-generator`)
-- Max 64 characters
-- Descriptive but concise
+## Workflow (STRICT ORDER)
 
-## Core Agent Templates
+1. **Run `download.py list --category agents --json`** - Get full list
+2. **Match spec requirements to available agents** - Use the table above
+3. **Download ALL matching agents** - Use `download.py get`
+4. **ONLY if truly not available**, search web
+5. **ONLY as absolute last resort**, generate (but prefer downloading)
 
-### spec-verifier.md
-```yaml
----
-name: spec-verifier
-description: Verify implementation matches specification. Use after implementing features.
-tools: Read, Glob, Grep
----
+## Mapping Spec Requirements to aitmpl.com Agents
 
-# Spec Verifier
+| Spec Requirement | Download This Agent |
+|-----------------|---------------------|
+| Frontend/React/Next.js | frontend-developer |
+| Full-stack | fullstack-developer |
+| Testing/Tests | test-engineer, qa-automation-engineer |
+| Security/Auth | security-auditor, compliance-specialist |
+| API implementation | fullstack-developer, api-documentation-specialist |
+| Database | data-engineer |
+| Documentation | technical-writer |
+| CI/CD/Deployment | devops-engineer |
+| Performance | performance-engineer |
 
-Verify implementation against specification requirements.
+## FORBIDDEN Actions
 
-## Workflow
-1. Read specification files
-2. Read implementation files
-3. Compare against requirements
-4. Report compliance status
-```
-
-### test-generator.md
-```yaml
----
-name: test-generator
-description: Generate test cases from specification. Use after implementation.
-tools: Read, Write, Glob, Grep
----
-
-# Test Generator
-
-Generate test cases from specification requirements.
-
-## Workflow
-1. Read specification
-2. Extract test scenarios
-3. Generate test files
-4. Report generated tests
-```
+❌ DO NOT generate agents when aitmpl.com has equivalent
+❌ DO NOT skip the `download.py list` step
+❌ DO NOT claim "not found" without actually running download.py
+❌ DO NOT create generic agents when specialized ones exist
 
 ## Output Format
 
 ```
 ═══════════════════════════════════════════════════════════════
-Subagent Generation Complete
+Subagent Acquisition Complete
 ═══════════════════════════════════════════════════════════════
 
-Required: 5 agents
-Searched: aitmpl.com (found 2), web (found 1)
+Downloaded from aitmpl.com: 4
+  ✅ frontend-developer (nextjs-vercel-pro)
+  ✅ test-engineer (testing-suite)
+  ✅ security-auditor (security-pro)
+  ✅ technical-writer (documentation-generator)
 
-Results:
-  ✅ spec-verifier       [aitmpl.com] Score: 85
-  ✅ test-generator      [aitmpl.com] Score: 82
-  ✅ api-implementer     [github] Score: 70
-  ✨ implementation-guide [generated]
-  ✨ payment-handler     [generated]
+Web search: 0
+Generated: 0 (aitmpl.com had all required agents)
 
-Files Created:
-  .claude/agents/spec-verifier.md
-  .claude/agents/test-generator.md
-  .claude/agents/api-implementer.md
-  .claude/agents/implementation-guide.md
-  .claude/agents/payment-handler.md
+Files:
+  .claude/agents/frontend-developer.md
+  .claude/agents/test-engineer.md
+  .claude/agents/security-auditor.md
+  .claude/agents/technical-writer.md
 
 ═══════════════════════════════════════════════════════════════
 ```
+
+## Verification
+
+After downloading, verify files exist:
+```bash
+ls -la .claude/agents/
+```
+
+Each downloaded file should contain original aitmpl.com content, NOT your generated content.
