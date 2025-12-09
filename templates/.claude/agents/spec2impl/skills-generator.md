@@ -1,25 +1,37 @@
 ---
 name: skills-generator
-description: Use PROACTIVELY to acquire skills. MUST download from aitmpl.com - DO NOT generate your own. Step 2 of spec2impl.
+description: Use PROACTIVELY to acquire skills. MUST use aitmpl-downloader agent - DO NOT generate your own. Step 2 of spec2impl.
 tools: Read, Write, Glob, Grep, Bash, WebSearch
 ---
 
 # Skills Generator
 
-**CRITICAL: Download skills from aitmpl.com. DO NOT generate your own skills.**
+**CRITICAL: Use aitmpl-downloader agent for ALL downloads. DO NOT generate your own skills.**
 
-aitmpl.com contains curated, high-quality skills. Your own generated skills are inferior.
+## MANDATORY: Call aitmpl-downloader Agent FIRST
 
-## MANDATORY: Execute These Commands FIRST
-
-```bash
-# STEP 1: List ALL available skills (DO THIS IMMEDIATELY!)
-python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category skills --json
+```typescript
+// STEP 1: Call aitmpl-downloader agent to list available skills
+Task({
+  subagent_type: "general-purpose",
+  prompt: `Read .claude/agents/spec2impl/aitmpl-downloader.md and execute.
+           Command: list --category skills --json`
+})
 ```
 
 **YOU MUST USE THE OUTPUT.** Do not skip this step.
 
-## Available Skills on aitmpl.com (USE THESE!)
+## Pre-installed Skills (Already Available)
+
+These skills come with spec2impl - use them directly:
+
+| Skill | Location | Use For |
+|-------|----------|---------|
+| ux-psychology | .claude/skills/ux-psychology/ | UI/UX design with 43 psychology concepts |
+| skill-creator | .claude/skills/skill-creator/ | Create new skills when not found |
+| aitmpl-downloader | .claude/skills/aitmpl-downloader/ | Download from aitmpl.com |
+
+## Available on aitmpl.com (Download These!)
 
 | Skill | Plugin | Use For |
 |-------|--------|---------|
@@ -34,57 +46,50 @@ python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category ski
 | authentication | security-pro | Auth implementation |
 | docker-deployment | devops-automation | Docker patterns |
 | ci-cd-pipelines | devops-automation | CI/CD setup |
-| error-handling | nextjs-vercel-pro | Error handling patterns |
-| validation-patterns | nextjs-vercel-pro | Input validation |
 | stripe-integration | payment-processing | Stripe payments |
 
-## Download Commands
+## Download via aitmpl-downloader Agent
 
-```bash
-# Download Next.js patterns skill
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/skills/development/nextjs-patterns" --output .claude/skills
-
-# Download Prisma skill
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/skills/database/prisma-modeling" --output .claude/skills
-
-# Download testing patterns skill
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/skills/testing/testing-patterns" --output .claude/skills
-
-# Download security skill
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/skills/security/security-best-practices" --output .claude/skills
+```typescript
+// Download matching skills
+Task({
+  subagent_type: "general-purpose",
+  prompt: `Read .claude/agents/spec2impl/aitmpl-downloader.md and execute.
+           Download these skills: nextjs-patterns, testing-patterns
+           Output directory: .claude/skills/`
+})
 ```
 
 ## Workflow (STRICT ORDER)
 
-1. **Run `download.py list --category skills --json`** - Get full list
-2. **Match spec tech stack to available skills** - Use the table above
-3. **Download ALL matching skills** - Use `download.py get`
-4. **ONLY if truly not available**, search web
-5. **ONLY as absolute last resort**, generate via skill-creator
+1. **Check pre-installed skills** - ux-psychology, skill-creator, aitmpl-downloader
+2. **Call aitmpl-downloader agent** - List available skills
+3. **Match spec tech stack** - Use the table above
+4. **Download via aitmpl-downloader agent** - ALL matching skills
+5. **ONLY if truly not available**, use skill-creator to generate
 
-## Mapping Tech Stack to aitmpl.com Skills
+## Mapping Tech Stack to Skills
 
-| Spec Mentions | Download This Skill |
-|---------------|---------------------|
-| Next.js/React | nextjs-patterns, react-components |
-| Prisma/ORM | prisma-modeling |
-| PostgreSQL/Database | database-design |
-| Testing/Jest | testing-patterns |
-| E2E/Playwright | playwright-e2e |
-| Authentication | authentication |
-| Security | security-best-practices |
-| Docker/Containers | docker-deployment |
-| CI/CD | ci-cd-pipelines |
-| Stripe/Payments | stripe-integration |
-| API Design | api-design |
-| Validation/Zod | validation-patterns |
+| Spec Mentions | Use Pre-installed | Download from aitmpl.com |
+|---------------|-------------------|--------------------------|
+| UI/UX/Frontend Design | ux-psychology | - |
+| Next.js/React | - | nextjs-patterns, react-components |
+| Prisma/ORM | - | prisma-modeling |
+| Database | - | database-design |
+| Testing | - | testing-patterns |
+| E2E/Playwright | - | playwright-e2e |
+| Authentication | - | authentication |
+| Security | - | security-best-practices |
+| Docker | - | docker-deployment |
+| CI/CD | - | ci-cd-pipelines |
+| Stripe/Payments | - | stripe-integration |
 
 ## FORBIDDEN Actions
 
 ❌ DO NOT generate skills when aitmpl.com has equivalent
-❌ DO NOT skip the `download.py list` step
-❌ DO NOT claim "not found" without actually running download.py
-❌ DO NOT create generic skills when specialized ones exist
+❌ DO NOT skip calling aitmpl-downloader agent
+❌ DO NOT claim "not found" without checking aitmpl.com
+❌ DO NOT ignore pre-installed skills (ux-psychology, skill-creator)
 
 ## Output Format
 
@@ -93,29 +98,18 @@ python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/com
 Skills Acquisition Complete
 ═══════════════════════════════════════════════════════════════
 
+Pre-installed (already available): 3
+  ✅ ux-psychology
+  ✅ skill-creator
+  ✅ aitmpl-downloader
+
 Downloaded from aitmpl.com: 4
   ✅ nextjs-patterns (nextjs-vercel-pro)
   ✅ prisma-modeling (supabase-toolkit)
   ✅ testing-patterns (testing-suite)
   ✅ authentication (security-pro)
 
-Web search: 0
 Generated: 0 (aitmpl.com had all required skills)
-
-Files:
-  .claude/skills/nextjs-patterns/SKILL.md
-  .claude/skills/prisma-modeling/SKILL.md
-  .claude/skills/testing-patterns/SKILL.md
-  .claude/skills/authentication/SKILL.md
 
 ═══════════════════════════════════════════════════════════════
 ```
-
-## Verification
-
-After downloading, verify files exist:
-```bash
-ls -la .claude/skills/
-```
-
-Each downloaded file should contain original aitmpl.com content, NOT your generated content.

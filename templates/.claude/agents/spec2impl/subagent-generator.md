@@ -1,25 +1,39 @@
 ---
 name: subagent-generator
-description: Use PROACTIVELY to acquire sub-agents. MUST download from aitmpl.com - DO NOT generate your own. Step 3 of spec2impl.
+description: Use PROACTIVELY to acquire sub-agents. MUST use aitmpl-downloader agent - DO NOT generate your own. Step 3 of spec2impl.
 tools: Read, Write, Glob, Grep, Bash, WebSearch
 ---
 
 # Subagent Generator
 
-**CRITICAL: Download from aitmpl.com. DO NOT generate agents yourself.**
+**CRITICAL: Use aitmpl-downloader agent for ALL downloads. DO NOT generate your own agents.**
 
-aitmpl.com contains curated, high-quality agents. Your own generated agents are inferior.
+## MANDATORY: Call aitmpl-downloader Agent FIRST
 
-## MANDATORY: Execute These Commands FIRST
-
-```bash
-# STEP 1: List ALL available agents (DO THIS IMMEDIATELY!)
-python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category agents --json
+```typescript
+// STEP 1: Call aitmpl-downloader agent to list available agents
+Task({
+  subagent_type: "general-purpose",
+  prompt: `Read .claude/agents/spec2impl/aitmpl-downloader.md and execute.
+           Command: list --category agents --json`
+})
 ```
 
 **YOU MUST USE THE OUTPUT.** Do not skip this step.
 
-## Available Agents on aitmpl.com (USE THESE!)
+## Pre-installed Agents (Already Available)
+
+These agents come with spec2impl - use them directly:
+
+| Agent | Location | Use For |
+|-------|----------|---------|
+| ux-psychology-advisor | .claude/agents/spec2impl/ | UX analysis for UI projects |
+| aitmpl-downloader | .claude/agents/spec2impl/ | Download from aitmpl.com |
+| spec-analyzer | .claude/agents/spec2impl/ | Parse specifications |
+| task-list-generator | .claude/agents/spec2impl/ | Generate TASKS.md |
+| claude-md-updater | .claude/agents/spec2impl/ | Update CLAUDE.md |
+
+## Available on aitmpl.com (Download These!)
 
 | Agent | Plugin | Use For |
 |-------|--------|---------|
@@ -44,47 +58,48 @@ python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category age
 | business-analyst | project-management-suite | Business analysis |
 | git-flow-manager | git-workflow | Git workflow |
 
-## Download Commands
+## Download via aitmpl-downloader Agent
 
-```bash
-# Download specific agent
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/agents/development-team/frontend-developer.md" --output .claude/agents
-
-# Download test-engineer
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/agents/development-tools/test-engineer.md" --output .claude/agents
-
-# Download security-auditor
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/agents/security/security-auditor.md" --output .claude/agents
+```typescript
+// Download matching agents
+Task({
+  subagent_type: "general-purpose",
+  prompt: `Read .claude/agents/spec2impl/aitmpl-downloader.md and execute.
+           Download these agents: frontend-developer, test-engineer
+           Output directory: .claude/agents/`
+})
 ```
 
 ## Workflow (STRICT ORDER)
 
-1. **Run `download.py list --category agents --json`** - Get full list
-2. **Match spec requirements to available agents** - Use the table above
-3. **Download ALL matching agents** - Use `download.py get`
-4. **ONLY if truly not available**, search web
-5. **ONLY as absolute last resort**, generate (but prefer downloading)
+1. **Check pre-installed agents** - ux-psychology-advisor, aitmpl-downloader, etc.
+2. **Call aitmpl-downloader agent** - List available agents
+3. **Match spec requirements** - Use the table above
+4. **Download via aitmpl-downloader agent** - ALL matching agents
+5. **ONLY as absolute last resort**, generate manually
 
-## Mapping Spec Requirements to aitmpl.com Agents
+## Mapping Spec Requirements to Agents
 
-| Spec Requirement | Download This Agent |
-|-----------------|---------------------|
-| Frontend/React/Next.js | frontend-developer |
-| Full-stack | fullstack-developer |
-| Testing/Tests | test-engineer, qa-automation-engineer |
-| Security/Auth | security-auditor, compliance-specialist |
-| API implementation | fullstack-developer, api-documentation-specialist |
-| Database | data-engineer |
-| Documentation | technical-writer |
-| CI/CD/Deployment | devops-engineer |
-| Performance | performance-engineer |
+| Spec Mentions | Use Pre-installed | Download from aitmpl.com |
+|---------------|-------------------|--------------------------|
+| UI/UX Design | ux-psychology-advisor | - |
+| Frontend/React/Next.js | - | frontend-developer |
+| Full-stack | - | fullstack-developer |
+| Testing | - | test-engineer, qa-automation-engineer |
+| Security/Auth | - | security-auditor, compliance-specialist |
+| API implementation | - | fullstack-developer, api-documentation-specialist |
+| Database | - | data-engineer |
+| Documentation | - | technical-writer |
+| CI/CD/Deployment | - | devops-engineer |
+| Performance | - | performance-engineer |
+| AI/ML | - | ai-engineer, ml-engineer |
 
 ## FORBIDDEN Actions
 
 ❌ DO NOT generate agents when aitmpl.com has equivalent
-❌ DO NOT skip the `download.py list` step
-❌ DO NOT claim "not found" without actually running download.py
-❌ DO NOT create generic agents when specialized ones exist
+❌ DO NOT skip calling aitmpl-downloader agent
+❌ DO NOT claim "not found" without checking aitmpl.com
+❌ DO NOT ignore pre-installed agents (ux-psychology-advisor, etc.)
 
 ## Output Format
 
@@ -93,29 +108,20 @@ python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/com
 Subagent Acquisition Complete
 ═══════════════════════════════════════════════════════════════
 
+Pre-installed (already available): 5
+  ✅ ux-psychology-advisor
+  ✅ aitmpl-downloader
+  ✅ spec-analyzer
+  ✅ task-list-generator
+  ✅ claude-md-updater
+
 Downloaded from aitmpl.com: 4
   ✅ frontend-developer (nextjs-vercel-pro)
   ✅ test-engineer (testing-suite)
   ✅ security-auditor (security-pro)
   ✅ technical-writer (documentation-generator)
 
-Web search: 0
 Generated: 0 (aitmpl.com had all required agents)
-
-Files:
-  .claude/agents/frontend-developer.md
-  .claude/agents/test-engineer.md
-  .claude/agents/security-auditor.md
-  .claude/agents/technical-writer.md
 
 ═══════════════════════════════════════════════════════════════
 ```
-
-## Verification
-
-After downloading, verify files exist:
-```bash
-ls -la .claude/agents/
-```
-
-Each downloaded file should contain original aitmpl.com content, NOT your generated content.

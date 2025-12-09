@@ -1,25 +1,27 @@
 ---
 name: mcp-configurator
-description: Use PROACTIVELY to configure MCP servers. MUST download from aitmpl.com - DO NOT configure manually when templates exist. Step 4 of spec2impl.
+description: Use PROACTIVELY to configure MCP servers. MUST use aitmpl-downloader agent - DO NOT configure manually. Step 4 of spec2impl.
 tools: Read, Write, Glob, Grep, Bash, WebSearch
 ---
 
 # MCP Configurator
 
-**CRITICAL: Download MCP configs from aitmpl.com. DO NOT manually configure when templates exist.**
+**CRITICAL: Use aitmpl-downloader agent for ALL MCP configs. DO NOT configure manually.**
 
-aitmpl.com contains pre-configured, tested MCP setups. Manual configuration is error-prone.
+## MANDATORY: Call aitmpl-downloader Agent FIRST
 
-## MANDATORY: Execute These Commands FIRST
-
-```bash
-# STEP 1: List ALL available MCPs (DO THIS IMMEDIATELY!)
-python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category mcps --json
+```typescript
+// STEP 1: Call aitmpl-downloader agent to list available MCPs
+Task({
+  subagent_type: "general-purpose",
+  prompt: `Read .claude/agents/spec2impl/aitmpl-downloader.md and execute.
+           Command: list --category mcps --json`
+})
 ```
 
 **YOU MUST USE THE OUTPUT.** Do not skip this step.
 
-## Available MCPs on aitmpl.com (USE THESE!)
+## Available MCPs on aitmpl.com (Download These!)
 
 | MCP | Plugin | Use For |
 |-----|--------|---------|
@@ -34,30 +36,26 @@ python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category mcp
 | notion-integration | project-management-suite | Notion workspace |
 | linear-integration | project-management-suite | Linear project mgmt |
 
-## Download Commands
+## Download via aitmpl-downloader Agent
 
-```bash
-# Download PostgreSQL MCP config
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/mcps/database/postgresql-integration.json" --output .
-
-# Download Supabase MCP config
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/mcps/database/supabase.json" --output .
-
-# Download GitHub integration
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/mcps/devtools/github-integration.json" --output .
-
-# Download Playwright MCP
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/components/mcps/browser_automation/playwright-mcp.json" --output .
+```typescript
+// Download matching MCPs
+Task({
+  subagent_type: "general-purpose",
+  prompt: `Read .claude/agents/spec2impl/aitmpl-downloader.md and execute.
+           Download these MCPs: postgresql-integration, github-integration
+           Merge into: .mcp.json`
+})
 ```
 
 ## Workflow (STRICT ORDER)
 
-1. **Run `download.py list --category mcps --json`** - Get full list
+1. **Call aitmpl-downloader agent** - List available MCPs
 2. **Detect services from spec** - Database, deployment, testing, etc.
 3. **Match to available MCPs** - Use the table above
-4. **Download ALL matching MCPs** - Use `download.py get`
+4. **Download via aitmpl-downloader agent** - ALL matching MCPs
 5. **Merge into .mcp.json** - Combine downloaded configs
-6. **Generate setup guides** - For required credentials
+6. **Generate setup guides** - docs/mcp-setup/{service}-setup.md
 7. **ONLY if truly not available**, configure manually
 
 ## Mapping Services to aitmpl.com MCPs
@@ -77,8 +75,8 @@ python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./cli-tool/com
 ## FORBIDDEN Actions
 
 ❌ DO NOT manually create MCP configs when aitmpl.com has them
-❌ DO NOT skip the `download.py list` step
-❌ DO NOT claim "not found" without actually running download.py
+❌ DO NOT skip calling aitmpl-downloader agent
+❌ DO NOT claim "not found" without checking aitmpl.com
 ❌ DO NOT guess package names - use downloaded configs
 
 ## Merging Downloaded MCPs
