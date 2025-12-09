@@ -12,8 +12,8 @@ Search and evaluate plugins: aitmpl.com FIRST → Web Search → Score.
 
 ```bash
 # STEP 1: Search aitmpl.com FIRST (MANDATORY - DO THIS IMMEDIATELY!)
-python3 .claude/skills/aitmpl-downloader/scripts/download.py search "${query}" --json
-python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category ${category} --json
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py search "${query}" --json
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py list --category ${category} --json
 
 # STEP 2: Web search ONLY if not found
 WebSearch("claude skill ${query}")

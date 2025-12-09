@@ -27,9 +27,9 @@ These skills come with spec2impl - use them directly:
 
 | Skill | Location | Use For |
 |-------|----------|---------|
-| ux-psychology | .claude/skills/ux-psychology/ | UI/UX design with 43 psychology concepts |
-| skill-creator | .claude/skills/skill-creator/ | Create new skills when not found |
-| aitmpl-downloader | .claude/skills/aitmpl-downloader/ | Download from aitmpl.com |
+| ux-psychology | .claude/skills/spec2impl/ux-psychology/ | UI/UX design with 43 psychology concepts |
+| skill-creator | .claude/skills/spec2impl/skill-creator/ | Create new skills when not found |
+| aitmpl-downloader | .claude/skills/spec2impl/aitmpl-downloader/ | Download from aitmpl.com |
 
 ## Available on aitmpl.com (Download These!)
 

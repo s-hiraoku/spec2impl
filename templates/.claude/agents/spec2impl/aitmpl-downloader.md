@@ -14,24 +14,24 @@ Downloads Claude Code templates from aitmpl.com.
 
 ```bash
 # Always use the download.py script from the aitmpl-downloader skill
-python3 .claude/skills/aitmpl-downloader/scripts/download.py <command>
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py <command>
 ```
 
 ## Commands
 
 ```bash
 # List all available templates
-python3 .claude/skills/aitmpl-downloader/scripts/download.py list --json
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py list --json
 
 # List by category (agents, commands, mcps, plugins, settings, hooks)
-python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category agents --json
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py list --category agents --json
 
 # Search for templates
-python3 .claude/skills/aitmpl-downloader/scripts/download.py search "security" --json
-python3 .claude/skills/aitmpl-downloader/scripts/download.py search "database" --category mcps --json
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py search "security" --json
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py search "database" --category mcps --json
 
 # Download a template
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "./path/to/template.md" --output .claude/agents
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py get "./path/to/template.md" --output .claude/agents
 ```
 
 ## Output Directories

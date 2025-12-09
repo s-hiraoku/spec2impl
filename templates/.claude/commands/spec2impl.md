@@ -100,7 +100,7 @@ If spec includes frontend/UI components:
 Task({
   subagent_type: "general-purpose",
   prompt: `Read .claude/agents/spec2impl/ux-psychology-advisor.md and
-           .claude/skills/ux-psychology/SKILL.md.
+           .claude/skills/spec2impl/ux-psychology/SKILL.md.
            Analyze UI requirements from spec and provide UX recommendations.
            Spec Analysis: ${specAnalysis}`
 })
@@ -145,8 +145,7 @@ Output: CLAUDE.md (updated)
 Delete spec2impl files (optional):
 - .claude/commands/spec2impl.md
 - .claude/agents/spec2impl/
-- .claude/skills/skill-creator/
-- .claude/skills/aitmpl-downloader/
+- .claude/skills/spec2impl/
 
 ---
 

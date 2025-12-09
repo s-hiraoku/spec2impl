@@ -13,15 +13,15 @@ Download Claude Code templates from aitmpl.com marketplace.
 
 ```bash
 # Search for templates
-python3 .claude/skills/aitmpl-downloader/scripts/download.py search "<query>" --json
-python3 .claude/skills/aitmpl-downloader/scripts/download.py search "<query>" --category agents --json
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py search "<query>" --json
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py search "<query>" --category agents --json
 
 # List all templates in a category
-python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category agents --json
-python3 .claude/skills/aitmpl-downloader/scripts/download.py list --category mcps --json
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py list --category agents --json
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py list --category mcps --json
 
 # Download a template
-python3 .claude/skills/aitmpl-downloader/scripts/download.py get "<path>" --output .claude/agents
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py get "<path>" --output .claude/agents
 ```
 
 ## Categories
