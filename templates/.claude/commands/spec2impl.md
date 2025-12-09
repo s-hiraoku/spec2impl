@@ -91,22 +91,21 @@ Output: .mcp.json, docs/mcp-setup/
 
 ---
 
-### Step 5: UX Psychology Analysis (for UI/Frontend projects)
-**Agent:** `ux-psychology-advisor.md` + **Skill:** `ux-psychology`
+### Step 5: Deploy Optional Skills/Agents (for UI/Frontend projects)
 
-If spec includes frontend/UI components:
+If spec includes frontend/UI components, deploy ux-psychology for implementation use:
 
-```typescript
-Task({
-  subagent_type: "general-purpose",
-  prompt: `Read .claude/agents/spec2impl/ux-psychology-advisor.md and
-           .claude/skills/spec2impl/ux-psychology/SKILL.md.
-           Analyze UI requirements from spec and provide UX recommendations.
-           Spec Analysis: ${specAnalysis}`
-})
+```bash
+# Copy skill to project (outside spec2impl namespace)
+cp -r .claude/skills/spec2impl/ux-psychology .claude/skills/
+
+# Copy agent to project (outside spec2impl namespace)
+cp .claude/agents/spec2impl/ux-psychology-advisor.md .claude/agents/
 ```
 
-Output: UX recommendations for UI implementation
+These will remain after cleanup and be available during implementation.
+
+Output: .claude/skills/ux-psychology/, .claude/agents/ux-psychology-advisor.md
 
 ---
 

@@ -21,15 +21,27 @@ Task({
 
 **YOU MUST USE THE OUTPUT.** Do not skip this step.
 
-## Pre-installed Skills (Already Available)
+## Bundled Skills (spec2impl internal use)
 
-These skills come with spec2impl - use them directly:
+These skills are used by spec2impl during harness generation:
 
-| Skill | Location | Use For |
+| Skill | Location | Purpose |
 |-------|----------|---------|
-| ux-psychology | .claude/skills/spec2impl/ux-psychology/ | UI/UX design with 43 psychology concepts |
-| skill-creator | .claude/skills/spec2impl/skill-creator/ | Create new skills when not found |
+| skill-creator | .claude/skills/spec2impl/skill-creator/ | Generate new skills when not found |
 | aitmpl-downloader | .claude/skills/spec2impl/aitmpl-downloader/ | Download from aitmpl.com |
+
+## Deployable Skills (copy to project if needed)
+
+These can be deployed to the project for use during implementation:
+
+| Skill | Source | Deploy To | When |
+|-------|--------|-----------|------|
+| ux-psychology | .claude/skills/spec2impl/ux-psychology/ | .claude/skills/ux-psychology/ | UI/Frontend projects |
+
+Deploy command:
+```bash
+cp -r .claude/skills/spec2impl/ux-psychology .claude/skills/
+```
 
 ## Available on aitmpl.com (Download These!)
 
@@ -62,16 +74,16 @@ Task({
 
 ## Workflow (STRICT ORDER)
 
-1. **Check pre-installed skills** - ux-psychology, skill-creator, aitmpl-downloader
-2. **Call aitmpl-downloader agent** - List available skills
-3. **Match spec tech stack** - Use the table above
-4. **Download via aitmpl-downloader agent** - ALL matching skills
+1. **Call aitmpl-downloader agent** - List available skills on aitmpl.com
+2. **Match spec tech stack** - Use the table above
+3. **Download via aitmpl-downloader agent** - ALL matching skills
+4. **Deploy bundled skills if needed** - Copy ux-psychology for UI projects
 5. **ONLY if truly not available**, use skill-creator to generate
 
 ## Mapping Tech Stack to Skills
 
-| Spec Mentions | Use Pre-installed | Download from aitmpl.com |
-|---------------|-------------------|--------------------------|
+| Spec Mentions | Deploy Bundled | Download from aitmpl.com |
+|---------------|----------------|--------------------------|
 | UI/UX/Frontend Design | ux-psychology | - |
 | Next.js/React | - | nextjs-patterns, react-components |
 | Prisma/ORM | - | prisma-modeling |
@@ -89,7 +101,7 @@ Task({
 ❌ DO NOT generate skills when aitmpl.com has equivalent
 ❌ DO NOT skip calling aitmpl-downloader agent
 ❌ DO NOT claim "not found" without checking aitmpl.com
-❌ DO NOT ignore pre-installed skills (ux-psychology, skill-creator)
+❌ DO NOT forget to deploy ux-psychology for UI/frontend projects
 
 ## Output Format
 
@@ -98,10 +110,8 @@ Task({
 Skills Acquisition Complete
 ═══════════════════════════════════════════════════════════════
 
-Pre-installed (already available): 3
-  ✅ ux-psychology
-  ✅ skill-creator
-  ✅ aitmpl-downloader
+Deployed from bundled: 1
+  ✅ ux-psychology → .claude/skills/ux-psychology/
 
 Downloaded from aitmpl.com: 4
   ✅ nextjs-patterns (nextjs-vercel-pro)
