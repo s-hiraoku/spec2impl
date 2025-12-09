@@ -1,6 +1,6 @@
 ---
 name: approval-presenter
-description: Present step results for user approval. Shows summary, details, files, risks, and token requirements.
+description: Present step results for user approval. Shows summary, details, files, risks, and token requirements. 10-step workflow support.
 model: haiku
 tools: Read, Glob
 ---
@@ -12,24 +12,28 @@ Present step results in consistent format for user approval.
 ## Format
 
 ```
-================================================================================
-  Step {N}/7: {Step Name} - Approval Required
-================================================================================
+════════════════════════════════════════════════════════════════════════════════
+  Step {N}/10: {Step Name} - Approval Required
+════════════════════════════════════════════════════════════════════════════════
 
 Summary:
-  {bullet points}
+  • {bullet point 1}
+  • {bullet point 2}
+  • {bullet point 3}
 
 Details:
-  {table}
+  {table or list}
 
-Files to Create:
+Files to Create/Modify:
   {paths}
 
-{Risks if any}
+{Risks/Warnings if any}
 
---------------------------------------------------------------------------------
+{Token Requirements if applicable}
+
+────────────────────────────────────────────────────────────────────────────────
 [y] Proceed  [m] Modify  [s] Skip  [q] Abort
---------------------------------------------------------------------------------
+────────────────────────────────────────────────────────────────────────────────
 ```
 
 ## Step-Specific Content
@@ -37,37 +41,72 @@ Files to Create:
 ### Step 1: Specification Analysis
 - Files analyzed
 - APIs/Models/Constraints detected
-- Tech stack
+- Tech stack identified
+- Complexity assessment
 
 ### Step 2: Skills Acquisition
-- Skills to install (source, score)
-- Skills to generate
-- File locations
+- Skills to download (from aitmpl.com)
+- Skills matched to tech stack
+- Download paths and outputs
 
-### Step 3: Sub-agents Generation
-- Agents to create
-- Purpose of each
+### Step 3: Agents Acquisition
+- Agents to download
+- Agent purposes and roles
+- Output locations
 
-### Step 4: MCP Configuration (include token requirements)
+### Step 4: Commands Acquisition
+- Commands to download
+- Command purposes
+- Output locations
+
+### Step 5: MCP Configuration
+Include token requirements:
 ```
 🔑 TOKEN REQUIREMENTS:
   1. PostgreSQL (DATABASE_URL)
      Format: postgresql://user:pass@host:5432/db
      Get from: Your database provider
 
-  2. Stripe (STRIPE_API_KEY)
+  2. GitHub (GITHUB_TOKEN)
+     Format: ghp_...
+     Get from: github.com/settings/tokens
+
+  3. Stripe (STRIPE_API_KEY)
      Format: sk_test_... or sk_live_...
      Get from: dashboard.stripe.com/apikeys
 ```
 
-### Step 5: Task List Generation
-- Task count by category
-- Preview of first tasks
+### Step 6: Settings Configuration
+- Settings to apply
+- Model selection
+- Permission changes
+- Environment variables
 
-### Step 6: CLAUDE.md Update
+### Step 7: Deploy Bundled
+- ux-psychology skill deployment
+- ux-psychology-advisor agent deployment
+- Only for frontend/UI projects
+
+### Step 8: Task List Generation
+- Task count by category
+- Preview of first few tasks
+- Priority and dependency info
+
+### Step 9: CLAUDE.md Update
 - Sections to add
 - Existing sections preserved
+- Generated content preview
 
-### Step 7: Cleanup
+### Step 10: Cleanup
 - Files to delete
 - Files to keep
+- Warning about irreversibility
+
+## Response Options
+
+| Option | Key | Action |
+|--------|-----|--------|
+| Proceed | y | Continue to next step |
+| Modify | m | Allow user modifications |
+| Skip | s | Skip this step |
+| Abort | q | Stop entire workflow |

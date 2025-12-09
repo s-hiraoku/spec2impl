@@ -14,16 +14,22 @@ Analyze specification documents and build Claude Code implementation environment
 
 ## Execution Flow
 
-Execute 8 steps sequentially. Launch subagents PROACTIVELY using:
+Execute 10 steps sequentially. Each step:
+1. Show progress with `progress-dashboard`
+2. Execute step logic
+3. Present results with `approval-presenter` for user approval
 
 ```typescript
+// Progress display
 Task({
   subagent_type: "general-purpose",
-  prompt: `Read .claude/agents/spec2impl/${agentName}.md and execute. ${input}`
+  model: "haiku",
+  prompt: `Read .claude/agents/spec2impl/progress-dashboard.md and execute.
+           Mode: workflow
+           Current Step: ${stepNumber}
+           Total Steps: 10`
 })
 ```
-
-**CRITICAL: All download operations MUST use the aitmpl-downloader agent.**
 
 ---
 
@@ -40,60 +46,101 @@ Task({
 })
 ```
 
-Output: APIs, models, constraints, tech stack
+→ Output: APIs, models, constraints, tech stack
+→ Call `approval-presenter` with results
 
 ---
 
 ### Step 2: Skills Acquisition
-**Agent:** `skills-generator.md` → calls `aitmpl-downloader.md`
+**Agent:** `category-downloader.md` (category: skills)
 
 ```typescript
 Task({
   subagent_type: "general-purpose",
-  prompt: `Read .claude/agents/spec2impl/skills-generator.md and execute.
-           Use aitmpl-downloader agent for ALL downloads.
-           Tech Stack: ${techStack}`
+  prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
+           Category: skills
+           Tech Stack: ${techStack}
+           Requirements: ${specRequirements}`
 })
 ```
 
-Output: .claude/skills/[name]/SKILL.md
+→ Output: `.claude/skills/[name]/`
+→ Call `approval-presenter` with downloaded skills
 
 ---
 
-### Step 3: Sub-agents Generation
-**Agent:** `subagent-generator.md` → calls `aitmpl-downloader.md`
+### Step 3: Agents Acquisition
+**Agent:** `category-downloader.md` (category: agents)
 
 ```typescript
 Task({
   subagent_type: "general-purpose",
-  prompt: `Read .claude/agents/spec2impl/subagent-generator.md and execute.
-           Use aitmpl-downloader agent for ALL downloads.`
+  prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
+           Category: agents
+           Requirements: ${specRequirements}`
 })
 ```
 
-Output: .claude/agents/[name].md
+→ Output: `.claude/agents/[name].md`
+→ Call `approval-presenter` with downloaded agents
 
 ---
 
-### Step 4: MCP Configuration
-**Agent:** `mcp-configurator.md` → calls `aitmpl-downloader.md`
+### Step 4: Commands Acquisition
+**Agent:** `category-downloader.md` (category: commands)
 
 ```typescript
 Task({
   subagent_type: "general-purpose",
-  prompt: `Read .claude/agents/spec2impl/mcp-configurator.md and execute.
-           Use aitmpl-downloader agent for ALL downloads.
-           Services: ${detectedServices}`
+  prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
+           Category: commands
+           Requirements: ${specRequirements}`
 })
 ```
 
-Output: .mcp.json, docs/mcp-setup/
+→ Output: `.claude/commands/[name].md`
+→ Call `approval-presenter` with downloaded commands
 
 ---
 
-### Step 5: Deploy Optional Skills/Agents (for UI/Frontend projects)
+### Step 5: MCP Configuration
+**Agent:** `category-downloader.md` (category: mcps)
 
-If spec includes frontend/UI components, deploy ux-psychology for implementation use:
+```typescript
+Task({
+  subagent_type: "general-purpose",
+  prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
+           Category: mcps
+           Services: ${detectedServices}
+           Requirements: ${specRequirements}`
+})
+```
+
+→ Output: `.mcp.json`
+→ Call `approval-presenter` with MCP configs (include token requirements)
+
+---
+
+### Step 6: Settings Configuration
+**Agent:** `category-downloader.md` (category: settings)
+
+```typescript
+Task({
+  subagent_type: "general-purpose",
+  prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
+           Category: settings
+           Project Type: ${projectType}`
+})
+```
+
+→ Output: `.claude/settings.local.json`
+→ Call `approval-presenter` with settings
+
+---
+
+### Step 7: Deploy Bundled (for UI/Frontend projects)
+
+If spec includes frontend/UI components, deploy ux-psychology:
 
 ```bash
 # Copy skill to project (outside spec2impl namespace)
@@ -103,13 +150,11 @@ cp -r .claude/skills/spec2impl/ux-psychology .claude/skills/
 cp .claude/agents/spec2impl/ux-psychology-advisor.md .claude/agents/
 ```
 
-These will remain after cleanup and be available during implementation.
-
-Output: .claude/skills/ux-psychology/, .claude/agents/ux-psychology-advisor.md
+→ Output: `.claude/skills/ux-psychology/`, `.claude/agents/ux-psychology-advisor.md`
 
 ---
 
-### Step 6: Task List Generation
+### Step 8: Task List Generation
 **Agent:** `task-list-generator.md`
 
 ```typescript
@@ -117,15 +162,17 @@ Task({
   subagent_type: "general-purpose",
   prompt: `Read .claude/agents/spec2impl/task-list-generator.md and execute.
            Include UX recommendations if applicable.
-           Spec Analysis: ${specAnalysis}`
+           Spec Analysis: ${specAnalysis}
+           Downloaded: ${downloadedItems}`
 })
 ```
 
-Output: docs/TASKS.md
+→ Output: `docs/TASKS.md`
+→ Call `approval-presenter` with task summary
 
 ---
 
-### Step 7: CLAUDE.md Update
+### Step 9: CLAUDE.md Update
 **Agent:** `claude-md-updater.md`
 
 ```typescript
@@ -136,37 +183,39 @@ Task({
 })
 ```
 
-Output: CLAUDE.md (updated)
+→ Output: `CLAUDE.md` (updated)
 
 ---
 
-### Step 8: Cleanup
-Delete spec2impl files (optional):
-- .claude/commands/spec2impl.md
-- .claude/agents/spec2impl/
-- .claude/skills/spec2impl/
+### Step 10: Cleanup (Optional)
+
+Delete spec2impl files:
+- `.claude/commands/spec2impl.md`
+- `.claude/agents/spec2impl/`
+- `.claude/skills/spec2impl/`
+
+→ Call `approval-presenter` for cleanup confirmation
 
 ---
 
 ## Available Agents Reference
 
-| Agent | Purpose | When to Use |
-|-------|---------|-------------|
-| aitmpl-downloader | Download from aitmpl.com | Every download operation |
-| ux-psychology-advisor | UX recommendations | Frontend/UI projects |
-| spec-analyzer | Parse specifications | Step 1 |
-| skills-generator | Acquire skills | Step 2 |
-| subagent-generator | Acquire agents | Step 3 |
-| mcp-configurator | Configure MCPs | Step 4 |
-| task-list-generator | Generate TASKS.md | Step 6 |
-| claude-md-updater | Update CLAUDE.md | Step 7 |
+| Agent | Purpose | Steps |
+|-------|---------|-------|
+| spec-analyzer | Parse specifications | 1 |
+| category-downloader | Download by category | 2, 3, 4, 5, 6 |
+| task-list-generator | Generate TASKS.md | 8 |
+| claude-md-updater | Update CLAUDE.md | 9 |
+| progress-dashboard | Show progress | All |
+| approval-presenter | Get user approval | 1-6, 8, 10 |
+| ux-psychology-advisor | UX recommendations | Deployed in 7 |
 
 ## Available Skills Reference
 
 | Skill | Purpose | When to Use |
 |-------|---------|-------------|
-| aitmpl-downloader | Template marketplace | All download operations |
-| ux-psychology | 43 UX psychology concepts | UI/frontend design |
+| aitmpl-downloader | Template marketplace (GitHub API) | Steps 2-6 |
+| ux-psychology | 43 UX psychology concepts | UI/frontend projects |
 | skill-creator | Create new skills | When no template exists |
 
 ---
@@ -174,25 +223,25 @@ Delete spec2impl files (optional):
 ## Completion Report
 
 ```
-====================================================
-spec2impl Complete
-====================================================
+════════════════════════════════════════════════════════════════
+spec2impl Complete (10/10 steps)
+════════════════════════════════════════════════════════════════
 
 Downloaded from aitmpl.com:
-  Skills:     ${downloadedSkills} downloaded
-  Agents:     ${downloadedAgents} downloaded
-  MCPs:       ${downloadedMCPs} configured
+  Skills:     ${downloadedSkills}
+  Agents:     ${downloadedAgents}
+  Commands:   ${downloadedCommands}
+  MCPs:       ${downloadedMCPs}
+  Settings:   ${downloadedSettings}
 
-Generated (not found on aitmpl.com):
-  Skills:     ${generatedSkills}
-  Agents:     ${generatedAgents}
+Deployed:
+  UX Psychology: ${uxDeployed ? "Yes" : "N/A"}
 
-Tasks:      ${taskCount} tasks in docs/TASKS.md
-UX Applied: ${uxApplied ? "Yes" : "N/A"}
+Tasks: ${taskCount} tasks in docs/TASKS.md
 
 Next Steps:
-1. Configure MCPs (see docs/mcp-setup/)
+1. Configure MCPs (see token requirements above)
 2. Review docs/TASKS.md
 3. Start: "Implement T-SPEC-1"
-====================================================
+════════════════════════════════════════════════════════════════
 ```
