@@ -237,9 +237,17 @@ def list_items(category: Optional[str] = None, use_cache: bool = True) -> List[D
 
 
 def search_items(query: str, category: Optional[str] = None) -> List[Dict]:
-    """Search items by query string."""
+    """Search items by query string.
+
+    Supports multiple search terms separated by spaces.
+    Items matching ANY term will be included (OR logic).
+    """
     items = list_items(category)
-    query_lower = query.lower()
+
+    # Split query into individual terms
+    query_terms = [term.lower().strip() for term in query.split() if term.strip()]
+    if not query_terms:
+        return []
 
     results = []
     for item in items:
@@ -248,10 +256,10 @@ def search_items(query: str, category: Optional[str] = None) -> List[Dict]:
         subcategory = item.get("subcategory", "").lower()
         path = item.get("path", "").lower()
 
-        if (query_lower in name or
-            query_lower in desc or
-            query_lower in subcategory or
-            query_lower in path):
+        searchable = f"{name} {desc} {subcategory} {path}"
+
+        # Match if ANY term is found (OR logic)
+        if any(term in searchable for term in query_terms):
             results.append(item)
 
     return results
