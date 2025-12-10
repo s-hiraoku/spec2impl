@@ -1,6 +1,6 @@
 {
   "name": "spec2impl",
-  "version": "0.3.23",
+  "version": "0.3.24",
   "description": "Generate Claude Code implementation environment from specification documents",
   "author": "",
   "license": "MIT",
