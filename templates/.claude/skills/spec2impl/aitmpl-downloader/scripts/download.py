@@ -56,6 +56,9 @@ OUTPUT_DIRS = {
 CACHE_DIR = Path.home() / ".cache" / "aitmpl-downloader"
 CACHE_TTL_MINUTES = 15
 
+# Fallback index (used when API rate limit is hit)
+FALLBACK_INDEX_PATH = Path(__file__).parent.parent / "fallback-index.json"
+
 
 def get_cache_path(category: str) -> Path:
     """Get cache file path for a category."""
@@ -87,6 +90,18 @@ def write_cache(category: str, items: List[Dict]):
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path = get_cache_path(category)
     cache_path.write_text(json.dumps(items, ensure_ascii=False, indent=2))
+
+
+def load_fallback_index(category: str) -> List[Dict]:
+    """Load items from fallback index file when API fails."""
+    if not FALLBACK_INDEX_PATH.exists():
+        return []
+
+    try:
+        data = json.loads(FALLBACK_INDEX_PATH.read_text())
+        return data.get(category, [])
+    except (json.JSONDecodeError, IOError):
+        return []
 
 
 def fetch_url(url: str, is_api: bool = False) -> Optional[str]:
@@ -204,6 +219,13 @@ def list_items(category: Optional[str] = None, use_cache: bool = True) -> List[D
         # Fetch from GitHub API
         base_path = CATEGORY_PATHS[cat]
         items = fetch_items_recursive(base_path, cat)
+
+        # If API fails (empty result), try fallback index
+        if not items:
+            fallback_items = load_fallback_index(cat)
+            if fallback_items:
+                print(f"Using fallback index for {cat} (API rate limit or network issue)", file=sys.stderr)
+                items = fallback_items
 
         # Cache the results
         if items:

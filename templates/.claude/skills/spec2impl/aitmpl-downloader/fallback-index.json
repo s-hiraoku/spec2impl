@@ -1,0 +1,589 @@
+{
+  "generated_at": "2025-12-10T01:10:31.577959Z",
+  "source": "https://github.com/davila7/claude-code-templates",
+  "note": "Partial index from cache. Run update-index.py with GITHUB_TOKEN for complete index.",
+  "agents": [],
+  "commands": [],
+  "skills": [
+    {
+      "category": "skills",
+      "name": "ANTHROPIC_ATTRIBUTION",
+      "description": "Skills from skills",
+      "path": "cli-tool/components/skills/ANTHROPIC_ATTRIBUTION.md",
+      "subcategory": "skills",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/ANTHROPIC_ATTRIBUTION.md",
+      "size": 3249
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from competitive-ads-extractor",
+      "path": "cli-tool/components/skills/business-marketing/competitive-ads-extractor/SKILL.md",
+      "subcategory": "competitive-ads-extractor",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/business-marketing/competitive-ads-extractor/SKILL.md",
+      "size": 7912
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from content-research-writer",
+      "path": "cli-tool/components/skills/business-marketing/content-research-writer/SKILL.md",
+      "subcategory": "content-research-writer",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/business-marketing/content-research-writer/SKILL.md",
+      "size": 14244
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from lead-research-assistant",
+      "path": "cli-tool/components/skills/business-marketing/lead-research-assistant/SKILL.md",
+      "subcategory": "lead-research-assistant",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/business-marketing/lead-research-assistant/SKILL.md",
+      "size": 6587
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from algorithmic-art",
+      "path": "cli-tool/components/skills/creative-design/algorithmic-art/SKILL.md",
+      "subcategory": "algorithmic-art",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/algorithmic-art/SKILL.md",
+      "size": 19769
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from canvas-design",
+      "path": "cli-tool/components/skills/creative-design/canvas-design/SKILL.md",
+      "subcategory": "canvas-design",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/canvas-design/SKILL.md",
+      "size": 11939
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from slack-gif-creator",
+      "path": "cli-tool/components/skills/creative-design/slack-gif-creator/SKILL.md",
+      "subcategory": "slack-gif-creator",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/slack-gif-creator/SKILL.md",
+      "size": 17142
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from theme-factory",
+      "path": "cli-tool/components/skills/creative-design/theme-factory/SKILL.md",
+      "subcategory": "theme-factory",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/theme-factory/SKILL.md",
+      "size": 3124
+    },
+    {
+      "category": "skills",
+      "name": "arctic-frost",
+      "description": "Skills from themes",
+      "path": "cli-tool/components/skills/creative-design/theme-factory/themes/arctic-frost.md",
+      "subcategory": "themes",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/theme-factory/themes/arctic-frost.md",
+      "size": 544
+    },
+    {
+      "category": "skills",
+      "name": "botanical-garden",
+      "description": "Skills from themes",
+      "path": "cli-tool/components/skills/creative-design/theme-factory/themes/botanical-garden.md",
+      "subcategory": "themes",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/theme-factory/themes/botanical-garden.md",
+      "size": 519
+    },
+    {
+      "category": "skills",
+      "name": "desert-rose",
+      "description": "Skills from themes",
+      "path": "cli-tool/components/skills/creative-design/theme-factory/themes/desert-rose.md",
+      "subcategory": "themes",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/theme-factory/themes/desert-rose.md",
+      "size": 496
+    },
+    {
+      "category": "skills",
+      "name": "forest-canopy",
+      "description": "Skills from themes",
+      "path": "cli-tool/components/skills/creative-design/theme-factory/themes/forest-canopy.md",
+      "subcategory": "themes",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/theme-factory/themes/forest-canopy.md",
+      "size": 506
+    },
+    {
+      "category": "skills",
+      "name": "golden-hour",
+      "description": "Skills from themes",
+      "path": "cli-tool/components/skills/creative-design/theme-factory/themes/golden-hour.md",
+      "subcategory": "themes",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/theme-factory/themes/golden-hour.md",
+      "size": 528
+    },
+    {
+      "category": "skills",
+      "name": "midnight-galaxy",
+      "description": "Skills from themes",
+      "path": "cli-tool/components/skills/creative-design/theme-factory/themes/midnight-galaxy.md",
+      "subcategory": "themes",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/theme-factory/themes/midnight-galaxy.md",
+      "size": 513
+    },
+    {
+      "category": "skills",
+      "name": "modern-minimalist",
+      "description": "Skills from themes",
+      "path": "cli-tool/components/skills/creative-design/theme-factory/themes/modern-minimalist.md",
+      "subcategory": "themes",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/theme-factory/themes/modern-minimalist.md",
+      "size": 549
+    },
+    {
+      "category": "skills",
+      "name": "ocean-depths",
+      "description": "Skills from themes",
+      "path": "cli-tool/components/skills/creative-design/theme-factory/themes/ocean-depths.md",
+      "subcategory": "themes",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/theme-factory/themes/ocean-depths.md",
+      "size": 555
+    },
+    {
+      "category": "skills",
+      "name": "sunset-boulevard",
+      "description": "Skills from themes",
+      "path": "cli-tool/components/skills/creative-design/theme-factory/themes/sunset-boulevard.md",
+      "subcategory": "themes",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/theme-factory/themes/sunset-boulevard.md",
+      "size": 558
+    },
+    {
+      "category": "skills",
+      "name": "tech-innovation",
+      "description": "Skills from themes",
+      "path": "cli-tool/components/skills/creative-design/theme-factory/themes/tech-innovation.md",
+      "subcategory": "themes",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/creative-design/theme-factory/themes/tech-innovation.md",
+      "size": 547
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from artifacts-builder",
+      "path": "cli-tool/components/skills/development/artifacts-builder/SKILL.md",
+      "subcategory": "artifacts-builder",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/artifacts-builder/SKILL.md",
+      "size": 3079
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from changelog-generator",
+      "path": "cli-tool/components/skills/development/changelog-generator/SKILL.md",
+      "subcategory": "changelog-generator",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/changelog-generator/SKILL.md",
+      "size": 3096
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from cocoindex",
+      "path": "cli-tool/components/skills/development/cocoindex/SKILL.md",
+      "subcategory": "cocoindex",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/cocoindex/SKILL.md",
+      "size": 25659
+    },
+    {
+      "category": "skills",
+      "name": "api_operations",
+      "description": "Skills from references",
+      "path": "cli-tool/components/skills/development/cocoindex/references/api_operations.md",
+      "subcategory": "references",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/cocoindex/references/api_operations.md",
+      "size": 13488
+    },
+    {
+      "category": "skills",
+      "name": "cli_operations",
+      "description": "Skills from references",
+      "path": "cli-tool/components/skills/development/cocoindex/references/cli_operations.md",
+      "subcategory": "references",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/cocoindex/references/cli_operations.md",
+      "size": 8897
+    },
+    {
+      "category": "skills",
+      "name": "custom_functions",
+      "description": "Skills from references",
+      "path": "cli-tool/components/skills/development/cocoindex/references/custom_functions.md",
+      "subcategory": "references",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/cocoindex/references/custom_functions.md",
+      "size": 13690
+    },
+    {
+      "category": "skills",
+      "name": "flow_patterns",
+      "description": "Skills from references",
+      "path": "cli-tool/components/skills/development/cocoindex/references/flow_patterns.md",
+      "subcategory": "references",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/cocoindex/references/flow_patterns.md",
+      "size": 13857
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from developer-growth-analysis",
+      "path": "cli-tool/components/skills/development/developer-growth-analysis/SKILL.md",
+      "subcategory": "developer-growth-analysis",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/developer-growth-analysis/SKILL.md",
+      "size": 15720
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from git-commit-helper",
+      "path": "cli-tool/components/skills/development/git-commit-helper/SKILL.md",
+      "subcategory": "git-commit-helper",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/git-commit-helper/SKILL.md",
+      "size": 4372
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from mcp-builder",
+      "path": "cli-tool/components/skills/development/mcp-builder/SKILL.md",
+      "subcategory": "mcp-builder",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/mcp-builder/SKILL.md",
+      "size": 13552
+    },
+    {
+      "category": "skills",
+      "name": "evaluation",
+      "description": "Skills from reference",
+      "path": "cli-tool/components/skills/development/mcp-builder/reference/evaluation.md",
+      "subcategory": "reference",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/mcp-builder/reference/evaluation.md",
+      "size": 21663
+    },
+    {
+      "category": "skills",
+      "name": "mcp_best_practices",
+      "description": "Skills from reference",
+      "path": "cli-tool/components/skills/development/mcp-builder/reference/mcp_best_practices.md",
+      "subcategory": "reference",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/mcp-builder/reference/mcp_best_practices.md",
+      "size": 28910
+    },
+    {
+      "category": "skills",
+      "name": "node_mcp_server",
+      "description": "Skills from reference",
+      "path": "cli-tool/components/skills/development/mcp-builder/reference/node_mcp_server.md",
+      "subcategory": "reference",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/mcp-builder/reference/node_mcp_server.md",
+      "size": 26709
+    },
+    {
+      "category": "skills",
+      "name": "python_mcp_server",
+      "description": "Skills from reference",
+      "path": "cli-tool/components/skills/development/mcp-builder/reference/python_mcp_server.md",
+      "subcategory": "reference",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/mcp-builder/reference/python_mcp_server.md",
+      "size": 26182
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from move-code-quality",
+      "path": "cli-tool/components/skills/development/move-code-quality/SKILL.md",
+      "subcategory": "move-code-quality",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/move-code-quality/SKILL.md",
+      "size": 12996
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from skill-creator",
+      "path": "cli-tool/components/skills/development/skill-creator/SKILL.md",
+      "subcategory": "skill-creator",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/skill-creator/SKILL.md",
+      "size": 11547
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from webapp-testing",
+      "path": "cli-tool/components/skills/development/webapp-testing/SKILL.md",
+      "subcategory": "webapp-testing",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/webapp-testing/SKILL.md",
+      "size": 3913
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from zapier-workflows",
+      "path": "cli-tool/components/skills/development/zapier-workflows/SKILL.md",
+      "subcategory": "zapier-workflows",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/zapier-workflows/SKILL.md",
+      "size": 19552
+    },
+    {
+      "category": "skills",
+      "name": "mcp-patterns",
+      "description": "Skills from references",
+      "path": "cli-tool/components/skills/development/zapier-workflows/references/mcp-patterns.md",
+      "subcategory": "references",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/zapier-workflows/references/mcp-patterns.md",
+      "size": 2174
+    },
+    {
+      "category": "skills",
+      "name": "zaps",
+      "description": "Skills from references",
+      "path": "cli-tool/components/skills/development/zapier-workflows/references/zaps.md",
+      "subcategory": "references",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/development/zapier-workflows/references/zaps.md",
+      "size": 1660
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from docx",
+      "path": "cli-tool/components/skills/document-processing/docx/SKILL.md",
+      "subcategory": "docx",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/docx/SKILL.md",
+      "size": 10150
+    },
+    {
+      "category": "skills",
+      "name": "docx-js",
+      "description": "Skills from docx",
+      "path": "cli-tool/components/skills/document-processing/docx/docx-js.md",
+      "subcategory": "docx",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/docx/docx-js.md",
+      "size": 16509
+    },
+    {
+      "category": "skills",
+      "name": "ooxml",
+      "description": "Skills from docx",
+      "path": "cli-tool/components/skills/document-processing/docx/ooxml.md",
+      "subcategory": "docx",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/docx/ooxml.md",
+      "size": 23572
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from pdf-anthropic",
+      "path": "cli-tool/components/skills/document-processing/pdf-anthropic/SKILL.md",
+      "subcategory": "pdf-anthropic",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/pdf-anthropic/SKILL.md",
+      "size": 7068
+    },
+    {
+      "category": "skills",
+      "name": "forms",
+      "description": "Skills from pdf-anthropic",
+      "path": "cli-tool/components/skills/document-processing/pdf-anthropic/forms.md",
+      "subcategory": "pdf-anthropic",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/pdf-anthropic/forms.md",
+      "size": 9438
+    },
+    {
+      "category": "skills",
+      "name": "reference",
+      "description": "Skills from pdf-anthropic",
+      "path": "cli-tool/components/skills/document-processing/pdf-anthropic/reference.md",
+      "subcategory": "pdf-anthropic",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/pdf-anthropic/reference.md",
+      "size": 16692
+    },
+    {
+      "category": "skills",
+      "name": "FORMS",
+      "description": "Skills from pdf-processing-pro",
+      "path": "cli-tool/components/skills/document-processing/pdf-processing-pro/FORMS.md",
+      "subcategory": "pdf-processing-pro",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/pdf-processing-pro/FORMS.md",
+      "size": 14006
+    },
+    {
+      "category": "skills",
+      "name": "OCR",
+      "description": "Skills from pdf-processing-pro",
+      "path": "cli-tool/components/skills/document-processing/pdf-processing-pro/OCR.md",
+      "subcategory": "pdf-processing-pro",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/pdf-processing-pro/OCR.md",
+      "size": 2828
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from pdf-processing-pro",
+      "path": "cli-tool/components/skills/document-processing/pdf-processing-pro/SKILL.md",
+      "subcategory": "pdf-processing-pro",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/pdf-processing-pro/SKILL.md",
+      "size": 7029
+    },
+    {
+      "category": "skills",
+      "name": "TABLES",
+      "description": "Skills from pdf-processing-pro",
+      "path": "cli-tool/components/skills/document-processing/pdf-processing-pro/TABLES.md",
+      "subcategory": "pdf-processing-pro",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/pdf-processing-pro/TABLES.md",
+      "size": 14911
+    },
+    {
+      "category": "skills",
+      "name": "FORMS",
+      "description": "Skills from pdf-processing",
+      "path": "cli-tool/components/skills/document-processing/pdf-processing/FORMS.md",
+      "subcategory": "pdf-processing",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/pdf-processing/FORMS.md",
+      "size": 2860
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from pdf-processing",
+      "path": "cli-tool/components/skills/document-processing/pdf-processing/SKILL.md",
+      "subcategory": "pdf-processing",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/pdf-processing/SKILL.md",
+      "size": 3148
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from pptx",
+      "path": "cli-tool/components/skills/document-processing/pptx/SKILL.md",
+      "subcategory": "pptx",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/pptx/SKILL.md",
+      "size": 25551
+    },
+    {
+      "category": "skills",
+      "name": "html2pptx",
+      "description": "Skills from pptx",
+      "path": "cli-tool/components/skills/document-processing/pptx/html2pptx.md",
+      "subcategory": "pptx",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/pptx/html2pptx.md",
+      "size": 19859
+    },
+    {
+      "category": "skills",
+      "name": "ooxml",
+      "description": "Skills from pptx",
+      "path": "cli-tool/components/skills/document-processing/pptx/ooxml.md",
+      "subcategory": "pptx",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/pptx/ooxml.md",
+      "size": 10388
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from xlsx",
+      "path": "cli-tool/components/skills/document-processing/xlsx/SKILL.md",
+      "subcategory": "xlsx",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/document-processing/xlsx/SKILL.md",
+      "size": 10632
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from brand-guidelines",
+      "path": "cli-tool/components/skills/enterprise-communication/brand-guidelines/SKILL.md",
+      "subcategory": "brand-guidelines",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/enterprise-communication/brand-guidelines/SKILL.md",
+      "size": 2235
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from email-composer",
+      "path": "cli-tool/components/skills/enterprise-communication/email-composer/SKILL.md",
+      "subcategory": "email-composer",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/enterprise-communication/email-composer/SKILL.md",
+      "size": 6813
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from excel-analysis",
+      "path": "cli-tool/components/skills/enterprise-communication/excel-analysis/SKILL.md",
+      "subcategory": "excel-analysis",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/enterprise-communication/excel-analysis/SKILL.md",
+      "size": 5166
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from internal-comms",
+      "path": "cli-tool/components/skills/enterprise-communication/internal-comms/SKILL.md",
+      "subcategory": "internal-comms",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/enterprise-communication/internal-comms/SKILL.md",
+      "size": 1511
+    },
+    {
+      "category": "skills",
+      "name": "3p-updates",
+      "description": "Skills from examples",
+      "path": "cli-tool/components/skills/enterprise-communication/internal-comms/examples/3p-updates.md",
+      "subcategory": "examples",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/enterprise-communication/internal-comms/examples/3p-updates.md",
+      "size": 3274
+    },
+    {
+      "category": "skills",
+      "name": "company-newsletter",
+      "description": "Skills from examples",
+      "path": "cli-tool/components/skills/enterprise-communication/internal-comms/examples/company-newsletter.md",
+      "subcategory": "examples",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/enterprise-communication/internal-comms/examples/company-newsletter.md",
+      "size": 3295
+    },
+    {
+      "category": "skills",
+      "name": "faq-answers",
+      "description": "Skills from examples",
+      "path": "cli-tool/components/skills/enterprise-communication/internal-comms/examples/faq-answers.md",
+      "subcategory": "examples",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/enterprise-communication/internal-comms/examples/faq-answers.md",
+      "size": 2366
+    },
+    {
+      "category": "skills",
+      "name": "general-comms",
+      "description": "Skills from examples",
+      "path": "cli-tool/components/skills/enterprise-communication/internal-comms/examples/general-comms.md",
+      "subcategory": "examples",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/enterprise-communication/internal-comms/examples/general-comms.md",
+      "size": 602
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from image-enhancer",
+      "path": "cli-tool/components/skills/media/image-enhancer/SKILL.md",
+      "subcategory": "image-enhancer",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/media/image-enhancer/SKILL.md",
+      "size": 2540
+    },
+    {
+      "category": "skills",
+      "name": "SKILL",
+      "description": "Skills from video-downloader",
+      "path": "cli-tool/components/skills/media/video-downloader/SKILL.md",
+      "subcategory": "video-downloader",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-tool/components/skills/media/video-downloader/SKILL.md",
+      "size": 2687
+    }
+  ],
+  "mcps": [],
+  "settings": [],
+  "hooks": [],
+  "plugins": []
+}
