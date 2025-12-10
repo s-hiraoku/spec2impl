@@ -2,6 +2,7 @@
 name: marketplace-plugin-scout
 description: Use PROACTIVELY to search plugins. MUST search aitmpl.com FIRST via download.py, then web search. Returns scored recommendations. Does NOT install.
 tools: Read, Glob, Grep, Bash, WebSearch
+skills: aitmpl-downloader
 ---
 
 # Marketplace Plugin Scout

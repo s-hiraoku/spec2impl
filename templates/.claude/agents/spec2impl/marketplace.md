@@ -2,6 +2,7 @@
 name: marketplace
 description: Install plugins from GitHub/npm after marketplace-plugin-scout finds them. Manages local plugin registry. Does NOT search - use marketplace-plugin-scout for search.
 tools: Bash, Read, Write, Edit, Glob, Grep
+skills: aitmpl-downloader
 ---
 
 # Marketplace

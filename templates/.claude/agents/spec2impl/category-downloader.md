@@ -2,6 +2,7 @@
 name: category-downloader
 description: Download templates from aitmpl.com by category. Reads category-specific skill and executes download based on requirements.
 tools: Bash, Read, Write, Glob
+skills: aitmpl-downloader
 ---
 
 # Category Downloader
