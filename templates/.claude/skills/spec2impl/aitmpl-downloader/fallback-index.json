@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-12-10T15:34:29.384262Z",
+  "generated_at": "2025-12-10T16:25:18.716957Z",
   "source": "https://github.com/davila7/claude-code-templates",
   "agents": [
     {
@@ -5506,12 +5506,123 @@
   "plugins": [
     {
       "category": "plugins",
-      "name": "marketplace",
-      "description": "Plugins from .claude-plugin",
+      "name": "git-workflow",
+      "description": "Git workflow automation: feature, release, and hotfix commands with git specialists",
       "path": ".claude-plugin/marketplace.json",
-      "subcategory": ".claude-plugin",
+      "subcategory": "marketplace",
       "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/.claude-plugin/marketplace.json",
-      "size": 11285
+      "keywords": "feature release hotfix finish flow-status git-flow-manager",
+      "commands_count": 5,
+      "agents_count": 1,
+      "skills_count": 0
+    },
+    {
+      "category": "plugins",
+      "name": "supabase-toolkit",
+      "description": "Complete Supabase workflow with specialized commands, data engineering agents, and MCP integrations",
+      "path": ".claude-plugin/marketplace.json",
+      "subcategory": "marketplace",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/.claude-plugin/marketplace.json",
+      "keywords": "supabase-backup-manager supabase-data-explorer supabase-migration-assistant supabase-performance-optimizer supabase-schema-sync data-engineer data-scientist",
+      "commands_count": 5,
+      "agents_count": 2,
+      "skills_count": 0
+    },
+    {
+      "category": "plugins",
+      "name": "nextjs-vercel-pro",
+      "description": "Complete Next.js and Vercel development toolkit with deployment automation and performance optimization",
+      "path": ".claude-plugin/marketplace.json",
+      "subcategory": "marketplace",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/.claude-plugin/marketplace.json",
+      "keywords": "nextjs-scaffold nextjs-component-generator nextjs-api-tester nextjs-performance-audit vercel-deploy-optimize vercel-edge-function vercel-env-sync frontend-developer fullstack-developer nextjs react vercel",
+      "commands_count": 7,
+      "agents_count": 2,
+      "skills_count": 0
+    },
+    {
+      "category": "plugins",
+      "name": "testing-suite",
+      "description": "Comprehensive testing toolkit with E2E, unit, integration, and visual testing automation",
+      "path": ".claude-plugin/marketplace.json",
+      "subcategory": "marketplace",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/.claude-plugin/marketplace.json",
+      "keywords": "generate-tests e2e-setup test-coverage setup-visual-testing setup-load-testing test-automation-orchestrator test-quality-analyzer qa-automation-engineer test-engineer",
+      "commands_count": 7,
+      "agents_count": 2,
+      "skills_count": 0
+    },
+    {
+      "category": "plugins",
+      "name": "security-pro",
+      "description": "Enterprise security toolkit with auditing, penetration testing, and compliance automation",
+      "path": ".claude-plugin/marketplace.json",
+      "subcategory": "marketplace",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/.claude-plugin/marketplace.json",
+      "keywords": "security-audit vulnerability-scan dependency-audit code-security-review security-auditor penetration-tester compliance-specialist incident-responder",
+      "commands_count": 4,
+      "agents_count": 4,
+      "skills_count": 0
+    },
+    {
+      "category": "plugins",
+      "name": "ai-ml-toolkit",
+      "description": "AI and Machine Learning development suite with data engineering and model deployment tools",
+      "path": ".claude-plugin/marketplace.json",
+      "subcategory": "marketplace",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/.claude-plugin/marketplace.json",
+      "keywords": "ai-engineer ml-engineer nlp-engineer computer-vision-engineer mlops-engineer ai ml machine-learning",
+      "commands_count": 0,
+      "agents_count": 5,
+      "skills_count": 0
+    },
+    {
+      "category": "plugins",
+      "name": "devops-automation",
+      "description": "DevOps automation suite with CI/CD, infrastructure management, and deployment orchestration",
+      "path": ".claude-plugin/marketplace.json",
+      "subcategory": "marketplace",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/.claude-plugin/marketplace.json",
+      "keywords": "setup-ci-cd-pipeline docker-compose-setup kubernetes-deploy monitoring-setup backup-strategy devops-engineer cloud-architect kubernetes-specialist infrastructure-engineer devops cicd docker kubernetes",
+      "commands_count": 5,
+      "agents_count": 4,
+      "skills_count": 0
+    },
+    {
+      "category": "plugins",
+      "name": "documentation-generator",
+      "description": "Automated documentation generation with API docs, technical writing, and content management",
+      "path": ".claude-plugin/marketplace.json",
+      "subcategory": "marketplace",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/.claude-plugin/marketplace.json",
+      "keywords": "generate-api-docs update-docs create-user-guide setup-docusaurus generate-changelog technical-writer api-documentation-specialist docusaurus-expert",
+      "commands_count": 5,
+      "agents_count": 3,
+      "skills_count": 0
+    },
+    {
+      "category": "plugins",
+      "name": "performance-optimizer",
+      "description": "Performance optimization suite with profiling, bundle analysis, and speed improvement tools",
+      "path": ".claude-plugin/marketplace.json",
+      "subcategory": "marketplace",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/.claude-plugin/marketplace.json",
+      "keywords": "optimize-bundle performance-audit add-caching optimize-images reduce-bundle-size add-lazy-loading performance-engineer load-testing-specialist",
+      "commands_count": 6,
+      "agents_count": 2,
+      "skills_count": 0
+    },
+    {
+      "category": "plugins",
+      "name": "project-management-suite",
+      "description": "Project management toolkit with sprint planning, task automation, and team collaboration tools",
+      "path": ".claude-plugin/marketplace.json",
+      "subcategory": "marketplace",
+      "download_url": "https://raw.githubusercontent.com/davila7/claude-code-templates/main/.claude-plugin/marketplace.json",
+      "keywords": "sprint-planning create-roadmap task-breakdown estimate-project standup-generator retrospective-facilitator product-strategist business-analyst tech-lead agile scrum",
+      "commands_count": 6,
+      "agents_count": 3,
+      "skills_count": 0
     }
   ]
 }

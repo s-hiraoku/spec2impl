@@ -198,6 +198,63 @@ def fetch_items_recursive(base_path: str, category: str, depth: int = 0, max_dep
     return items
 
 
+def fetch_marketplace_plugins() -> List[Dict]:
+    """Fetch and parse plugins from marketplace.json.
+
+    The marketplace.json contains plugin definitions that include
+    multiple commands, agents, skills bundled together.
+    """
+    marketplace_url = f"{GITHUB_RAW_BASE}/.claude-plugin/marketplace.json"
+    content = fetch_url(marketplace_url)
+
+    if not content:
+        return []
+
+    try:
+        data = json.loads(content)
+        plugins = data.get("plugins", [])
+
+        items = []
+        for plugin in plugins:
+            plugin_name = plugin.get("name", "")
+            plugin_desc = plugin.get("description", "")
+
+            # Extract components for searchability
+            # Components are paths like "./cli-tool/components/commands/nextjs-vercel/nextjs-scaffold.md"
+            commands = plugin.get("commands", [])
+            agents = plugin.get("agents", [])
+            skills = plugin.get("skills", [])
+
+            # Build searchable keywords from component paths
+            keywords = []
+            for path in commands + agents + skills:
+                if isinstance(path, str):
+                    # Extract name from path like "nextjs-scaffold" from ".../nextjs-scaffold.md"
+                    name = Path(path).stem
+                    keywords.append(name)
+                elif isinstance(path, dict):
+                    keywords.append(path.get("name", ""))
+
+            items.append({
+                "category": "plugins",
+                "name": plugin_name,
+                "description": plugin_desc,
+                "path": ".claude-plugin/marketplace.json",
+                "subcategory": "marketplace",
+                "download_url": marketplace_url,
+                "keywords": " ".join(keywords),
+                "commands_count": len(commands),
+                "agents_count": len(agents),
+                "skills_count": len(skills),
+                "plugin_data": plugin,  # Full plugin data for installation
+            })
+
+        return items
+    except json.JSONDecodeError as e:
+        print(f"Error parsing marketplace.json: {e}", file=sys.stderr)
+        return []
+
+
 def list_items(category: Optional[str] = None, use_cache: bool = True) -> List[Dict]:
     """List available items from GitHub repository."""
     all_items = []
@@ -216,9 +273,12 @@ def list_items(category: Optional[str] = None, use_cache: bool = True) -> List[D
                 all_items.extend(cached)
                 continue
 
-        # Fetch from GitHub API
-        base_path = CATEGORY_PATHS[cat]
-        items = fetch_items_recursive(base_path, cat)
+        # Fetch from GitHub API (plugins use special handling)
+        if cat == "plugins":
+            items = fetch_marketplace_plugins()
+        else:
+            base_path = CATEGORY_PATHS[cat]
+            items = fetch_items_recursive(base_path, cat)
 
         # If API fails (empty result), try fallback index
         if not items:
@@ -255,8 +315,9 @@ def search_items(query: str, category: Optional[str] = None) -> List[Dict]:
         desc = item.get("description", "").lower()
         subcategory = item.get("subcategory", "").lower()
         path = item.get("path", "").lower()
+        keywords = item.get("keywords", "").lower()  # For plugins
 
-        searchable = f"{name} {desc} {subcategory} {path}"
+        searchable = f"{name} {desc} {subcategory} {path} {keywords}"
 
         # Match if ANY term is found (OR logic)
         if any(term in searchable for term in query_terms):

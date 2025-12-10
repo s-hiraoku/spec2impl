@@ -148,6 +148,64 @@ def fetch_items_recursive(base_path: str, category: str, depth: int = 0, max_dep
     return items
 
 
+def fetch_marketplace_plugins() -> List[Dict]:
+    """Fetch and parse plugins from marketplace.json."""
+    print("  Fetching marketplace.json for plugins...", file=sys.stderr)
+    marketplace_url = f"{GITHUB_RAW_BASE}/.claude-plugin/marketplace.json"
+
+    try:
+        request = urllib.request.Request(
+            marketplace_url,
+            headers={"User-Agent": "aitmpl-downloader/1.0"}
+        )
+        with urllib.request.urlopen(request, timeout=30) as response:
+            content = response.read().decode('utf-8')
+    except urllib.error.URLError as e:
+        print(f"  Error fetching marketplace.json: {e}", file=sys.stderr)
+        return []
+
+    try:
+        data = json.loads(content)
+        plugins = data.get("plugins", [])
+
+        items = []
+        for plugin in plugins:
+            plugin_name = plugin.get("name", "")
+            plugin_desc = plugin.get("description", "")
+
+            # Extract components for searchability
+            commands = plugin.get("commands", [])
+            agents = plugin.get("agents", [])
+            skills = plugin.get("skills", [])
+
+            # Build searchable keywords from component paths
+            keywords = []
+            for path in commands + agents + skills:
+                if isinstance(path, str):
+                    name = Path(path).stem
+                    keywords.append(name)
+                elif isinstance(path, dict):
+                    keywords.append(path.get("name", ""))
+
+            items.append({
+                "category": "plugins",
+                "name": plugin_name,
+                "description": plugin_desc,
+                "path": ".claude-plugin/marketplace.json",
+                "subcategory": "marketplace",
+                "download_url": marketplace_url,
+                "keywords": " ".join(keywords),
+                "commands_count": len(commands),
+                "agents_count": len(agents),
+                "skills_count": len(skills),
+            })
+
+        return items
+    except json.JSONDecodeError as e:
+        print(f"  Error parsing marketplace.json: {e}", file=sys.stderr)
+        return []
+
+
 def generate_index() -> Dict:
     """Generate complete index for all categories."""
     index = {
@@ -157,7 +215,10 @@ def generate_index() -> Dict:
 
     for category, path in CATEGORY_PATHS.items():
         print(f"\nFetching {category}...", file=sys.stderr)
-        items = fetch_items_recursive(path, category)
+        if category == "plugins":
+            items = fetch_marketplace_plugins()
+        else:
+            items = fetch_items_recursive(path, category)
         index[category] = items
         print(f"  Found {len(items)} items", file=sys.stderr)
 
