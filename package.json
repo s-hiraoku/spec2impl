@@ -34,7 +34,7 @@
     "test": "vitest",
     "lint": "eslint src/",
     "update-index": "python3 templates/.claude/skills/spec2impl/aitmpl-downloader/scripts/update-index.py",
-    "prepublishOnly": "npm run update-index && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "chalk": "^5.3.0",
