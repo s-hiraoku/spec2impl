@@ -12,8 +12,8 @@ Universal downloader agent that downloads templates from aitmpl.com (GitHub API)
 ## Input Parameters
 
 - **Category**: One of `agents`, `commands`, `skills`, `mcps`, `settings`, `hooks`, `plugins`
+- **Search Terms**: Array of keywords from tech-stack-expander (e.g., `[nextjs, react, typescript, tailwind, prisma]`)
 - **Requirements**: Specification requirements to match (e.g., tech stack, features)
-- **Tech Stack**: Optional - technology stack from spec analysis
 
 ## Execution Flow
 
@@ -24,16 +24,25 @@ Universal downloader agent that downloads templates from aitmpl.com (GitHub API)
 Read .claude/skills/spec2impl/aitmpl-downloader/categories/${category}.md
 ```
 
-### Step 2: List Available Items
+### Step 2: Search with Expanded Tech Stack
+
+Use the search terms from tech-stack-expander to find matching items:
 
 ```bash
-# List all items in the category
-python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py list --category ${category} --json
+# Search using expanded tech stack terms (OR logic)
+python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py search "${searchTerms.join(' ')}" --category ${category} --json
+
+# Example: searchTerms = [nextjs, react, typescript, tailwind, prisma]
+# Searches: "nextjs react typescript tailwind prisma" with OR logic
+# Returns items matching ANY of these terms
 ```
 
-### Step 3: Match Requirements
+### Step 3: Prioritize Results
 
-Based on the category guide's "Spec Mapping" table, identify items that match the requirements.
+Based on the category guide's "Spec Mapping" table and search results:
+1. **Exact matches**: Items with multiple search term hits
+2. **Partial matches**: Items with single search term hit
+3. **Plugin bundles**: Prefer plugins that include multiple components
 
 ### Step 4: Download Matching Items
 
@@ -62,13 +71,15 @@ Task({
   prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
 
            Category: skills
-           Tech Stack: Next.js, Prisma, PostgreSQL
+           Search Terms: [nextjs, react, typescript, tailwind, prisma, postgresql, frontend, database, orm]
            Requirements:
            - Frontend framework patterns
            - Database modeling
            - Testing patterns`
 })
 ```
+
+**Note**: Search Terms come from tech-stack-expander (Step 2) which expands the original tech stack via Web search and user questions.
 
 ## Output Format
 

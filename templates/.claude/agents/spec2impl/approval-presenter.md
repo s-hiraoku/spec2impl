@@ -1,6 +1,6 @@
 ---
 name: approval-presenter
-description: Present step results for user approval. Shows summary, details, files, risks, and token requirements. 10-step workflow support.
+description: Present step results for user approval. Shows summary, details, files, risks, and token requirements. 11-step workflow support.
 model: haiku
 tools: Read, Glob
 ---
@@ -13,7 +13,7 @@ Present step results in consistent format for user approval.
 
 ```
 ════════════════════════════════════════════════════════════════════════════════
-  Step {N}/10: {Step Name} - Approval Required
+  Step {N}/11: {Step Name} - Approval Required
 ════════════════════════════════════════════════════════════════════════════════
 
 Summary:
@@ -44,22 +44,29 @@ Files to Create/Modify:
 - Tech stack identified
 - Complexity assessment
 
-### Step 2: Skills Acquisition
+### Step 2: Tech Stack Expansion
+- Original tech stack from spec
+- Implicit dependencies discovered (via Web search)
+- User-selected technologies
+- Final expanded tech stack
+- Search terms for downloading
+
+### Step 3: Skills Acquisition
 - Skills to download (from aitmpl.com)
-- Skills matched to tech stack
+- Skills matched to expanded tech stack
 - Download paths and outputs
 
-### Step 3: Agents Acquisition
+### Step 4: Agents Acquisition
 - Agents to download
 - Agent purposes and roles
 - Output locations
 
-### Step 4: Commands Acquisition
+### Step 5: Commands Acquisition
 - Commands to download
 - Command purposes
 - Output locations
 
-### Step 5: MCP Configuration
+### Step 6: MCP Configuration
 Include token requirements:
 ```
 🔑 TOKEN REQUIREMENTS:
@@ -76,28 +83,28 @@ Include token requirements:
      Get from: dashboard.stripe.com/apikeys
 ```
 
-### Step 6: Settings Configuration
+### Step 7: Settings Configuration
 - Settings to apply
 - Model selection
 - Permission changes
 - Environment variables
 
-### Step 7: Deploy Bundled
+### Step 8: Deploy Bundled
 - ux-psychology skill deployment
 - ux-psychology-advisor agent deployment
 - Only for frontend/UI projects
 
-### Step 8: Task List Generation
+### Step 9: Task List Generation
 - Task count by category
 - Preview of first few tasks
 - Priority and dependency info
 
-### Step 9: CLAUDE.md Update
+### Step 10: CLAUDE.md Update
 - Sections to add
 - Existing sections preserved
 - Generated content preview
 
-### Step 10: Cleanup
+### Step 11: Cleanup
 - Files to delete
 - Files to keep
 - Warning about irreversibility

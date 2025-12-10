@@ -14,7 +14,7 @@ Analyze specification documents and build Claude Code implementation environment
 
 ## Execution Flow
 
-Execute 10 steps sequentially. Each step:
+Execute 11 steps sequentially. Each step:
 1. Show progress with `progress-dashboard`
 2. Execute step logic
 3. Present results with `approval-presenter` for user approval
@@ -27,7 +27,7 @@ Task({
   prompt: `Read .claude/agents/spec2impl/progress-dashboard.md and execute.
            Mode: workflow
            Current Step: ${stepNumber}
-           Total Steps: 10`
+           Total Steps: 11`
 })
 ```
 
@@ -51,7 +51,34 @@ Task({
 
 ---
 
-### Step 2: Skills Acquisition
+### Step 2: Tech Stack Expansion
+**Agent:** `tech-stack-expander.md`
+
+```typescript
+Task({
+  subagent_type: "general-purpose",
+  prompt: `Read .claude/agents/spec2impl/tech-stack-expander.md and execute.
+
+           Input:
+           - techStack: ${specAnalysisResult.techStack}
+           - specContent: ${specContent}
+
+           This agent will:
+           1. Launch parallel subagents to Web search for related technologies
+           2. Discover implicit dependencies (e.g., Next.js → React, TypeScript)
+           3. Find technology choices (CSS framework, state management, ORM, etc.)
+           4. Check spec for already-decided technologies
+           5. Ask user ALL undecided questions (multiple AskUserQuestion calls if needed)
+           6. Output expandedTechStack with searchTerms`
+})
+```
+
+→ Output: expandedTechStack (confirmed technologies + searchTerms)
+→ Call `approval-presenter` with expanded tech stack
+
+---
+
+### Step 3: Skills Acquisition
 **Agent:** `category-downloader.md` (category: skills)
 
 ```typescript
@@ -59,7 +86,7 @@ Task({
   subagent_type: "general-purpose",
   prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
            Category: skills
-           Tech Stack: ${techStack}
+           Search Terms: ${expandedTechStack.searchTerms}
            Requirements: ${specRequirements}`
 })
 ```
@@ -69,7 +96,7 @@ Task({
 
 ---
 
-### Step 3: Agents Acquisition
+### Step 4: Agents Acquisition
 **Agent:** `category-downloader.md` (category: agents)
 
 ```typescript
@@ -77,6 +104,7 @@ Task({
   subagent_type: "general-purpose",
   prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
            Category: agents
+           Search Terms: ${expandedTechStack.searchTerms}
            Requirements: ${specRequirements}`
 })
 ```
@@ -86,7 +114,7 @@ Task({
 
 ---
 
-### Step 4: Commands Acquisition
+### Step 5: Commands Acquisition
 **Agent:** `category-downloader.md` (category: commands)
 
 ```typescript
@@ -94,6 +122,7 @@ Task({
   subagent_type: "general-purpose",
   prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
            Category: commands
+           Search Terms: ${expandedTechStack.searchTerms}
            Requirements: ${specRequirements}`
 })
 ```
@@ -103,7 +132,7 @@ Task({
 
 ---
 
-### Step 5: MCP Configuration
+### Step 6: MCP Configuration
 **Agent:** `category-downloader.md` (category: mcps)
 
 ```typescript
@@ -111,6 +140,7 @@ Task({
   subagent_type: "general-purpose",
   prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
            Category: mcps
+           Search Terms: ${expandedTechStack.searchTerms}
            Services: ${detectedServices}
            Requirements: ${specRequirements}`
 })
@@ -121,7 +151,7 @@ Task({
 
 ---
 
-### Step 6: Settings Configuration
+### Step 7: Settings Configuration
 **Agent:** `category-downloader.md` (category: settings)
 
 ```typescript
@@ -129,6 +159,7 @@ Task({
   subagent_type: "general-purpose",
   prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
            Category: settings
+           Search Terms: ${expandedTechStack.searchTerms}
            Project Type: ${projectType}`
 })
 ```
@@ -138,7 +169,7 @@ Task({
 
 ---
 
-### Step 7: Deploy Bundled (for UI/Frontend projects)
+### Step 8: Deploy Bundled (for UI/Frontend projects)
 
 If spec includes frontend/UI components, deploy ux-psychology:
 
@@ -154,7 +185,7 @@ cp .claude/agents/spec2impl/ux-psychology-advisor.md .claude/agents/
 
 ---
 
-### Step 8: Task List Generation
+### Step 9: Task List Generation
 **Agent:** `task-list-generator.md`
 
 ```typescript
@@ -172,7 +203,7 @@ Task({
 
 ---
 
-### Step 9: CLAUDE.md Update
+### Step 10: CLAUDE.md Update
 **Agent:** `claude-md-updater.md`
 
 ```typescript
@@ -187,7 +218,7 @@ Task({
 
 ---
 
-### Step 10: Cleanup (Optional)
+### Step 11: Cleanup (Optional)
 
 Delete spec2impl files:
 - `.claude/commands/spec2impl.md`
@@ -203,18 +234,19 @@ Delete spec2impl files:
 | Agent | Purpose | Steps |
 |-------|---------|-------|
 | spec-analyzer | Parse specifications | 1 |
-| category-downloader | Download by category | 2, 3, 4, 5, 6 |
-| task-list-generator | Generate TASKS.md | 8 |
-| claude-md-updater | Update CLAUDE.md | 9 |
+| tech-stack-expander | Expand tech stack via Web search + user questions | 2 |
+| category-downloader | Download by category | 3, 4, 5, 6, 7 |
+| task-list-generator | Generate TASKS.md | 9 |
+| claude-md-updater | Update CLAUDE.md | 10 |
 | progress-dashboard | Show progress | All |
-| approval-presenter | Get user approval | 1-6, 8, 10 |
-| ux-psychology-advisor | UX recommendations | Deployed in 7 |
+| approval-presenter | Get user approval | 1-7, 9, 11 |
+| ux-psychology-advisor | UX recommendations | Deployed in 8 |
 
 ## Available Skills Reference
 
 | Skill | Purpose | When to Use |
 |-------|---------|-------------|
-| aitmpl-downloader | Template marketplace (GitHub API) | Steps 2-6 |
+| aitmpl-downloader | Template marketplace (GitHub API) | Steps 3-7 |
 | ux-psychology | 43 UX psychology concepts | UI/frontend projects |
 | skill-creator | Create new skills | When no template exists |
 
@@ -224,8 +256,13 @@ Delete spec2impl files:
 
 ```
 ════════════════════════════════════════════════════════════════
-spec2impl Complete (10/10 steps)
+spec2impl Complete (11/11 steps)
 ════════════════════════════════════════════════════════════════
+
+Tech Stack Expanded:
+  Original:   ${originalTechStack}
+  Expanded:   ${expandedTechStack.confirmed}
+  User Chose: ${expandedTechStack.userSelected}
 
 Downloaded from aitmpl.com:
   Skills:     ${downloadedSkills}

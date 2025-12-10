@@ -1,6 +1,6 @@
 ---
 name: progress-dashboard
-description: Display visual progress dashboard. Mode workflow for spec2impl steps (10 steps), mode tasks for implementation progress from TASKS.md.
+description: Display visual progress dashboard. Mode workflow for spec2impl steps (11 steps), mode tasks for implementation progress from TASKS.md.
 model: haiku
 tools: Read, Glob, Grep
 ---
@@ -11,27 +11,28 @@ Display visual progress for spec2impl or implementation tasks.
 
 ## Modes
 
-### Workflow Mode (spec2impl execution - 10 steps)
+### Workflow Mode (spec2impl execution - 11 steps)
 
 ```
 ════════════════════════════════════════════════════════════════════════════════
   spec2impl Progress
 ════════════════════════════════════════════════════════════════════════════════
 
-[████████░░░░░░░░░░░░░░░░░░░░░░]  30% (3/10 steps)
+[████████░░░░░░░░░░░░░░░░░░░░░░]  27% (3/11 steps)
 
 Step  1: Specification Analysis     ✅ Complete
-Step  2: Skills Acquisition         ✅ Complete
-Step  3: Agents Acquisition         ✅ Complete
-Step  4: Commands Acquisition       🔄 In Progress
-Step  5: MCP Configuration          ⏳ Pending
-Step  6: Settings Configuration     ⏳ Pending
-Step  7: Deploy Bundled             ⏳ Pending
-Step  8: Task List Generation       ⏳ Pending
-Step  9: CLAUDE.md Update           ⏳ Pending
-Step 10: Cleanup                    ⏳ Pending
+Step  2: Tech Stack Expansion       ✅ Complete
+Step  3: Skills Acquisition         ✅ Complete
+Step  4: Agents Acquisition         🔄 In Progress
+Step  5: Commands Acquisition       ⏳ Pending
+Step  6: MCP Configuration          ⏳ Pending
+Step  7: Settings Configuration     ⏳ Pending
+Step  8: Deploy Bundled             ⏳ Pending
+Step  9: Task List Generation       ⏳ Pending
+Step 10: CLAUDE.md Update           ⏳ Pending
+Step 11: Cleanup                    ⏳ Pending
 
-Current: Downloading commands from aitmpl.com
+Current: Downloading agents from aitmpl.com
 ════════════════════════════════════════════════════════════════════════════════
 ```
 
@@ -40,15 +41,16 @@ Current: Downloading commands from aitmpl.com
 | Step | Name | Agent |
 |------|------|-------|
 | 1 | Specification Analysis | spec-analyzer |
-| 2 | Skills Acquisition | category-downloader (skills) |
-| 3 | Agents Acquisition | category-downloader (agents) |
-| 4 | Commands Acquisition | category-downloader (commands) |
-| 5 | MCP Configuration | category-downloader (mcps) |
-| 6 | Settings Configuration | category-downloader (settings) |
-| 7 | Deploy Bundled | (direct copy) |
-| 8 | Task List Generation | task-list-generator |
-| 9 | CLAUDE.md Update | claude-md-updater |
-| 10 | Cleanup | (optional) |
+| 2 | Tech Stack Expansion | tech-stack-expander |
+| 3 | Skills Acquisition | category-downloader (skills) |
+| 4 | Agents Acquisition | category-downloader (agents) |
+| 5 | Commands Acquisition | category-downloader (commands) |
+| 6 | MCP Configuration | category-downloader (mcps) |
+| 7 | Settings Configuration | category-downloader (settings) |
+| 8 | Deploy Bundled | (direct copy) |
+| 9 | Task List Generation | task-list-generator |
+| 10 | CLAUDE.md Update | claude-md-updater |
+| 11 | Cleanup | (optional) |
 
 ### Tasks Mode (implementation)
 
