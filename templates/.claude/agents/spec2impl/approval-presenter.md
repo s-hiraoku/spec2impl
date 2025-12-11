@@ -66,21 +66,42 @@ Files to Create/Modify:
 - Command purposes
 - Output locations
 
-### Step 6: MCP Configuration
-Include token requirements:
+### Step 6: MCP Configuration (3-Layer)
+
+Display MCPs in 3 layers with descriptions and token requirements:
+
 ```
+📦 Layer 1: Base MCPs (ユーザー選択)
+  ✅ context7 - 最新ライブラリドキュメント取得
+     任意のライブラリの最新ドキュメント・コード例を自動取得
+  ✅ memory - セッション間の永続メモリ
+     プロジェクトの決定事項、設計方針を永続化
+  ⏭️ github-integration - スキップ
+  ⏭️ markitdown - スキップ
+
+🔍 Layer 2: Auto-Detected (仕様書から検出)
+  ✅ postgresql-integration - "PostgreSQL" キーワード検出
+     PostgreSQLデータベースへのクエリ実行・スキーマ管理
+  ✅ deepgraph-typescript - "TypeScript" キーワード検出
+     TypeScript型解析・型推論・リファクタリング支援
+  ✅ stripe - "決済" キーワード検出
+     Stripe決済API連携（顧客、商品、サブスクリプション管理）
+
+⭐ Layer 3: Additional (ユーザー選択)
+  ✅ browsermcp - ブラウザ自動操作
+     ブラウザ自動操作・スクリーンショット・DOM解析
+
 🔑 TOKEN REQUIREMENTS:
-  1. PostgreSQL (DATABASE_URL)
+  1. DATABASE_URL (postgresql-integration)
      Format: postgresql://user:pass@host:5432/db
      Get from: Your database provider
 
-  2. GitHub (GITHUB_TOKEN)
-     Format: ghp_...
-     Get from: github.com/settings/tokens
-
-  3. Stripe (STRIPE_API_KEY)
+  2. STRIPE_API_KEY (stripe)
      Format: sk_test_... or sk_live_...
      Get from: dashboard.stripe.com/apikeys
+
+Files to Create/Modify:
+  .mcp.json (5 MCPs configured)
 ```
 
 ### Step 7: Settings Configuration

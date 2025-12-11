@@ -46,7 +46,7 @@ Current: Downloading agents from aitmpl.com
 | 3 | Skills Acquisition | category-downloader (skills) |
 | 4 | Agents Acquisition | category-downloader (agents) |
 | 5 | Commands Acquisition | category-downloader (commands) |
-| 6 | MCP Configuration | category-downloader (mcps) |
+| 6 | MCP Configuration (3-Layer) | category-downloader (mcps) |
 | 7 | Settings Configuration | category-downloader (settings) |
 | 8 | Deploy Bundled | (direct copy) |
 | 9 | Task List Generation | task-list-generator |

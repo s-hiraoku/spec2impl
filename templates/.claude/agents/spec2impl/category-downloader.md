@@ -63,6 +63,120 @@ python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py get "${it
 | hooks | `.claude/settings.local.json` (merge) |
 | plugins | Multiple locations |
 
+---
+
+## MCP Category: 3-Layer Configuration
+
+When `Category: mcps`, use the 3-layer approach defined in `categories/mcps.md`:
+
+### Layer 1: Recommended Base MCPs (User Selection)
+
+**Ask user** which base MCPs to install:
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "基本MCPをインストールしますか？開発全般で有用なMCPです。",
+    header: "基本MCP",
+    options: [
+      {
+        label: "context7 (推奨)",
+        description: "任意のライブラリの最新ドキュメントとコード例を取得"
+      },
+      {
+        label: "memory",
+        description: "セッション間で情報を記憶・永続化。プロジェクト知識を維持"
+      },
+      {
+        label: "github-integration",
+        description: "GitHub API連携: PR作成、Issue管理 (GITHUB_TOKEN必要)"
+      },
+      {
+        label: "markitdown",
+        description: "PDF/Word/Excel/画像をMarkdownに変換 (Docker必要)"
+      }
+    ],
+    multiSelect: true
+  }]
+})
+```
+
+### Layer 2: Auto-Detected MCPs (Spec-based)
+
+Scan specification for keywords and **show detected MCPs** to user:
+
+| Keyword Pattern | MCP | Description |
+|-----------------|-----|-------------|
+| `postgres`, `postgresql`, `pg` | `postgresql-integration` | PostgreSQLクエリ実行・スキーマ管理 |
+| `mysql`, `mariadb` | `mysql-integration` | MySQLクエリ実行・スキーマ管理 |
+| `sqlite` | `sqlite` | SQLiteローカルDB操作 |
+| `mongodb`, `mongo` | `mongodb` | MongoDBドキュメント操作 |
+| `supabase` | `supabase` | Supabase BaaS連携 |
+| `github`, `pr`, `issue` | `github-integration` | GitHub API連携 |
+| `stripe`, `payment`, `決済` | `stripe` | Stripe決済API連携 |
+| `slack`, `channel` | `slack` | Slackメッセージ・通知 |
+| `notion`, `wiki` | `notion` | Notionページ・DB操作 |
+| `sentry`, `error tracking` | `sentry` | Sentryエラー監視 |
+| `playwright`, `e2e` | `mcp-server-playwright` | Playwrightブラウザ自動化 |
+| `next.js`, `next`, `nextjs` | `deepgraph-nextjs` | Next.js専用コード解析 |
+| `react` | `deepgraph-react` | Reactコンポーネント解析 |
+| `typescript` | `deepgraph-typescript` | TypeScript型解析 |
+| `vue`, `nuxt` | `deepgraph-vue` | Vue/Nuxtコンポーネント解析 |
+
+### Layer 3: Additional Recommended MCPs (User Selection)
+
+Based on project type, present additional recommendations:
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "追加でおすすめのMCPを設定しますか？",
+    header: "追加MCP",
+    options: [
+      // Web/Frontend
+      { label: "browsermcp", description: "ブラウザ自動操作・スクリーンショット（トークン不要）" },
+      // API/Backend
+      { label: "postman", description: "Postmanコレクション実行（POSTMAN_API_KEY必要）" },
+      // DevOps
+      { label: "terraform", description: "Terraformインフラ定義（トークン不要）" },
+      // AI/ML
+      { label: "huggingface", description: "HuggingFaceモデル検索（HF_TOKEN必要）" }
+    ],
+    multiSelect: true
+  }]
+})
+```
+
+### MCP Output Format
+
+```
+═══════════════════════════════════════════════════════════════
+MCP Configuration (3-Layer)
+═══════════════════════════════════════════════════════════════
+
+📦 Layer 1: Base MCPs (ユーザー選択)
+  ✅ context7 - 最新ライブラリドキュメント取得
+  ✅ memory - セッション間の永続メモリ
+  ⏭️ github-integration - スキップ
+  ⏭️ markitdown - スキップ
+
+🔍 Layer 2: Auto-Detected (仕様書から検出)
+  ✅ postgresql-integration - "PostgreSQL" キーワード検出
+  ✅ deepgraph-typescript - "TypeScript" キーワード検出
+  ✅ stripe - "決済" キーワード検出
+
+⭐ Layer 3: Additional (ユーザー選択)
+  ✅ browsermcp - ブラウザ自動化
+
+🔑 Required Tokens:
+  1. DATABASE_URL (postgresql-integration)
+     → postgresql://user:pass@host:5432/db
+  2. STRIPE_API_KEY (stripe)
+     → dashboard.stripe.com/apikeys
+
+═══════════════════════════════════════════════════════════════
+```
+
 ## Example Usage
 
 ```typescript
