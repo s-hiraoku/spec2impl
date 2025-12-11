@@ -69,6 +69,10 @@ python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py get "${it
 
 When `Category: mcps`, use the 3-layer approach defined in `categories/mcps.md`:
 
+> ⚠️ **注意: MCPはコンテキストウィンドウを消費します**
+> 各MCPはツール定義として読み込まれるため、多すぎるとコンテキストが圧迫されます。
+> 本当に必要なMCPのみを選択するよう案内してください。
+
 ### Layer 1: Recommended Base MCPs (User Selection)
 
 **Ask user** which base MCPs to install:

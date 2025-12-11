@@ -15,6 +15,13 @@ Download MCP (Model Context Protocol) server configurations from claude-code-tem
 
 ## 3-Layer MCP Configuration
 
+> ⚠️ **注意: MCPはコンテキストウィンドウを消費します**
+>
+> 各MCPはツール定義としてコンテキストに読み込まれるため、**インストールするMCPが多いほどコンテキストウィンドウが圧迫**されます。
+> - 本当に必要なMCPのみを選択してください
+> - 使用頻度の低いMCPは後から追加できます
+> - 迷った場合は最小限（context7 + memory）から始めることを推奨
+
 ### Layer 1: Recommended Base MCPs (User Selection)
 
 Present these via `AskUserQuestion` with multiSelect. All are highly recommended for general development.

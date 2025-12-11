@@ -68,7 +68,13 @@ Files to Create/Modify:
 
 ### Step 6: MCP Configuration (3-Layer)
 
-Display MCPs in 3 layers with descriptions and token requirements:
+Display MCPs in 3 layers with descriptions and token requirements.
+
+**Important warning to include:**
+```
+⚠️ 注意: MCPはコンテキストウィンドウを消費します
+   多すぎるとコンテキストが圧迫されます。本当に必要なMCPのみ選択してください。
+```
 
 ```
 📦 Layer 1: Base MCPs (ユーザー選択)
