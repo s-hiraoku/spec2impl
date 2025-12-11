@@ -65,6 +65,110 @@ python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py get "${it
 
 ---
 
+## Agents Category: 3-Layer Configuration
+
+When `Category: agents`, use the 3-layer approach defined in `categories/agents.md`:
+
+> ⚠️ **Warning: Agents consume context window space**
+> Each agent definition is loaded when invoked, so too many agents can impact performance.
+> Guide users to select only agents they'll actually use.
+
+### Layer 1: Recommended Base Agents (User Selection)
+
+**Ask user** which base agents to install:
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "Install base agents? These are useful for general development.",
+    header: "Base Agents",
+    options: [
+      {
+        label: "code-reviewer (Recommended)",
+        description: "Code review, quality checks, best practices enforcement"
+      },
+      {
+        label: "test-engineer",
+        description: "Test strategy, test case generation, coverage analysis"
+      },
+      {
+        label: "technical-writer",
+        description: "Documentation generation, API docs, README creation"
+      }
+    ],
+    multiSelect: true
+  }]
+})
+```
+
+### Layer 2: Auto-Detected Agents (Spec-based)
+
+Scan specification for keywords and **show detected agents** to user:
+
+| Keyword Pattern | Agent | Description |
+|-----------------|-------|-------------|
+| `frontend`, `react`, `vue`, `next.js` | `frontend-developer` | Frontend development specialist |
+| `UI`, `UX`, `design` | `ui-ux-designer` | UI/UX design and implementation |
+| `backend`, `API`, `server`, `REST` | `backend-architect` | Backend architecture and API design |
+| `fullstack`, `full-stack` | `fullstack-developer` | Full-stack development |
+| `database`, `SQL`, `postgres`, `mysql` | `database-architect` | Database design and optimization |
+| `devops`, `CI/CD`, `pipeline` | `devops-engineer` | DevOps and CI/CD pipelines |
+| `deploy`, `deployment`, `hosting` | `deployment-engineer` | Deployment and hosting |
+| `security`, `auth`, `authentication` | `security-engineer` | Security implementation |
+| `AI`, `ML`, `machine learning` | `ai-engineer` | AI/ML implementation |
+| `MCP`, `protocol` | `mcp-server-architect` | MCP server architecture |
+| `GraphQL`, `schema` | `graphql-architect` | GraphQL API design |
+| `mobile`, `iOS`, `Android` | `mobile-developer` | Mobile app development |
+
+### Layer 3: Additional Recommended Agents (User Selection)
+
+Based on project type, present additional recommendations:
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "Install additional recommended agents?",
+    header: "Additional Agents",
+    options: [
+      // Web App
+      { label: "performance-engineer", description: "Performance optimization and profiling" },
+      // API/Backend
+      { label: "api-documenter", description: "API documentation generation" },
+      // Data/Analytics
+      { label: "data-scientist", description: "Data analysis and modeling" },
+      // DevOps
+      { label: "cloud-architect", description: "Cloud infrastructure design" }
+    ],
+    multiSelect: true
+  }]
+})
+```
+
+### Agents Output Format
+
+```
+═══════════════════════════════════════════════════════════════
+Agents Configuration (3-Layer)
+═══════════════════════════════════════════════════════════════
+
+📦 Layer 1: Base Agents (User Selection)
+  ✅ code-reviewer - Code review and quality checks
+  ✅ test-engineer - Test strategy and case generation
+  ⏭️ technical-writer - Skipped
+
+🔍 Layer 2: Auto-Detected (From Spec)
+  ✅ frontend-developer - "React" keyword detected
+  ✅ backend-architect - "API" keyword detected
+  ✅ database-architect - "PostgreSQL" keyword detected
+
+⭐ Layer 3: Additional (User Selection)
+  ✅ performance-engineer - Performance optimization
+
+═══════════════════════════════════════════════════════════════
+```
+
+---
+
 ## Skills Category: 3-Layer Configuration
 
 When `Category: skills`, use the 3-layer approach defined in `categories/skills.md`:

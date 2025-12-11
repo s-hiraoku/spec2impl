@@ -87,10 +87,44 @@ Files to Create:
   .claude/skills/theme-factory/
 ```
 
-### Step 4: Agents Acquisition
-- Agents to download
-- Agent purposes and roles
-- Output locations
+### Step 4: Agents Acquisition (3-Layer)
+
+Display Agents in 3 layers with descriptions.
+
+**Important warning to include:**
+```
+⚠️ Warning: Agents consume context window space
+   Too many agents will impact performance. Select only agents you'll actually use.
+```
+
+```
+📦 Layer 1: Base Agents (User Selection)
+  ✅ code-reviewer - Code review and quality checks
+     Reviews code for patterns, best practices, and potential issues
+  ✅ test-engineer - Test strategy and case generation
+     Creates test strategies and generates test cases
+  ⏭️ technical-writer - Skipped
+
+🔍 Layer 2: Auto-Detected (From Spec)
+  ✅ frontend-developer - "React" keyword detected
+     Frontend development specialist
+  ✅ backend-architect - "API" keyword detected
+     Backend architecture and API design
+  ✅ database-architect - "PostgreSQL" keyword detected
+     Database design and optimization
+
+⭐ Layer 3: Additional (User Selection)
+  ✅ performance-engineer - Performance optimization
+     Performance profiling and optimization
+
+Files to Create:
+  .claude/agents/code-reviewer.md
+  .claude/agents/test-engineer.md
+  .claude/agents/frontend-developer.md
+  .claude/agents/backend-architect.md
+  .claude/agents/database-architect.md
+  .claude/agents/performance-engineer.md
+```
 
 ### Step 5: Commands Acquisition
 - Commands to download
@@ -103,30 +137,30 @@ Display MCPs in 3 layers with descriptions and token requirements.
 
 **Important warning to include:**
 ```
-⚠️ 注意: MCPはコンテキストウィンドウを消費します
-   多すぎるとコンテキストが圧迫されます。本当に必要なMCPのみ選択してください。
+⚠️ Warning: MCPs consume context window space
+   Too many MCPs will reduce available context. Select only essential MCPs.
 ```
 
 ```
-📦 Layer 1: Base MCPs (ユーザー選択)
-  ✅ context7 - 最新ライブラリドキュメント取得
-     任意のライブラリの最新ドキュメント・コード例を自動取得
-  ✅ memory - セッション間の永続メモリ
-     プロジェクトの決定事項、設計方針を永続化
-  ⏭️ github-integration - スキップ
-  ⏭️ markitdown - スキップ
+📦 Layer 1: Base MCPs (User Selection)
+  ✅ context7 - Get latest library documentation
+     Automatically fetch latest docs and code examples for any library
+  ✅ memory - Persistent memory across sessions
+     Persist project decisions and design patterns
+  ⏭️ github-integration - Skipped
+  ⏭️ markitdown - Skipped
 
-🔍 Layer 2: Auto-Detected (仕様書から検出)
-  ✅ postgresql-integration - "PostgreSQL" キーワード検出
-     PostgreSQLデータベースへのクエリ実行・スキーマ管理
-  ✅ deepgraph-typescript - "TypeScript" キーワード検出
-     TypeScript型解析・型推論・リファクタリング支援
-  ✅ stripe - "決済" キーワード検出
-     Stripe決済API連携（顧客、商品、サブスクリプション管理）
+🔍 Layer 2: Auto-Detected (From Spec)
+  ✅ postgresql-integration - "PostgreSQL" keyword detected
+     PostgreSQL query execution and schema management
+  ✅ deepgraph-typescript - "TypeScript" keyword detected
+     TypeScript type analysis and refactoring support
+  ✅ stripe - "payment" keyword detected
+     Stripe payment API integration (customers, products, subscriptions)
 
-⭐ Layer 3: Additional (ユーザー選択)
-  ✅ browsermcp - ブラウザ自動操作
-     ブラウザ自動操作・スクリーンショット・DOM解析
+⭐ Layer 3: Additional (User Selection)
+  ✅ browsermcp - Browser automation
+     Browser automation, screenshots, DOM analysis
 
 🔑 TOKEN REQUIREMENTS:
   1. DATABASE_URL (postgresql-integration)

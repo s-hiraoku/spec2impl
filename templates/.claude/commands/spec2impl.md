@@ -117,8 +117,10 @@ Task({
 
 ---
 
-### Step 4: Agents Acquisition
+### Step 4: Agents Acquisition (3-Layer)
 **Agent:** `category-downloader.md` (category: agents)
+
+**IMPORTANT:** Agents category MUST use 3-layer structure.
 
 ```typescript
 Task({
@@ -126,7 +128,26 @@ Task({
   prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
            Category: agents
            Search Terms: ${expandedTechStack.searchTerms}
-           Requirements: ${specRequirements}`
+           Requirements: ${specRequirements}
+
+           IMPORTANT: Agents category MUST use 3-layer structure:
+
+           1. Layer 1 - Base agents selection:
+              Present via AskUserQuestion (multiSelect):
+              - code-reviewer (Recommended): Code review and quality checks
+              - test-engineer: Test strategy and case generation
+              - technical-writer: Documentation generation
+
+           2. Layer 2 - Auto-detected from spec:
+              Detect agents by keyword matching and display
+              (frontend, backend, database, devops, security, AI/ML, MCP, GraphQL, mobile)
+
+           3. Layer 3 - Additional recommendations:
+              Present via AskUserQuestion based on project type
+
+           ⚠️ MUST display warning:
+           "Agents consume context window space.
+            Select only agents you'll actually use."`
 })
 ```
 
