@@ -1,6 +1,6 @@
 ---
 name: approval-presenter
-description: Present step results for user approval. Shows summary, details, files, risks, and token requirements. 11-step workflow support.
+description: Present step results for user approval. Shows summary, details, files, risks, and token requirements. 12-step workflow support.
 model: haiku
 tools: Read, Glob
 ---
@@ -13,7 +13,7 @@ Present step results in consistent format for user approval.
 
 ```
 ════════════════════════════════════════════════════════════════════════════════
-  Step {N}/11: {Step Name} - Approval Required
+  Step {N}/12: {Step Name} - Approval Required
 ════════════════════════════════════════════════════════════════════════════════
 
 Summary:
@@ -104,7 +104,14 @@ Include token requirements:
 - Existing sections preserved
 - Generated content preview
 
-### Step 11: Cleanup
+### Step 11: Harness Guide Generation
+- Components listed with usage instructions
+- Token requirements extracted from MCPs
+- First 3 tasks from TASKS.md
+- Quick start guide included
+- Output: docs/HARNESS_GUIDE.md
+
+### Step 12: Cleanup
 - Files to delete
 - Files to keep
 - Warning about irreversibility

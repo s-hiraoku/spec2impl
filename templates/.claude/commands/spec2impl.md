@@ -14,7 +14,7 @@ Analyze specification documents and build Claude Code implementation environment
 
 ## Execution Flow
 
-Execute 11 steps sequentially. Each step:
+Execute 12 steps sequentially. Each step:
 1. Show progress with `progress-dashboard`
 2. Execute step logic
 3. Present results with `approval-presenter` for user approval
@@ -27,7 +27,7 @@ Task({
   prompt: `Read .claude/agents/spec2impl/progress-dashboard.md and execute.
            Mode: workflow
            Current Step: ${stepNumber}
-           Total Steps: 11`
+           Total Steps: 12`
 })
 ```
 
@@ -218,7 +218,35 @@ Task({
 
 ---
 
-### Step 11: Cleanup (Optional)
+### Step 11: Harness Guide Generation
+**Agent:** `harness-guide-generator.md`
+
+```typescript
+Task({
+  subagent_type: "general-purpose",
+  prompt: `Read .claude/agents/spec2impl/harness-guide-generator.md and execute.
+
+           Input:
+           - expandedTechStack: ${expandedTechStack}
+           - downloadedItems: ${downloadedItems}
+           - specDirectory: ${ARGUMENTS}
+           - taskCount: ${taskCount}
+
+           Generate docs/HARNESS_GUIDE.md with:
+           1. Generation summary (tech stack, task count)
+           2. Downloaded components with usage instructions
+           3. Token requirements from MCPs
+           4. First 3 tasks from TASKS.md
+           5. Quick start guide`
+})
+```
+
+→ Output: `docs/HARNESS_GUIDE.md`
+→ Call `approval-presenter` with guide summary
+
+---
+
+### Step 12: Cleanup (Optional)
 
 Delete spec2impl files:
 - `.claude/commands/spec2impl.md`
@@ -238,8 +266,9 @@ Delete spec2impl files:
 | category-downloader | Download by category | 3, 4, 5, 6, 7 |
 | task-list-generator | Generate TASKS.md | 9 |
 | claude-md-updater | Update CLAUDE.md | 10 |
+| harness-guide-generator | Generate HARNESS_GUIDE.md | 11 |
 | progress-dashboard | Show progress | All |
-| approval-presenter | Get user approval | 1-7, 9, 11 |
+| approval-presenter | Get user approval | 1-7, 9, 11, 12 |
 | ux-psychology-advisor | UX recommendations | Deployed in 8 |
 
 ## Available Skills Reference
@@ -256,7 +285,7 @@ Delete spec2impl files:
 
 ```
 ════════════════════════════════════════════════════════════════
-spec2impl Complete (11/11 steps)
+spec2impl Complete (12/12 steps)
 ════════════════════════════════════════════════════════════════
 
 Tech Stack Expanded:
@@ -276,9 +305,12 @@ Deployed:
 
 Tasks: ${taskCount} tasks in docs/TASKS.md
 
+📚 Harness Guide: docs/HARNESS_GUIDE.md
+   → コンポーネントの使い方、トークン設定、クイックスタートガイド
+
 Next Steps:
-1. Configure MCPs (see token requirements above)
-2. Review docs/TASKS.md
+1. Read docs/HARNESS_GUIDE.md for usage instructions
+2. Configure tokens (see guide for details)
 3. Start: "Implement T-SPEC-1"
 ════════════════════════════════════════════════════════════════
 ```

@@ -1,6 +1,6 @@
 ---
 name: progress-dashboard
-description: Display visual progress dashboard. Mode workflow for spec2impl steps (11 steps), mode tasks for implementation progress from TASKS.md.
+description: Display visual progress dashboard. Mode workflow for spec2impl steps (12 steps), mode tasks for implementation progress from TASKS.md.
 model: haiku
 tools: Read, Glob, Grep
 ---
@@ -11,14 +11,14 @@ Display visual progress for spec2impl or implementation tasks.
 
 ## Modes
 
-### Workflow Mode (spec2impl execution - 11 steps)
+### Workflow Mode (spec2impl execution - 12 steps)
 
 ```
 ════════════════════════════════════════════════════════════════════════════════
   spec2impl Progress
 ════════════════════════════════════════════════════════════════════════════════
 
-[████████░░░░░░░░░░░░░░░░░░░░░░]  27% (3/11 steps)
+[████████░░░░░░░░░░░░░░░░░░░░░░]  25% (3/12 steps)
 
 Step  1: Specification Analysis     ✅ Complete
 Step  2: Tech Stack Expansion       ✅ Complete
@@ -30,7 +30,8 @@ Step  7: Settings Configuration     ⏳ Pending
 Step  8: Deploy Bundled             ⏳ Pending
 Step  9: Task List Generation       ⏳ Pending
 Step 10: CLAUDE.md Update           ⏳ Pending
-Step 11: Cleanup                    ⏳ Pending
+Step 11: Harness Guide Generation   ⏳ Pending
+Step 12: Cleanup                    ⏳ Pending
 
 Current: Downloading agents from aitmpl.com
 ════════════════════════════════════════════════════════════════════════════════
@@ -50,7 +51,8 @@ Current: Downloading agents from aitmpl.com
 | 8 | Deploy Bundled | (direct copy) |
 | 9 | Task List Generation | task-list-generator |
 | 10 | CLAUDE.md Update | claude-md-updater |
-| 11 | Cleanup | (optional) |
+| 11 | Harness Guide Generation | harness-guide-generator |
+| 12 | Cleanup | (optional) |
 
 ### Tasks Mode (implementation)
 
