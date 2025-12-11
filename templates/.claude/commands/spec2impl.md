@@ -132,8 +132,10 @@ Task({
 
 ---
 
-### Step 6: MCP Configuration
+### Step 6: MCP Configuration (3-Layer)
 **Agent:** `category-downloader.md` (category: mcps)
+
+**IMPORTANT:** MCPカテゴリは3層構造を必ず実行してください。
 
 ```typescript
 Task({
@@ -142,7 +144,26 @@ Task({
            Category: mcps
            Search Terms: ${expandedTechStack.searchTerms}
            Services: ${detectedServices}
-           Requirements: ${specRequirements}`
+           Requirements: ${specRequirements}
+
+           IMPORTANT: MCPカテゴリは3層構造を必ず実行:
+
+           1. Layer 1 - 基本MCP選択:
+              AskUserQuestionで以下を提示（multiSelect）:
+              - context7 (推奨): 最新ライブラリドキュメント取得
+              - memory: セッション間の永続メモリ
+              - github-integration: GitHub API連携 (TOKEN必要)
+              - markitdown: ファイル変換 (Docker必要)
+
+           2. Layer 2 - 仕様書から自動検出:
+              キーワードマッチでMCPを検出して表示
+
+           3. Layer 3 - 追加おすすめ:
+              AskUserQuestionで追加MCPを提示
+
+           ⚠️ 注意書きを必ず表示:
+           「MCPはコンテキストウィンドウを消費します。
+            本当に必要なMCPのみ選択してください。」`
 })
 ```
 
