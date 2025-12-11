@@ -57,27 +57,27 @@ Display Skills in 3 layers with descriptions.
 
 **Important warning to include:**
 ```
-⚠️ 注意: Skillsもコンテキストウィンドウを消費します
-   多すぎるとコンテキストが圧迫されます。本当に必要なスキルのみ選択してください。
+⚠️ Warning: Skills consume context window space
+   Too many skills will reduce available context. Select only essential skills.
 ```
 
 ```
-📦 Layer 1: Base Skills (ユーザー選択)
-  ✅ skill-creator - 新しいスキル作成ガイド
-     プロジェクト固有のスキルをテンプレートから作成可能
-  ✅ git-commit-helper - Gitコミットメッセージ生成
-     Conventional Commitに沿ったメッセージ生成・ベストプラクティス
-  ⏭️ changelog-generator - スキップ
+📦 Layer 1: Base Skills (User Selection)
+  ✅ skill-creator - Create new skills guide
+     Create project-specific skills from templates
+  ✅ git-commit-helper - Git commit message generation
+     Conventional Commit best practices and message generation
+  ⏭️ changelog-generator - Skipped
 
-🔍 Layer 2: Auto-Detected (仕様書から検出)
-  ✅ webapp-testing - "テスト" キーワード検出
-     Webアプリテストパターン・E2Eテストユーティリティ
-  ✅ pdf-anthropic - "PDF" キーワード検出
-     PDF処理・抽出・分析
+🔍 Layer 2: Auto-Detected (From Spec)
+  ✅ webapp-testing - "test" keyword detected
+     Web app testing patterns and E2E test utilities
+  ✅ pdf-anthropic - "PDF" keyword detected
+     PDF processing, extraction, and analysis
 
-⭐ Layer 3: Additional (ユーザー選択)
-  ✅ theme-factory - UIテーマ生成
-     UIテーマ・カラーパレット・デザインシステム生成
+⭐ Layer 3: Additional (User Selection)
+  ✅ theme-factory - UI theme generation
+     UI themes, color palettes, and design system generation
 
 Files to Create:
   .claude/skills/skill-creator/

@@ -81,7 +81,7 @@ Task({
 ### Step 3: Skills Acquisition (3-Layer)
 **Agent:** `category-downloader.md` (category: skills)
 
-**IMPORTANT:** Skillsカテゴリは3層構造を必ず実行してください。
+**IMPORTANT:** Skills category MUST use 3-layer structure.
 
 ```typescript
 Task({
@@ -91,24 +91,24 @@ Task({
            Search Terms: ${expandedTechStack.searchTerms}
            Requirements: ${specRequirements}
 
-           IMPORTANT: Skillsカテゴリは3層構造を必ず実行:
+           IMPORTANT: Skills category MUST use 3-layer structure:
 
-           1. Layer 1 - 基本スキル選択:
-              AskUserQuestionで以下を提示（multiSelect）:
-              - skill-creator (推奨): 新しいスキル作成ガイド
-              - git-commit-helper: Gitコミットメッセージ生成
-              - changelog-generator: CHANGELOG自動生成
+           1. Layer 1 - Base skills selection:
+              Present via AskUserQuestion (multiSelect):
+              - skill-creator (Recommended): Create new skills guide
+              - git-commit-helper: Git commit message generation
+              - changelog-generator: CHANGELOG auto-generation
 
-           2. Layer 2 - 仕様書から自動検出:
-              キーワードマッチでスキルを検出して表示
-              (PDF, Word, Excel, テスト, MCP, Zapier, テーマ, Slack)
+           2. Layer 2 - Auto-detected from spec:
+              Detect skills by keyword matching and display
+              (PDF, Word, Excel, test, MCP, Zapier, theme, Slack)
 
-           3. Layer 3 - 追加おすすめ:
-              プロジェクトタイプに応じてAskUserQuestionで提示
+           3. Layer 3 - Additional recommendations:
+              Present via AskUserQuestion based on project type
 
-           ⚠️ 注意書きを必ず表示:
-           「Skillsもコンテキストウィンドウを消費します。
-            本当に必要なスキルのみ選択してください。」`
+           ⚠️ MUST display warning:
+           "Skills consume context window space.
+            Select only essential skills."`
 })
 ```
 
@@ -156,7 +156,7 @@ Task({
 ### Step 6: MCP Configuration (3-Layer)
 **Agent:** `category-downloader.md` (category: mcps)
 
-**IMPORTANT:** MCPカテゴリは3層構造を必ず実行してください。
+**IMPORTANT:** MCP category MUST use 3-layer structure.
 
 ```typescript
 Task({
@@ -167,24 +167,24 @@ Task({
            Services: ${detectedServices}
            Requirements: ${specRequirements}
 
-           IMPORTANT: MCPカテゴリは3層構造を必ず実行:
+           IMPORTANT: MCP category MUST use 3-layer structure:
 
-           1. Layer 1 - 基本MCP選択:
-              AskUserQuestionで以下を提示（multiSelect）:
-              - context7 (推奨): 最新ライブラリドキュメント取得
-              - memory: セッション間の永続メモリ
-              - github-integration: GitHub API連携 (TOKEN必要)
-              - markitdown: ファイル変換 (Docker必要)
+           1. Layer 1 - Base MCP selection:
+              Present via AskUserQuestion (multiSelect):
+              - context7 (Recommended): Get latest library documentation
+              - memory: Persistent memory across sessions
+              - github-integration: GitHub API integration (TOKEN required)
+              - markitdown: File conversion (Docker required)
 
-           2. Layer 2 - 仕様書から自動検出:
-              キーワードマッチでMCPを検出して表示
+           2. Layer 2 - Auto-detected from spec:
+              Detect MCPs by keyword matching and display
 
-           3. Layer 3 - 追加おすすめ:
-              AskUserQuestionで追加MCPを提示
+           3. Layer 3 - Additional recommendations:
+              Present additional MCPs via AskUserQuestion
 
-           ⚠️ 注意書きを必ず表示:
-           「MCPはコンテキストウィンドウを消費します。
-            本当に必要なMCPのみ選択してください。」`
+           ⚠️ MUST display warning:
+           "MCPs consume context window space.
+            Select only essential MCPs."`
 })
 ```
 

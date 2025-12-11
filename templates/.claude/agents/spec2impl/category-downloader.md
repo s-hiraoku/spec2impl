@@ -69,9 +69,9 @@ python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py get "${it
 
 When `Category: skills`, use the 3-layer approach defined in `categories/skills.md`:
 
-> ⚠️ **注意: Skillsもコンテキストウィンドウを消費します**
-> 各スキルはセッション開始時に読み込まれるため、多すぎるとコンテキストが圧迫されます。
-> 本当に必要なスキルのみを選択するよう案内してください。
+> ⚠️ **Warning: Skills consume context window space**
+> Each skill is loaded at session start, so too many skills will reduce available context.
+> Guide users to select only essential skills.
 
 ### Layer 1: Recommended Base Skills (User Selection)
 
@@ -80,20 +80,20 @@ When `Category: skills`, use the 3-layer approach defined in `categories/skills.
 ```typescript
 AskUserQuestion({
   questions: [{
-    question: "基本スキルをインストールしますか？開発全般で有用なスキルです。",
-    header: "基本スキル",
+    question: "Install base skills? These are useful for general development.",
+    header: "Base Skills",
     options: [
       {
-        label: "skill-creator (推奨)",
-        description: "新しいスキル作成ガイド。プロジェクト固有のスキルを作成可能"
+        label: "skill-creator (Recommended)",
+        description: "Guide for creating new skills. Create project-specific skills from templates"
       },
       {
         label: "git-commit-helper",
-        description: "Gitコミットメッセージ生成・Conventional Commitベストプラクティス"
+        description: "Git commit message generation with Conventional Commit best practices"
       },
       {
         label: "changelog-generator",
-        description: "Gitコミットから CHANGELOG を自動生成"
+        description: "Auto-generate CHANGELOG from git commits"
       }
     ],
     multiSelect: true
@@ -107,14 +107,14 @@ Scan specification for keywords and **show detected skills** to user:
 
 | Keyword Pattern | Skill | Description |
 |-----------------|-------|-------------|
-| `pdf`, `帳票`, `レポート` | `pdf-anthropic` | PDF処理・抽出・分析 |
-| `word`, `docx`, `文書` | `docx` | Word文書生成・編集 |
-| `excel`, `xlsx`, `表計算` | `xlsx` | Excel処理・生成 |
-| `test`, `testing`, `e2e`, `qa` | `webapp-testing` | Webアプリテストパターン |
-| `mcp`, `protocol` | `mcp-builder` | MCPサーバー構築ガイド |
-| `zapier`, `自動化`, `webhook` | `zapier-workflows` | Zapier連携ワークフロー |
-| `theme`, `テーマ`, `カラー`, `ui` | `theme-factory` | UIテーマ・カラーパレット生成 |
-| `slack`, `通知`, `gif` | `slack-gif-creator` | Slack用GIF作成 |
+| `pdf`, `report`, `document` | `pdf-anthropic` | PDF processing, extraction, analysis |
+| `word`, `docx` | `docx` | Word document generation and editing |
+| `excel`, `xlsx`, `spreadsheet` | `xlsx` | Excel processing and generation |
+| `test`, `testing`, `e2e`, `qa` | `webapp-testing` | Web app testing patterns |
+| `mcp`, `protocol` | `mcp-builder` | MCP server building guide |
+| `zapier`, `automation`, `webhook` | `zapier-workflows` | Zapier integration workflows |
+| `theme`, `color`, `ui`, `design` | `theme-factory` | UI theme and color palette generation |
+| `slack`, `notification`, `gif` | `slack-gif-creator` | Slack GIF creation |
 
 ### Layer 3: Additional Recommended Skills (User Selection)
 
@@ -123,17 +123,17 @@ Based on project type, present additional recommendations:
 ```typescript
 AskUserQuestion({
   questions: [{
-    question: "追加でおすすめのスキルを設定しますか？",
-    header: "追加スキル",
+    question: "Install additional recommended skills?",
+    header: "Additional Skills",
     options: [
       // Marketing/Business
-      { label: "content-research-writer", description: "コンテンツリサーチ・SEOライティング" },
+      { label: "content-research-writer", description: "Content research and SEO writing" },
       // Design
-      { label: "theme-factory", description: "UIテーマ・カラーパレット生成" },
+      { label: "theme-factory", description: "UI theme and color palette generation" },
       // Document Processing
-      { label: "pdf-anthropic", description: "PDF処理・抽出・分析" },
+      { label: "pdf-anthropic", description: "PDF processing, extraction, analysis" },
       // Development
-      { label: "mcp-builder", description: "MCPサーバー構築ガイド" }
+      { label: "mcp-builder", description: "MCP server building guide" }
     ],
     multiSelect: true
   }]
@@ -147,17 +147,17 @@ AskUserQuestion({
 Skills Configuration (3-Layer)
 ═══════════════════════════════════════════════════════════════
 
-📦 Layer 1: Base Skills (ユーザー選択)
-  ✅ skill-creator - 新しいスキル作成ガイド
-  ✅ git-commit-helper - Gitコミットメッセージ生成
-  ⏭️ changelog-generator - スキップ
+📦 Layer 1: Base Skills (User Selection)
+  ✅ skill-creator - Create new skills guide
+  ✅ git-commit-helper - Git commit message generation
+  ⏭️ changelog-generator - Skipped
 
-🔍 Layer 2: Auto-Detected (仕様書から検出)
-  ✅ webapp-testing - "テスト" キーワード検出
-  ✅ pdf-anthropic - "PDF" キーワード検出
+🔍 Layer 2: Auto-Detected (From Spec)
+  ✅ webapp-testing - "test" keyword detected
+  ✅ pdf-anthropic - "PDF" keyword detected
 
-⭐ Layer 3: Additional (ユーザー選択)
-  ✅ theme-factory - UIテーマ生成
+⭐ Layer 3: Additional (User Selection)
+  ✅ theme-factory - UI theme generation
 
 ═══════════════════════════════════════════════════════════════
 ```

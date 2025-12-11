@@ -15,12 +15,12 @@ Download skill templates from claude-code-templates.
 
 ## 3-Layer Skills Configuration
 
-> ⚠️ **注意: Skillsもコンテキストウィンドウを消費します**
+> ⚠️ **Warning: Skills consume context window space**
 >
-> 各スキルはセッション開始時に読み込まれるため、**インストールするスキルが多いほどコンテキストウィンドウが圧迫**されます。
-> - 本当に必要なスキルのみを選択してください
-> - 使用頻度の低いスキルは後から追加できます
-> - 迷った場合は最小限（skill-creator のみ）から始めることを推奨
+> Each skill is loaded at session start, so **more skills installed means less available context**.
+> - Select only essential skills
+> - Less frequently used skills can be added later
+> - When in doubt, start with minimum (skill-creator only)
 
 ### Layer 1: Recommended Base Skills (User Selection)
 
@@ -29,20 +29,20 @@ Present these via `AskUserQuestion` with multiSelect. Useful for general develop
 ```typescript
 AskUserQuestion({
   questions: [{
-    question: "基本スキルをインストールしますか？開発全般で有用なスキルです。",
-    header: "基本スキル",
+    question: "Install base skills? These are useful for general development.",
+    header: "Base Skills",
     options: [
       {
-        label: "skill-creator (推奨)",
-        description: "新しいスキル作成ガイド。プロジェクト固有のスキルを作成可能"
+        label: "skill-creator (Recommended)",
+        description: "Guide for creating new skills. Create project-specific skills from templates"
       },
       {
         label: "git-commit-helper",
-        description: "Gitコミットメッセージ生成・Conventional Commitベストプラクティス"
+        description: "Git commit message generation with Conventional Commit best practices"
       },
       {
         label: "changelog-generator",
-        description: "Gitコミットから CHANGELOG を自動生成"
+        description: "Auto-generate CHANGELOG from git commits"
       }
     ],
     multiSelect: true
@@ -54,9 +54,9 @@ AskUserQuestion({
 
 | Skill | Description | Use Case |
 |-------|-------------|----------|
-| `skill-creator` | 新しいClaude Codeスキルをテンプレートから作成 | どのプロジェクトでも固有スキルを作れる |
-| `git-commit-helper` | Conventional Commitに沿ったメッセージ生成 | ほぼ全プロジェクトで使用 |
-| `changelog-generator` | コミット履歴からCHANGELOG自動生成 | リリース管理で有用 |
+| `skill-creator` | Create new Claude Code skills from templates | Create project-specific skills for any project |
+| `git-commit-helper` | Generate Conventional Commit messages | Used in almost all projects |
+| `changelog-generator` | Auto-generate CHANGELOG from commit history | Useful for release management |
 
 ---
 
@@ -66,14 +66,14 @@ These skills are **automatically detected** from specification keywords. Show de
 
 | Keywords in Spec | Skill | Description |
 |------------------|-------|-------------|
-| PDF, 帳票, レポート, document | `pdf-anthropic` | PDF処理・抽出・分析 |
-| Word, docx, 文書 | `docx` | Word文書生成・編集 |
-| Excel, xlsx, 表計算, spreadsheet | `xlsx` | Excel処理・生成 |
-| テスト, testing, E2E, QA | `webapp-testing` | Webアプリテストパターン |
-| MCP, サーバー連携, protocol | `mcp-builder` | MCPサーバー構築ガイド |
-| Zapier, 自動化, webhook, automation | `zapier-workflows` | Zapier連携ワークフロー |
-| テーマ, カラー, UI, デザイン, theme | `theme-factory` | UIテーマ・カラーパレット生成 |
-| Slack, 通知, Bot, GIF | `slack-gif-creator` | Slack用GIF作成 |
+| PDF, report, document | `pdf-anthropic` | PDF processing, extraction, analysis |
+| Word, docx | `docx` | Word document generation and editing |
+| Excel, xlsx, spreadsheet | `xlsx` | Excel processing and generation |
+| test, testing, E2E, QA | `webapp-testing` | Web app testing patterns |
+| MCP, server, protocol | `mcp-builder` | MCP server building guide |
+| Zapier, automation, webhook | `zapier-workflows` | Zapier integration workflows |
+| theme, color, UI, design | `theme-factory` | UI theme and color palette generation |
+| Slack, notification, Bot, GIF | `slack-gif-creator` | Slack GIF creation |
 
 ---
 
@@ -84,8 +84,8 @@ Present these via `AskUserQuestion` based on detected project type.
 ```typescript
 AskUserQuestion({
   questions: [{
-    question: "追加でおすすめのスキルを設定しますか？",
-    header: "追加スキル",
+    question: "Install additional recommended skills?",
+    header: "Additional Skills",
     options: [
       // Options vary based on project type - see below
     ],
@@ -97,31 +97,31 @@ AskUserQuestion({
 #### For Marketing/Business Projects
 | Skill | Description |
 |-------|-------------|
-| `content-research-writer` | コンテンツリサーチ・SEOライティング・コピーライティング |
-| `competitive-ads-extractor` | 競合広告分析・抽出 |
-| `lead-research-assistant` | リード生成リサーチ・見込み客分析 |
+| `content-research-writer` | Content research, SEO writing, copywriting |
+| `competitive-ads-extractor` | Competitive ads analysis and extraction |
+| `lead-research-assistant` | Lead generation research, prospect analysis |
 
 #### For Design/Creative Projects
 | Skill | Description |
 |-------|-------------|
-| `theme-factory` | UIテーマ生成・カラーパレット・デザインシステム |
-| `algorithmic-art` | アルゴリズミックアート・ジェネラティブデザイン |
-| `canvas-design` | キャンバスベースのデザイン・グラフィックス |
+| `theme-factory` | UI theme generation, color palettes, design systems |
+| `algorithmic-art` | Algorithmic art, generative design |
+| `canvas-design` | Canvas-based design and graphics |
 
 #### For Document Processing Projects
 | Skill | Description |
 |-------|-------------|
-| `pdf-anthropic` | PDF処理・抽出・分析 |
-| `pdf-processing-pro` | 高度なPDF処理（OCR・フォーム） |
-| `docx` | Word文書処理・生成 |
-| `xlsx` | Excelスプレッドシート処理・生成 |
+| `pdf-anthropic` | PDF processing, extraction, analysis |
+| `pdf-processing-pro` | Advanced PDF processing (OCR, forms) |
+| `docx` | Word document processing and generation |
+| `xlsx` | Excel spreadsheet processing and generation |
 
 #### For Development/Automation Projects
 | Skill | Description |
 |-------|-------------|
-| `mcp-builder` | MCPサーバー作成・開発ツール |
-| `zapier-workflows` | Zapier自動化ワークフロー |
-| `artifacts-builder` | Claudeアーティファクト構築・管理 |
+| `mcp-builder` | MCP server creation and development tools |
+| `zapier-workflows` | Zapier automation workflows |
+| `artifacts-builder` | Claude artifacts building and management |
 
 ---
 
@@ -130,39 +130,39 @@ AskUserQuestion({
 ### business-marketing
 | Skill | Description |
 |-------|-------------|
-| `competitive-ads-extractor` | 競合広告分析・抽出 |
-| `content-research-writer` | コンテンツリサーチ・SEOライティング |
-| `lead-research-assistant` | リード生成リサーチ |
+| `competitive-ads-extractor` | Competitive ads analysis and extraction |
+| `content-research-writer` | Content research and SEO writing |
+| `lead-research-assistant` | Lead generation research |
 
 ### creative-design
 | Skill | Description |
 |-------|-------------|
-| `algorithmic-art` | アルゴリズミックアート |
-| `canvas-design` | キャンバスデザイン |
-| `slack-gif-creator` | Slack用GIF作成 |
-| `theme-factory` | UIテーマ・カラーパレット生成 |
+| `algorithmic-art` | Algorithmic art |
+| `canvas-design` | Canvas design |
+| `slack-gif-creator` | Slack GIF creation |
+| `theme-factory` | UI theme and color palette generation |
 
 ### development
 | Skill | Description |
 |-------|-------------|
-| `artifacts-builder` | Claudeアーティファクト構築 |
-| `changelog-generator` | CHANGELOG自動生成 |
-| `cocoindex` | CocoIndex連携 |
-| `developer-growth-analysis` | 開発者成長分析 |
-| `git-commit-helper` | Gitコミットメッセージ生成 |
-| `mcp-builder` | MCPサーバー構築 |
-| `move-code-quality` | コード品質改善 |
-| `skill-creator` | 新しいスキル作成 |
-| `webapp-testing` | Webアプリテストパターン |
-| `zapier-workflows` | Zapier自動化ワークフロー |
+| `artifacts-builder` | Claude artifacts building |
+| `changelog-generator` | CHANGELOG auto-generation |
+| `cocoindex` | CocoIndex integration |
+| `developer-growth-analysis` | Developer growth analysis |
+| `git-commit-helper` | Git commit message generation |
+| `mcp-builder` | MCP server building |
+| `move-code-quality` | Code quality improvement |
+| `skill-creator` | Create new skills |
+| `webapp-testing` | Web app testing patterns |
+| `zapier-workflows` | Zapier automation workflows |
 
 ### document-processing
 | Skill | Description |
 |-------|-------------|
-| `docx` | Word文書処理 |
-| `pdf-anthropic` | PDF処理 |
-| `pdf-processing-pro` | 高度なPDF処理（OCR・フォーム） |
-| `xlsx` | Excel処理 |
+| `docx` | Word document processing |
+| `pdf-anthropic` | PDF processing |
+| `pdf-processing-pro` | Advanced PDF processing (OCR, forms) |
+| `xlsx` | Excel processing |
 
 ---
 
