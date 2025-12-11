@@ -78,8 +78,10 @@ Task({
 
 ---
 
-### Step 3: Skills Acquisition
+### Step 3: Skills Acquisition (3-Layer)
 **Agent:** `category-downloader.md` (category: skills)
+
+**IMPORTANT:** Skillsカテゴリは3層構造を必ず実行してください。
 
 ```typescript
 Task({
@@ -87,7 +89,26 @@ Task({
   prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
            Category: skills
            Search Terms: ${expandedTechStack.searchTerms}
-           Requirements: ${specRequirements}`
+           Requirements: ${specRequirements}
+
+           IMPORTANT: Skillsカテゴリは3層構造を必ず実行:
+
+           1. Layer 1 - 基本スキル選択:
+              AskUserQuestionで以下を提示（multiSelect）:
+              - skill-creator (推奨): 新しいスキル作成ガイド
+              - git-commit-helper: Gitコミットメッセージ生成
+              - changelog-generator: CHANGELOG自動生成
+
+           2. Layer 2 - 仕様書から自動検出:
+              キーワードマッチでスキルを検出して表示
+              (PDF, Word, Excel, テスト, MCP, Zapier, テーマ, Slack)
+
+           3. Layer 3 - 追加おすすめ:
+              プロジェクトタイプに応じてAskUserQuestionで提示
+
+           ⚠️ 注意書きを必ず表示:
+           「Skillsもコンテキストウィンドウを消費します。
+            本当に必要なスキルのみ選択してください。」`
 })
 ```
 

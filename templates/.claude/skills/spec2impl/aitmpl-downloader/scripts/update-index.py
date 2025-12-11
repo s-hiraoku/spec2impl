@@ -84,9 +84,36 @@ def fetch_github_contents(path: str) -> Optional[List[Dict]]:
     return None
 
 
-def extract_name_from_path(path: str) -> str:
-    """Extract readable name from file path."""
-    return Path(path).stem
+def extract_name_from_path(path: str, category: str = "") -> str:
+    """Extract readable name from file path.
+
+    For skills with SKILL.md filename, use the parent directory name instead.
+    """
+    parts = Path(path).parts
+    filename = Path(path).stem
+
+    # For SKILL.md files, use the skill directory name instead
+    if filename.upper() == "SKILL" and category == "skills":
+        # path: cli-tool/components/skills/development/git-commit-helper/SKILL.md
+        # → return "git-commit-helper"
+        skill_categories = (
+            "business-marketing", "creative-design", "development",
+            "document-processing", "enterprise-communication",
+            "media", "productivity", "utilities"
+        )
+        for i, part in enumerate(parts):
+            if part in skill_categories and i + 1 < len(parts):
+                next_part = parts[i + 1]
+                # Skip if next part is the SKILL.md file itself
+                if not next_part.upper().endswith(".MD"):
+                    return next_part
+        # Fallback: use parent directory name
+        if len(parts) >= 2:
+            parent = parts[-2]
+            if not parent.upper().endswith(".MD") and parent not in skill_categories:
+                return parent
+
+    return filename
 
 
 def get_parent_folder(path: str) -> str:
@@ -95,6 +122,48 @@ def get_parent_folder(path: str) -> str:
     if len(parts) >= 2:
         return parts[-2]
     return ""
+
+
+# Skills description mapping for better searchability
+SKILL_DESCRIPTIONS = {
+    # development
+    "skill-creator": "Create new Claude Code skills with templates and best practices",
+    "git-commit-helper": "Git commit message generation and conventional commit best practices",
+    "changelog-generator": "Automated changelog generation from git commits",
+    "mcp-builder": "MCP server creation, development tools and best practices",
+    "webapp-testing": "Web application testing patterns, E2E testing utilities",
+    "artifacts-builder": "Build and manage Claude artifacts",
+    "developer-growth-analysis": "Developer productivity and growth analysis",
+    "move-code-quality": "Code quality improvement and refactoring patterns",
+    "cocoindex": "CocoIndex integration and data indexing",
+    "zapier-workflows": "Zapier automation workflows and webhook integration",
+    # document-processing
+    "pdf-anthropic": "PDF document processing, extraction and analysis",
+    "pdf-processing-pro": "Advanced PDF processing with OCR and forms",
+    "docx": "Word document (docx) processing and generation",
+    "xlsx": "Excel spreadsheet (xlsx) processing and generation",
+    # creative-design
+    "theme-factory": "UI theme generation, color palettes and design systems",
+    "algorithmic-art": "Algorithmic art and generative design patterns",
+    "canvas-design": "Canvas-based design and graphics",
+    "slack-gif-creator": "Create GIFs for Slack notifications and messages",
+    # business-marketing
+    "content-research-writer": "Content research, SEO writing and copywriting",
+    "competitive-ads-extractor": "Competitive advertising analysis and extraction",
+    "lead-research-assistant": "Lead generation research and prospect analysis",
+}
+
+
+def generate_description(category: str, item_name: str, subcategory: str) -> str:
+    """Generate searchable description for items."""
+    # Use predefined description if available
+    if category == "skills" and item_name in SKILL_DESCRIPTIONS:
+        return SKILL_DESCRIPTIONS[item_name]
+
+    # Default description
+    if subcategory:
+        return f"{category.title()} from {subcategory}"
+    return f"{category.title()}"
 
 
 def fetch_items_recursive(base_path: str, category: str, depth: int = 0, max_depth: int = 4) -> List[Dict]:
@@ -134,11 +203,13 @@ def fetch_items_recursive(base_path: str, category: str, depth: int = 0, max_dep
                 continue
 
             subcategory = get_parent_folder(entry_path)
+            item_name = extract_name_from_path(entry_path, category)
+            description = generate_description(category, item_name, subcategory)
 
             items.append({
                 "category": category,
-                "name": extract_name_from_path(entry_name),
-                "description": f"{category.title()} from {subcategory}" if subcategory else f"{category.title()}",
+                "name": item_name,
+                "description": description,
                 "path": entry_path,
                 "subcategory": subcategory,
                 "download_url": entry.get("download_url", f"{GITHUB_RAW_BASE}/{entry_path}"),

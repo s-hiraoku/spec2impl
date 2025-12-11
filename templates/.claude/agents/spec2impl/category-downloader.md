@@ -65,6 +65,105 @@ python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py get "${it
 
 ---
 
+## Skills Category: 3-Layer Configuration
+
+When `Category: skills`, use the 3-layer approach defined in `categories/skills.md`:
+
+> ⚠️ **注意: Skillsもコンテキストウィンドウを消費します**
+> 各スキルはセッション開始時に読み込まれるため、多すぎるとコンテキストが圧迫されます。
+> 本当に必要なスキルのみを選択するよう案内してください。
+
+### Layer 1: Recommended Base Skills (User Selection)
+
+**Ask user** which base skills to install:
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "基本スキルをインストールしますか？開発全般で有用なスキルです。",
+    header: "基本スキル",
+    options: [
+      {
+        label: "skill-creator (推奨)",
+        description: "新しいスキル作成ガイド。プロジェクト固有のスキルを作成可能"
+      },
+      {
+        label: "git-commit-helper",
+        description: "Gitコミットメッセージ生成・Conventional Commitベストプラクティス"
+      },
+      {
+        label: "changelog-generator",
+        description: "Gitコミットから CHANGELOG を自動生成"
+      }
+    ],
+    multiSelect: true
+  }]
+})
+```
+
+### Layer 2: Auto-Detected Skills (Spec-based)
+
+Scan specification for keywords and **show detected skills** to user:
+
+| Keyword Pattern | Skill | Description |
+|-----------------|-------|-------------|
+| `pdf`, `帳票`, `レポート` | `pdf-anthropic` | PDF処理・抽出・分析 |
+| `word`, `docx`, `文書` | `docx` | Word文書生成・編集 |
+| `excel`, `xlsx`, `表計算` | `xlsx` | Excel処理・生成 |
+| `test`, `testing`, `e2e`, `qa` | `webapp-testing` | Webアプリテストパターン |
+| `mcp`, `protocol` | `mcp-builder` | MCPサーバー構築ガイド |
+| `zapier`, `自動化`, `webhook` | `zapier-workflows` | Zapier連携ワークフロー |
+| `theme`, `テーマ`, `カラー`, `ui` | `theme-factory` | UIテーマ・カラーパレット生成 |
+| `slack`, `通知`, `gif` | `slack-gif-creator` | Slack用GIF作成 |
+
+### Layer 3: Additional Recommended Skills (User Selection)
+
+Based on project type, present additional recommendations:
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "追加でおすすめのスキルを設定しますか？",
+    header: "追加スキル",
+    options: [
+      // Marketing/Business
+      { label: "content-research-writer", description: "コンテンツリサーチ・SEOライティング" },
+      // Design
+      { label: "theme-factory", description: "UIテーマ・カラーパレット生成" },
+      // Document Processing
+      { label: "pdf-anthropic", description: "PDF処理・抽出・分析" },
+      // Development
+      { label: "mcp-builder", description: "MCPサーバー構築ガイド" }
+    ],
+    multiSelect: true
+  }]
+})
+```
+
+### Skills Output Format
+
+```
+═══════════════════════════════════════════════════════════════
+Skills Configuration (3-Layer)
+═══════════════════════════════════════════════════════════════
+
+📦 Layer 1: Base Skills (ユーザー選択)
+  ✅ skill-creator - 新しいスキル作成ガイド
+  ✅ git-commit-helper - Gitコミットメッセージ生成
+  ⏭️ changelog-generator - スキップ
+
+🔍 Layer 2: Auto-Detected (仕様書から検出)
+  ✅ webapp-testing - "テスト" キーワード検出
+  ✅ pdf-anthropic - "PDF" キーワード検出
+
+⭐ Layer 3: Additional (ユーザー選択)
+  ✅ theme-factory - UIテーマ生成
+
+═══════════════════════════════════════════════════════════════
+```
+
+---
+
 ## MCP Category: 3-Layer Configuration
 
 When `Category: mcps`, use the 3-layer approach defined in `categories/mcps.md`:

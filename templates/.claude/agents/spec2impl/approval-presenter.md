@@ -51,10 +51,41 @@ Files to Create/Modify:
 - Final expanded tech stack
 - Search terms for downloading
 
-### Step 3: Skills Acquisition
-- Skills to download (from aitmpl.com)
-- Skills matched to expanded tech stack
-- Download paths and outputs
+### Step 3: Skills Acquisition (3-Layer)
+
+Display Skills in 3 layers with descriptions.
+
+**Important warning to include:**
+```
+⚠️ 注意: Skillsもコンテキストウィンドウを消費します
+   多すぎるとコンテキストが圧迫されます。本当に必要なスキルのみ選択してください。
+```
+
+```
+📦 Layer 1: Base Skills (ユーザー選択)
+  ✅ skill-creator - 新しいスキル作成ガイド
+     プロジェクト固有のスキルをテンプレートから作成可能
+  ✅ git-commit-helper - Gitコミットメッセージ生成
+     Conventional Commitに沿ったメッセージ生成・ベストプラクティス
+  ⏭️ changelog-generator - スキップ
+
+🔍 Layer 2: Auto-Detected (仕様書から検出)
+  ✅ webapp-testing - "テスト" キーワード検出
+     Webアプリテストパターン・E2Eテストユーティリティ
+  ✅ pdf-anthropic - "PDF" キーワード検出
+     PDF処理・抽出・分析
+
+⭐ Layer 3: Additional (ユーザー選択)
+  ✅ theme-factory - UIテーマ生成
+     UIテーマ・カラーパレット・デザインシステム生成
+
+Files to Create:
+  .claude/skills/skill-creator/
+  .claude/skills/git-commit-helper/
+  .claude/skills/webapp-testing/
+  .claude/skills/pdf-anthropic/
+  .claude/skills/theme-factory/
+```
 
 ### Step 4: Agents Acquisition
 - Agents to download
