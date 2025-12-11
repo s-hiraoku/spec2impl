@@ -11,6 +11,83 @@ Download Claude Code settings presets from claude-code-templates.
 
 - Target: `.claude/settings.local.json` (merge with existing)
 
+---
+
+## 3-Layer Settings Configuration
+
+> ℹ️ **Note: Settings configure Claude Code behavior**
+> Model selection, permissions, and environment variables.
+
+### Layer 1: Recommended Base Settings (User Selection)
+
+Present these via `AskUserQuestion` with multiSelect.
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "Install base settings? Configure model and permissions.",
+    header: "Base Settings",
+    options: [
+      {
+        label: "use-sonnet (Recommended)",
+        description: "Use Claude Sonnet as default model"
+      },
+      {
+        label: "auto-approve-safe",
+        description: "Auto-approve safe operations (Read, Glob, Grep)"
+      }
+    ],
+    multiSelect: true
+  }]
+})
+```
+
+**Settings Details:**
+
+| Settings | Description | Use Case |
+|----------|-------------|----------|
+| `use-sonnet` | Claude Sonnet as default model | Balanced speed and capability |
+| `auto-approve-safe` | Auto-approve read operations | Faster workflow |
+
+---
+
+### Layer 2: Auto-Detected Settings (Spec-based)
+
+These settings are **automatically detected** from specification keywords.
+
+| Keywords in Spec | Settings | Description |
+|------------------|----------|-------------|
+| quick, prototype, MVP, fast | `use-haiku` | Use Haiku for speed |
+| complex, analysis, architecture, deep | `use-opus` | Use Opus for complex tasks |
+| CI/CD, automation, pipeline, batch | `auto-approve` | Auto-approve all operations |
+| security, compliance, audit, strict | `strict-permissions` | Strict permission controls |
+| development, dev, local | `development` | Development environment |
+| production, prod, deploy | `production` | Production environment |
+
+---
+
+### Layer 3: Additional Recommended Settings (User Selection)
+
+Present these via `AskUserQuestion` based on project type.
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "Install additional settings presets?",
+    header: "Additional Settings",
+    options: [
+      { label: "use-haiku", description: "Fast model for quick tasks" },
+      { label: "use-opus", description: "Powerful model for complex tasks" },
+      { label: "minimal-statusline", description: "Minimal status display" },
+      { label: "detailed-statusline", description: "Detailed status display" }
+    ],
+    multiSelect: true
+  }]
+})
+```
+
+---
+
 ## Available Settings Categories
 
 | Category | Description | Examples |
@@ -20,7 +97,7 @@ Download Claude Code settings presets from claude-code-templates.
 | permissions | Permission presets | auto-approve.json, strict-permissions.json |
 | environment | Environment configs | development.json, production.json |
 
-## Commands
+## CLI Commands
 
 ```bash
 # List all settings
@@ -48,31 +125,9 @@ python3 .claude/skills/spec2impl/aitmpl-downloader/scripts/download.py get "<pat
 }
 ```
 
-## Spec Mapping
-
-| Project Type | Recommended Settings |
-|--------------|---------------------|
-| Quick prototyping | use-haiku.json |
-| Production apps | use-sonnet.json |
-| Complex analysis | use-opus.json |
-| CI/CD automation | auto-approve.json |
-| Security-sensitive | strict-permissions.json |
-
 ## Settings Merge Strategy
 
 When downloading, settings are deep-merged:
 - **Objects**: Recursive merge (new values override)
 - **Arrays**: Concatenate (deduplicated)
 - **Primitives**: New value wins
-
-Example merge:
-```json
-// Existing
-{ "model": "claude-sonnet", "permissions": { "allow": ["Read"] } }
-
-// Downloaded
-{ "permissions": { "allow": ["Write"] } }
-
-// Result
-{ "model": "claude-sonnet", "permissions": { "allow": ["Read", "Write"] } }
-```

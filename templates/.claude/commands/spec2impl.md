@@ -79,36 +79,14 @@ Task({
 ---
 
 ### Step 3: Skills Acquisition (3-Layer)
-**Agent:** `category-downloader.md` (category: skills)
-
-**IMPORTANT:** Skills category MUST use 3-layer structure.
+**Agent:** `skills-downloader.md`
 
 ```typescript
 Task({
   subagent_type: "general-purpose",
-  prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
-           Category: skills
+  prompt: `Read .claude/agents/spec2impl/skills-downloader.md and execute.
            Search Terms: ${expandedTechStack.searchTerms}
-           Requirements: ${specRequirements}
-
-           IMPORTANT: Skills category MUST use 3-layer structure:
-
-           1. Layer 1 - Base skills selection:
-              Present via AskUserQuestion (multiSelect):
-              - skill-creator (Recommended): Create new skills guide
-              - git-commit-helper: Git commit message generation
-              - changelog-generator: CHANGELOG auto-generation
-
-           2. Layer 2 - Auto-detected from spec:
-              Detect skills by keyword matching and display
-              (PDF, Word, Excel, test, MCP, Zapier, theme, Slack)
-
-           3. Layer 3 - Additional recommendations:
-              Present via AskUserQuestion based on project type
-
-           ⚠️ MUST display warning:
-           "Skills consume context window space.
-            Select only essential skills."`
+           Requirements: ${specRequirements}`
 })
 ```
 
@@ -118,36 +96,14 @@ Task({
 ---
 
 ### Step 4: Agents Acquisition (3-Layer)
-**Agent:** `category-downloader.md` (category: agents)
-
-**IMPORTANT:** Agents category MUST use 3-layer structure.
+**Agent:** `agents-downloader.md`
 
 ```typescript
 Task({
   subagent_type: "general-purpose",
-  prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
-           Category: agents
+  prompt: `Read .claude/agents/spec2impl/agents-downloader.md and execute.
            Search Terms: ${expandedTechStack.searchTerms}
-           Requirements: ${specRequirements}
-
-           IMPORTANT: Agents category MUST use 3-layer structure:
-
-           1. Layer 1 - Base agents selection:
-              Present via AskUserQuestion (multiSelect):
-              - code-reviewer (Recommended): Code review and quality checks
-              - test-engineer: Test strategy and case generation
-              - technical-writer: Documentation generation
-
-           2. Layer 2 - Auto-detected from spec:
-              Detect agents by keyword matching and display
-              (frontend, backend, database, devops, security, AI/ML, MCP, GraphQL, mobile)
-
-           3. Layer 3 - Additional recommendations:
-              Present via AskUserQuestion based on project type
-
-           ⚠️ MUST display warning:
-           "Agents consume context window space.
-            Select only agents you'll actually use."`
+           Requirements: ${specRequirements}`
 })
 ```
 
@@ -156,14 +112,13 @@ Task({
 
 ---
 
-### Step 5: Commands Acquisition
-**Agent:** `category-downloader.md` (category: commands)
+### Step 5: Commands Acquisition (3-Layer)
+**Agent:** `commands-downloader.md`
 
 ```typescript
 Task({
   subagent_type: "general-purpose",
-  prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
-           Category: commands
+  prompt: `Read .claude/agents/spec2impl/commands-downloader.md and execute.
            Search Terms: ${expandedTechStack.searchTerms}
            Requirements: ${specRequirements}`
 })
@@ -175,37 +130,15 @@ Task({
 ---
 
 ### Step 6: MCP Configuration (3-Layer)
-**Agent:** `category-downloader.md` (category: mcps)
-
-**IMPORTANT:** MCP category MUST use 3-layer structure.
+**Agent:** `mcps-downloader.md`
 
 ```typescript
 Task({
   subagent_type: "general-purpose",
-  prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
-           Category: mcps
+  prompt: `Read .claude/agents/spec2impl/mcps-downloader.md and execute.
            Search Terms: ${expandedTechStack.searchTerms}
            Services: ${detectedServices}
-           Requirements: ${specRequirements}
-
-           IMPORTANT: MCP category MUST use 3-layer structure:
-
-           1. Layer 1 - Base MCP selection:
-              Present via AskUserQuestion (multiSelect):
-              - context7 (Recommended): Get latest library documentation
-              - memory: Persistent memory across sessions
-              - github-integration: GitHub API integration (TOKEN required)
-              - markitdown: File conversion (Docker required)
-
-           2. Layer 2 - Auto-detected from spec:
-              Detect MCPs by keyword matching and display
-
-           3. Layer 3 - Additional recommendations:
-              Present additional MCPs via AskUserQuestion
-
-           ⚠️ MUST display warning:
-           "MCPs consume context window space.
-            Select only essential MCPs."`
+           Requirements: ${specRequirements}`
 })
 ```
 
@@ -214,16 +147,16 @@ Task({
 
 ---
 
-### Step 7: Settings Configuration
-**Agent:** `category-downloader.md` (category: settings)
+### Step 7: Settings Configuration (3-Layer)
+**Agent:** `settings-downloader.md`
 
 ```typescript
 Task({
   subagent_type: "general-purpose",
-  prompt: `Read .claude/agents/spec2impl/category-downloader.md and execute.
-           Category: settings
+  prompt: `Read .claude/agents/spec2impl/settings-downloader.md and execute.
            Search Terms: ${expandedTechStack.searchTerms}
-           Project Type: ${projectType}`
+           Project Type: ${projectType}
+           Requirements: ${specRequirements}`
 })
 ```
 
@@ -326,7 +259,12 @@ Delete spec2impl files:
 |-------|---------|-------|
 | spec-analyzer | Parse specifications | 1 |
 | tech-stack-expander | Expand tech stack via Web search + user questions | 2 |
-| category-downloader | Download by category | 3, 4, 5, 6, 7 |
+| skills-downloader | Download skills (3-layer) | 3 |
+| agents-downloader | Download agents (3-layer) | 4 |
+| commands-downloader | Download commands (3-layer) | 5 |
+| mcps-downloader | Download MCPs (3-layer) | 6 |
+| settings-downloader | Download settings (3-layer) | 7 |
+| category-downloader | Router to category-specific agents | 3-7 |
 | task-list-generator | Generate TASKS.md | 9 |
 | claude-md-updater | Update CLAUDE.md | 10 |
 | harness-guide-generator | Generate HARNESS_GUIDE.md | 11 |
@@ -369,7 +307,7 @@ Deployed:
 Tasks: ${taskCount} tasks in docs/TASKS.md
 
 📚 Harness Guide: docs/HARNESS_GUIDE.md
-   → コンポーネントの使い方、トークン設定、クイックスタートガイド
+   → Component usage, token configuration, quick start guide
 
 Next Steps:
 1. Read docs/HARNESS_GUIDE.md for usage instructions

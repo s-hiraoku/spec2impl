@@ -23,100 +23,100 @@ Launch 3 subagents in parallel to gather information:
 // Subagent 1: Discover implicit dependencies
 Task({
   subagent_type: "general-purpose",
-  prompt: `Web検索で以下の技術の関連技術・暗黙の依存を調査してください。
+  prompt: `Use Web search to discover related technologies and implicit dependencies.
 
-           技術スタック: ${techStack.join(", ")}
+           Tech Stack: ${techStack.join(", ")}
 
-           各技術について以下を検索:
+           Search for each technology:
            - "${tech} recommended tech stack 2025"
            - "${tech} ecosystem tools 2025"
            - "${tech} best practices 2025"
 
-           出力形式:
+           Output format:
            implicitDependencies:
              Next.js:
-               - React (UIライブラリ、Next.jsの基盤)
-               - TypeScript (型安全、ほぼ必須)
-               - Vercel (推奨デプロイ先)
+               - React (UI library, Next.js foundation)
+               - TypeScript (type safety, nearly essential)
+               - Vercel (recommended deployment)
              PostgreSQL:
-               - SQL (クエリ言語)
+               - SQL (query language)
                ...
 
-           注意: 実際のWeb検索結果に基づいて回答してください。`
+           Note: Base your response on actual Web search results.`
 })
 
 // Subagent 2: Discover technology choices
 Task({
   subagent_type: "general-purpose",
-  prompt: `Web検索で以下の技術に関する選択肢を調査してください。
+  prompt: `Use Web search to discover technology options.
 
-           技術スタック: ${techStack.join(", ")}
+           Tech Stack: ${techStack.join(", ")}
 
-           フロントエンド技術がある場合:
+           If frontend technologies present:
            - "CSS framework comparison 2025"
            - "state management comparison 2025"
            - "UI component library comparison 2025"
            - "form library comparison 2025"
            - "data fetching library 2025"
 
-           データベース技術がある場合:
+           If database technologies present:
            - "ORM comparison Node.js 2025" or "ORM comparison Python 2025"
            - "database migration tools 2025"
 
-           バックエンド技術がある場合:
+           If backend technologies present:
            - "authentication library 2025"
            - "API validation library 2025"
            - "logging library 2025"
 
-           インフラ関連:
+           Infrastructure related:
            - "deployment platform comparison 2025"
            - "CI/CD tools comparison 2025"
            - "testing framework comparison 2025"
 
-           出力形式:
+           Output format:
            choices:
              styling:
-               question: "CSSフレームワークは何を使用しますか？"
+               question: "Which CSS framework will you use?"
                options:
                  - label: TailwindCSS
-                   description: ユーティリティファースト、最も人気、高速開発
+                   description: Utility-first, most popular, rapid development
                  - label: CSS Modules
-                   description: スコープ付きCSS、追加依存なし
+                   description: Scoped CSS, no additional dependencies
                  - label: styled-components
-                   description: CSS-in-JS、コンポーネント指向
+                   description: CSS-in-JS, component-oriented
                  - label: Panda CSS
-                   description: 型安全なCSS-in-JS、新興
+                   description: Type-safe CSS-in-JS, emerging
              stateManagement:
-               question: "状態管理はどの方法を使用しますか？"
+               question: "Which state management approach will you use?"
                options:
                  - label: Zustand
-                   description: シンプル、軽量、TypeScript対応
+                   description: Simple, lightweight, TypeScript support
                  ...
 
-           注意: 実際のWeb検索結果に基づいて最新の選択肢を提示してください。`
+           Note: Present the latest options based on actual Web search results.`
 })
 
 // Subagent 3: Extract already-decided technologies from spec
 Task({
   subagent_type: "Explore",
-  prompt: `仕様書から既に決まっている技術を抽出してください。
+  prompt: `Extract technologies already decided in the specification.
 
-           仕様書の内容:
+           Specification content:
            ${specContent}
 
-           抽出対象:
-           - 明示的に指定されている技術（例: "TailwindCSSを使用"、"Prismaでデータベースアクセス"）
-           - 暗黙的に決まっている技術（例: package.jsonに記載、既存コードで使用中）
+           Extract:
+           - Explicitly specified technologies (e.g., "using TailwindCSS", "Prisma for database access")
+           - Implicitly decided technologies (e.g., listed in package.json, used in existing code)
 
-           出力形式:
+           Output format:
            alreadyDecided:
-             styling: TailwindCSS  # 仕様書に明記
-             orm: Prisma           # package.jsonに記載
+             styling: TailwindCSS  # specified in spec
+             orm: Prisma           # listed in package.json
              ...
 
            undecided:
-             - stateManagement    # 仕様書に記載なし
-             - authentication     # 仕様書に記載なし
+             - stateManagement    # not in spec
+             - authentication     # not in spec
              ...`
 })
 ```
@@ -141,25 +141,25 @@ if (hasUndecidedFrontendChoices) {
   AskUserQuestion({
     questions: [
       {
-        question: "CSSフレームワークは何を使用しますか？",
+        question: "Which CSS framework will you use?",
         header: "Styling",
         options: choices.styling.options,  // From Web search
         multiSelect: false
       },
       {
-        question: "状態管理はどの方法を使用しますか？",
+        question: "Which state management approach will you use?",
         header: "State",
         options: choices.stateManagement.options,
         multiSelect: false
       },
       {
-        question: "UIコンポーネントライブラリは使用しますか？",
+        question: "Will you use a UI component library?",
         header: "UI Library",
         options: choices.uiLibrary.options,
         multiSelect: false
       },
       {
-        question: "フォームライブラリは何を使用しますか？",
+        question: "Which form library will you use?",
         header: "Forms",
         options: choices.formLibrary.options,
         multiSelect: false
@@ -173,13 +173,13 @@ if (hasUndecidedBackendChoices) {
   AskUserQuestion({
     questions: [
       {
-        question: "ORMは何を使用しますか？",
+        question: "Which ORM will you use?",
         header: "ORM",
         options: choices.orm.options,
         multiSelect: false
       },
       {
-        question: "認証方式は何を使用しますか？",
+        question: "Which authentication method will you use?",
         header: "Auth",
         options: choices.authentication.options,
         multiSelect: false

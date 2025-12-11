@@ -126,10 +126,42 @@ Files to Create:
   .claude/agents/performance-engineer.md
 ```
 
-### Step 5: Commands Acquisition
-- Commands to download
-- Command purposes
-- Output locations
+### Step 5: Commands Acquisition (3-Layer)
+
+Display Commands in 3 layers with descriptions.
+
+**Important note to include:**
+```
+ℹ️ Note: Commands are invoked on-demand
+   Unlike Skills/MCPs, commands don't consume context until invoked.
+   Feel free to install useful commands.
+```
+
+```
+📦 Layer 1: Base Commands (User Selection)
+  ✅ review - Code review workflow
+     Reviews code with quality checklist and best practices
+  ✅ test - Test execution workflow
+     Runs tests and generates reports
+  ⏭️ docs - Skipped
+
+🔍 Layer 2: Auto-Detected (From Spec)
+  ✅ deploy - "CI/CD" keyword detected
+     Deployment automation workflow
+  ✅ debug - "error handling" keyword detected
+     Debugging assistance workflow
+
+⭐ Layer 3: Additional (User Selection)
+  ✅ analyze - Code analysis and metrics
+     Code quality analysis and metrics
+
+Files to Create:
+  .claude/commands/review.md
+  .claude/commands/test.md
+  .claude/commands/deploy.md
+  .claude/commands/debug.md
+  .claude/commands/analyze.md
+```
 
 ### Step 6: MCP Configuration (3-Layer)
 
@@ -175,11 +207,42 @@ Files to Create/Modify:
   .mcp.json (5 MCPs configured)
 ```
 
-### Step 7: Settings Configuration
-- Settings to apply
-- Model selection
-- Permission changes
-- Environment variables
+### Step 7: Settings Configuration (3-Layer)
+
+Display Settings in 3 layers with descriptions.
+
+**Important note to include:**
+```
+ℹ️ Note: Settings configure Claude Code behavior
+   Model selection, permissions, and environment variables.
+```
+
+```
+📦 Layer 1: Base Settings (User Selection)
+  ✅ use-sonnet - Claude Sonnet as default model
+     Balanced speed and capability for general development
+  ✅ auto-approve-safe - Auto-approve safe operations
+     Auto-approve Read, Glob, Grep operations
+  ⏭️ minimal-statusline - Skipped
+
+🔍 Layer 2: Auto-Detected (From Spec)
+  ✅ use-opus - "complex" keyword detected
+     Claude Opus for complex architecture tasks
+  ✅ development - "development" keyword detected
+     Development environment configuration
+
+⭐ Layer 3: Additional (User Selection)
+  ✅ detailed-statusline - Detailed status display
+     Show full status information
+
+Settings to Apply:
+  Model: claude-sonnet-4-20250514 (default), claude-opus-4-20250514 (complex)
+  Permissions: Auto-approve Read, Glob, Grep
+  Environment: NODE_ENV=development
+
+Files to Modify:
+  .claude/settings.local.json
+```
 
 ### Step 8: Deploy Bundled
 - ux-psychology skill deployment
