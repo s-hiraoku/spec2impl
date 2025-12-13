@@ -20,6 +20,11 @@ npm test                 # Run tests with vitest
 npx spec2impl            # Install templates to current project
 npx spec2impl --dry-run  # Preview files without installing
 npx spec2impl --force    # Overwrite all existing files
+
+# Slash command usage in Claude Code
+/spec2impl docs/                    # From specification documents
+/spec2impl --detect-stack           # From project files (package.json, etc.)
+/spec2impl docs/ --detect-stack     # Both: spec + project detection (merged)
 ```
 
 ## Architecture
@@ -32,32 +37,40 @@ npx spec2impl --force    # Overwrite all existing files
    - Published as npm package
 
 2. **Claude Code Integration** (`templates/`)
-   - Slash command: `.claude/commands/spec2impl.md` — orchestrates the 7-step workflow
+   - Slash command: `.claude/commands/spec2impl.md` — orchestrates the 13-step workflow
    - Sub-agents in `.claude/agents/spec2impl/` — each handles one step
-   - Skills in `.claude/skills/skill-creator/` — guides skill creation
+   - Skills in `.claude/skills/spec2impl/` — aitmpl-downloader, skill-creator, ux-psychology
 
-### spec2impl Workflow (7 Steps)
+### spec2impl Workflow (13 Steps)
 
-When user runs `/spec2impl docs/` in Claude Code:
+When user runs `/spec2impl docs/` or `/spec2impl --detect-stack` in Claude Code:
 
 ```
-Step 1: spec-analyzer      → Parse specs, extract APIs/models/constraints
-Step 2: skills-generator   → Search marketplace-plugin-scout, install/generate skills
-Step 3: subagent-generator → Web search for patterns, generate project agents
-Step 4: mcp-configurator   → Search marketplace-plugin-scout for MCPs, configure .mcp.json
-Step 5: task-list-generator → Extract/generate tasks → docs/TASKS.md
-Step 6: claude-md-updater  → Merge generated section into CLAUDE.md
-Step 7: Cleanup            → Optionally remove spec2impl files
+Step 1:  spec-analyzer          → Parse specs, extract APIs/models/constraints (if spec provided)
+Step 2:  project-stack-detector → Detect tech stack from project files (if --detect-stack)
+Step 3:  tech-stack-expander    → Web search + user questions to expand tech stack
+Step 4:  skills-downloader      → Download skills from aitmpl.com (3-layer selection)
+Step 5:  agents-downloader      → Download agents from aitmpl.com (3-layer selection)
+Step 6:  commands-downloader    → Download commands from aitmpl.com (3-layer selection)
+Step 7:  mcps-downloader        → Download MCPs, configure .mcp.json (3-layer selection)
+Step 8:  settings-downloader    → Configure .claude/settings.local.json (3-layer selection)
+Step 9:  Deploy bundled         → Deploy ux-psychology for UI/frontend projects
+Step 10: task-list-generator    → Extract/generate tasks → docs/TASKS.md
+Step 11: claude-md-updater      → Merge generated section into CLAUDE.md
+Step 12: harness-guide-generator → Generate docs/HARNESS_GUIDE.md
+Step 13: Cleanup                → Optionally remove spec2impl files
 ```
 
 ### Key Sub-Agents
 
 | Agent | Purpose |
 |-------|---------|
-| `marketplace-plugin-scout` | **WebSearch** for plugins (skills, MCPs) from GitHub/npm |
-| `marketplace` | Install/list/uninstall plugins (delegates search to scout) |
-| `skills-generator` | Calls scout to find skills, generates missing ones |
-| `mcp-configurator` | Calls scout for MCPs, generates .mcp.json + setup guides |
+| `spec-analyzer` | Parse specifications, extract APIs/models/tech stack |
+| `project-stack-detector` | Detect tech stack from project files (package.json, etc.) |
+| `tech-stack-expander` | Web search + user questions to expand and confirm tech stack |
+| `*-downloader` (x5) | Download components from aitmpl.com (skills, agents, commands, mcps, settings) |
+| `marketplace-plugin-scout` | **WebSearch** for plugins from aitmpl.com, GitHub, npm |
+| `aitmpl-downloader` | Skill for downloading templates from aitmpl.com marketplace |
 
 ### Managed vs User Files
 

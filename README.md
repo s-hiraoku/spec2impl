@@ -40,6 +40,7 @@ This installs the required files into your `.claude/` directory.
 **Options:**
 - `--dry-run` - Preview files without installing
 - `--force` - Overwrite existing `.claude/` directory
+- `--detect-stack` - Enable tech stack detection from project files
 
 ### Manual Installation
 
@@ -54,29 +55,48 @@ cp -r spec2impl/templates/.claude /path/to/your/project/
 
 ### Basic Usage
 
-In Claude Code, run:
+In Claude Code, run one of the following commands:
 
-```
+```bash
+# From specification documents
 /spec2impl docs/
+
+# From project files (package.json, requirements.txt, etc.)
+/spec2impl --detect-stack
+
+# Both: spec + project detection (merged)
+/spec2impl docs/ --detect-stack
 ```
 
-This analyzes specifications in `docs/` and builds the implementation environment.
-
-### Execution Flow
+### Execution Flow (13 Steps)
 
 ```
-/spec2impl docs/
+/spec2impl docs/ --detect-stack
        |
-Step 1: Specification Analysis -> Approve
-Step 2: Skills Acquisition (Search → Install → Assess Gaps → Generate) -> Approve
-Step 3: Sub-agents Generation -> Approve
-Step 4: MCP Configuration (Search → Configure) -> Approve
-Step 5: Task List Generation -> Approve
-Step 6: CLAUDE.md Update -> Approve
-Step 7: Cleanup (optional) -> Approve
+Step 1:  Specification Analysis (if spec provided) -> Approve
+Step 2:  Project Stack Detection (if --detect-stack) -> Approve
+Step 3:  Tech Stack Expansion (Web search + questions) -> Approve
+Step 4:  Skills Acquisition (3-layer selection) -> Approve
+Step 5:  Agents Acquisition (3-layer selection) -> Approve
+Step 6:  Commands Acquisition (3-layer selection) -> Approve
+Step 7:  MCP Configuration (3-layer selection) -> Approve
+Step 8:  Settings Configuration (3-layer selection) -> Approve
+Step 9:  Deploy Bundled (UX psychology for UI projects)
+Step 10: Task List Generation -> Approve
+Step 11: CLAUDE.md Update
+Step 12: Harness Guide Generation -> Approve
+Step 13: Cleanup (optional) -> Approve
        |
 Completion Report
 ```
+
+### 3-Layer Selection Pattern
+
+Steps 4-8 use a consistent 3-layer selection pattern:
+
+1. **Base Layer**: User selects from recommended items
+2. **Auto-Detect Layer**: Automatic selection based on tech stack keywords
+3. **Additional Layer**: User selects from additional recommendations
 
 ---
 
@@ -112,14 +132,25 @@ Completion Report
 ### Main Command
 
 ```
-/spec2impl <docs-directory>
+/spec2impl [docs-directory] [--detect-stack]
 ```
 
-Analyzes specifications and builds the implementation environment.
+Analyzes specifications and/or project files to build the implementation environment.
 
-| Description | Argument |
-|-------------|----------|
-| Target directory | Path to specification docs (e.g., `docs/`) |
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `<docs-directory>` | No* | Path to specification docs (e.g., `docs/`) |
+| `--detect-stack` | No* | Detect tech stack from project files |
+
+*At least one of `<docs-directory>` or `--detect-stack` must be provided.
+
+**Usage Patterns:**
+
+| Command | Description |
+|---------|-------------|
+| `/spec2impl docs/` | Analyze specs only |
+| `/spec2impl --detect-stack` | Detect from project files only |
+| `/spec2impl docs/ --detect-stack` | Both (merged) |
 
 ### Note on Marketplace and Dashboard
 
@@ -134,11 +165,16 @@ spec2impl uses specialized sub-agents for each step of the workflow. Below is a 
 | Agent | Step | Description |
 |-------|------|-------------|
 | **Spec Analyzer** | 1 | Analyzes Markdown specs to extract APIs, models, workflows, constraints, and tech stack |
-| **Skills Generator** | 2 | Searches marketplace for skills, installs found ones, assesses gaps, generates missing skills |
-| **Subagent Generator** | 3 | Researches latest agent design patterns and generates SpecVerifier, TestGenerator, etc. |
-| **MCP Configurator** | 4 | Detects external services, searches for MCP servers, generates .mcp.json and setup docs |
-| **Task List Generator** | 5 | Extracts tasks from specs and auto-generates implementation tasks with dependencies |
-| **CLAUDE.md Updater** | 6 | Updates CLAUDE.md with implementation environment, preserving existing sections |
+| **Project Stack Detector** | 2 | Detects tech stack from project files (package.json, requirements.txt, etc.) |
+| **Tech Stack Expander** | 3 | Uses Web search + user questions to discover and confirm the full tech stack |
+| **Skills Downloader** | 4 | Downloads skills from aitmpl.com using 3-layer selection |
+| **Agents Downloader** | 5 | Downloads agents from aitmpl.com using 3-layer selection |
+| **Commands Downloader** | 6 | Downloads commands from aitmpl.com using 3-layer selection |
+| **MCPs Downloader** | 7 | Downloads MCPs from aitmpl.com, configures .mcp.json |
+| **Settings Downloader** | 8 | Configures .claude/settings.local.json |
+| **Task List Generator** | 10 | Extracts tasks from specs and auto-generates implementation tasks with dependencies |
+| **CLAUDE.md Updater** | 11 | Updates CLAUDE.md with implementation environment, preserving existing sections |
+| **Harness Guide Generator** | 12 | Generates docs/HARNESS_GUIDE.md with usage instructions |
 
 ### Internal Services
 

@@ -1,20 +1,56 @@
 ---
-description: Generate Claude Code implementation environment from specification documents
+description: Generate Claude Code implementation environment from specification documents and/or project files
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, TodoWrite
-argument-hint: <docs-directory>
+argument-hint: [docs-directory] [--detect-stack]
 ---
 
 # spec2impl - Build Implementation Environment from Specifications
 
-Analyze specification documents and build Claude Code implementation environment.
+Analyze specification documents and/or project files to build Claude Code implementation environment.
 
 ## Arguments
 
-- `$ARGUMENTS`: Directory path containing specification documents (e.g., `docs/`)
+- `$ARGUMENTS`: Contains one or both of:
+  - `<directory>`: Path to specification documents (e.g., `docs/`)
+  - `--detect-stack`: Flag to detect tech stack from project files (package.json, etc.)
+
+## Arguments Parsing
+
+Parse `$ARGUMENTS` to extract:
+
+```typescript
+// Parse arguments
+const args = "$ARGUMENTS".split(/\s+/).filter(arg => arg.trim() !== "")
+let detectStack = args.includes("--detect-stack")
+const specDirectory = args.find(arg => !arg.startsWith("--")) || null
+
+// If no arguments provided, ask user about --detect-stack
+if (!specDirectory && !detectStack) {
+  AskUserQuestion({
+    questions: [{
+      question: "仕様ディレクトリが指定されていません。プロジェクトファイル（package.json等）から技術スタックを検出しますか？",
+      header: "実行モード",
+      options: [
+        { label: "はい（--detect-stack で実行）", description: "プロジェクトの依存関係から技術スタックを自動検出" },
+        { label: "いいえ（キャンセル）", description: "コマンドを終了し、使用例を表示" }
+      ],
+      multiSelect: false
+    }]
+  })
+  // If user selects "はい", set detectStack = true
+  // If user selects "いいえ", show usage and exit
+}
+```
+
+**Usage Examples:**
+- `/spec2impl` → ユーザーに確認後、--detect-stack で実行
+- `/spec2impl docs/` → specDirectory="docs/", detectStack=false
+- `/spec2impl --detect-stack` → specDirectory=null, detectStack=true
+- `/spec2impl docs/ --detect-stack` → specDirectory="docs/", detectStack=true
 
 ## Execution Flow
 
-Execute 12 steps sequentially. Each step:
+Execute 13 steps sequentially. Each step:
 1. Show progress with `progress-dashboard`
 2. Execute step logic
 3. Present results with `approval-presenter` for user approval
@@ -27,7 +63,7 @@ Task({
   prompt: `Read .claude/agents/spec2impl/progress-dashboard.md and execute.
            Mode: workflow
            Current Step: ${stepNumber}
-           Total Steps: 12`
+           Total Steps: 13`
 })
 ```
 
@@ -35,23 +71,59 @@ Task({
 
 ## Steps
 
-### Step 1: Specification Analysis
+### Step 1: Specification Analysis (Conditional)
 **Agent:** `spec-analyzer.md`
+**Condition:** Only if `specDirectory` is provided
 
 ```typescript
-Task({
-  subagent_type: "general-purpose",
-  prompt: `Read .claude/agents/spec2impl/spec-analyzer.md and execute.
-           Target Directory: ${ARGUMENTS}`
-})
+if (specDirectory) {
+  Task({
+    subagent_type: "general-purpose",
+    prompt: `Read .claude/agents/spec2impl/spec-analyzer.md and execute.
+             Target Directory: ${specDirectory}`
+  })
+  // → specAnalysis with APIs, models, constraints, techStack
+  // → Call approval-presenter with results
+} else {
+  specAnalysis = null  // Skip if only --detect-stack
+}
 ```
 
-→ Output: APIs, models, constraints, tech stack
-→ Call `approval-presenter` with results
+→ Output: APIs, models, constraints, tech stack (or null if skipped)
+→ Call `approval-presenter` with results (if executed)
 
 ---
 
-### Step 2: Tech Stack Expansion
+### Step 2: Project Stack Detection (Conditional)
+**Agent:** `project-stack-detector.md`
+**Condition:** Only if `--detect-stack` flag is present
+
+```typescript
+if (detectStack) {
+  Task({
+    subagent_type: "general-purpose",
+    prompt: `Read .claude/agents/spec2impl/project-stack-detector.md and execute.
+             Project Root: ./`
+  })
+  // → detectedTechStack with frameworks, databases, services, languages
+  // → Call approval-presenter with detected technologies
+} else {
+  detectedTechStack = null  // Skip if only specDirectory
+}
+
+// Prepare merged tech stack for Step 3
+const initialTechStack = mergeTechStacks(
+  specAnalysis?.techStack || {},
+  detectedTechStack?.techStack || {}
+)
+```
+
+→ Output: detectedTechStack (frameworks, databases, services, languages)
+→ Call `approval-presenter` with detected technologies (if executed)
+
+---
+
+### Step 3: Tech Stack Expansion
 **Agent:** `tech-stack-expander.md`
 
 ```typescript
@@ -60,16 +132,22 @@ Task({
   prompt: `Read .claude/agents/spec2impl/tech-stack-expander.md and execute.
 
            Input:
-           - techStack: ${specAnalysisResult.techStack}
-           - specContent: ${specContent}
+           - techStack: ${specAnalysis?.techStack || []}
+           - detectedStack: ${detectedTechStack?.techStack || []}
+           - specContent: ${specContent || ""}
+
+           Sources:
+           - Spec Analysis: ${specDirectory ? "Provided" : "Not provided"}
+           - Project Detection: ${detectStack ? "Enabled" : "Disabled"}
 
            This agent will:
-           1. Launch parallel subagents to Web search for related technologies
-           2. Discover implicit dependencies (e.g., Next.js → React, TypeScript)
-           3. Find technology choices (CSS framework, state management, ORM, etc.)
-           4. Check spec for already-decided technologies
-           5. Ask user ALL undecided questions (multiple AskUserQuestion calls if needed)
-           6. Output expandedTechStack with searchTerms`
+           1. Merge techStack and detectedStack (deduplicate, flag conflicts)
+           2. Launch parallel subagents to Web search for related technologies
+           3. Discover implicit dependencies (e.g., Next.js → React, TypeScript)
+           4. Find technology choices (CSS framework, state management, ORM, etc.)
+           5. Check spec for already-decided technologies
+           6. Ask user ALL undecided questions (multiple AskUserQuestion calls if needed)
+           7. Output expandedTechStack with searchTerms`
 })
 ```
 
@@ -78,7 +156,7 @@ Task({
 
 ---
 
-### Step 3: Skills Acquisition (3-Layer)
+### Step 4: Skills Acquisition (3-Layer)
 **Agent:** `skills-downloader.md`
 
 ```typescript
@@ -95,7 +173,7 @@ Task({
 
 ---
 
-### Step 4: Agents Acquisition (3-Layer)
+### Step 5: Agents Acquisition (3-Layer)
 **Agent:** `agents-downloader.md`
 
 ```typescript
@@ -112,7 +190,7 @@ Task({
 
 ---
 
-### Step 5: Commands Acquisition (3-Layer)
+### Step 6: Commands Acquisition (3-Layer)
 **Agent:** `commands-downloader.md`
 
 ```typescript
@@ -129,7 +207,7 @@ Task({
 
 ---
 
-### Step 6: MCP Configuration (3-Layer)
+### Step 7: MCP Configuration (3-Layer)
 **Agent:** `mcps-downloader.md`
 
 ```typescript
@@ -147,7 +225,7 @@ Task({
 
 ---
 
-### Step 7: Settings Configuration (3-Layer)
+### Step 8: Settings Configuration (3-Layer)
 **Agent:** `settings-downloader.md`
 
 ```typescript
@@ -165,7 +243,7 @@ Task({
 
 ---
 
-### Step 8: Deploy Bundled (for UI/Frontend projects)
+### Step 9: Deploy Bundled (for UI/Frontend projects)
 
 If spec includes frontend/UI components, deploy ux-psychology:
 
@@ -181,7 +259,7 @@ cp .claude/agents/spec2impl/ux-psychology-advisor.md .claude/agents/
 
 ---
 
-### Step 9: Task List Generation
+### Step 10: Task List Generation
 **Agent:** `task-list-generator.md`
 
 ```typescript
@@ -199,7 +277,7 @@ Task({
 
 ---
 
-### Step 10: CLAUDE.md Update
+### Step 11: CLAUDE.md Update
 **Agent:** `claude-md-updater.md`
 
 ```typescript
@@ -214,7 +292,7 @@ Task({
 
 ---
 
-### Step 11: Harness Guide Generation
+### Step 12: Harness Guide Generation
 **Agent:** `harness-guide-generator.md`
 
 ```typescript
@@ -242,7 +320,7 @@ Task({
 
 ---
 
-### Step 12: Cleanup (Optional)
+### Step 13: Cleanup (Optional)
 
 Delete spec2impl files:
 - `.claude/commands/spec2impl.md`
@@ -258,25 +336,26 @@ Delete spec2impl files:
 | Agent | Purpose | Steps |
 |-------|---------|-------|
 | spec-analyzer | Parse specifications | 1 |
-| tech-stack-expander | Expand tech stack via Web search + user questions | 2 |
-| skills-downloader | Download skills (3-layer) | 3 |
-| agents-downloader | Download agents (3-layer) | 4 |
-| commands-downloader | Download commands (3-layer) | 5 |
-| mcps-downloader | Download MCPs (3-layer) | 6 |
-| settings-downloader | Download settings (3-layer) | 7 |
-| category-downloader | Router to category-specific agents | 3-7 |
-| task-list-generator | Generate TASKS.md | 9 |
-| claude-md-updater | Update CLAUDE.md | 10 |
-| harness-guide-generator | Generate HARNESS_GUIDE.md | 11 |
+| project-stack-detector | Detect tech stack from project files | 2 |
+| tech-stack-expander | Expand tech stack via Web search + user questions | 3 |
+| skills-downloader | Download skills (3-layer) | 4 |
+| agents-downloader | Download agents (3-layer) | 5 |
+| commands-downloader | Download commands (3-layer) | 6 |
+| mcps-downloader | Download MCPs (3-layer) | 7 |
+| settings-downloader | Download settings (3-layer) | 8 |
+| category-downloader | Router to category-specific agents | 4-8 |
+| task-list-generator | Generate TASKS.md | 10 |
+| claude-md-updater | Update CLAUDE.md | 11 |
+| harness-guide-generator | Generate HARNESS_GUIDE.md | 12 |
 | progress-dashboard | Show progress | All |
-| approval-presenter | Get user approval | 1-7, 9, 11, 12 |
-| ux-psychology-advisor | UX recommendations | Deployed in 8 |
+| approval-presenter | Get user approval | 1-8, 10, 12, 13 |
+| ux-psychology-advisor | UX recommendations | Deployed in 9 |
 
 ## Available Skills Reference
 
 | Skill | Purpose | When to Use |
 |-------|---------|-------------|
-| aitmpl-downloader | Template marketplace (GitHub API) | Steps 3-7 |
+| aitmpl-downloader | Template marketplace (GitHub API) | Steps 4-8 |
 | ux-psychology | 43 UX psychology concepts | UI/frontend projects |
 | skill-creator | Create new skills | When no template exists |
 
@@ -286,13 +365,18 @@ Delete spec2impl files:
 
 ```
 ════════════════════════════════════════════════════════════════
-spec2impl Complete (12/12 steps)
+spec2impl Complete (13/13 steps)
 ════════════════════════════════════════════════════════════════
 
-Tech Stack Expanded:
-  Original:   ${originalTechStack}
-  Expanded:   ${expandedTechStack.confirmed}
-  User Chose: ${expandedTechStack.userSelected}
+Sources Used:
+  Spec Analysis:     ${specDirectory ? specDirectory : "N/A"}
+  Project Detection: ${detectStack ? "Enabled" : "Disabled"}
+
+Tech Stack:
+  From Spec:     ${specAnalysis?.techStack || "N/A"}
+  From Project:  ${detectedTechStack?.techStack || "N/A"}
+  Expanded:      ${expandedTechStack.confirmed}
+  User Chose:    ${expandedTechStack.userSelected}
 
 Downloaded from aitmpl.com:
   Skills:     ${downloadedSkills}

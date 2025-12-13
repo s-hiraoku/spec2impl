@@ -6,12 +6,33 @@ tools: Read, WebSearch, AskUserQuestion, Task, Glob, Grep
 
 # Tech Stack Expander
 
-Expand the tech stack from spec-analyzer by discovering related technologies via Web search and asking user about unresolved choices.
+Expand the tech stack from spec-analyzer and/or project-stack-detector by discovering related technologies via Web search and asking user about unresolved choices.
 
 ## Input
 
-- **techStack**: Array of technologies from spec-analyzer (e.g., [Next.js, PostgreSQL, Stripe])
-- **specContent**: Original specification content to check for already-decided technologies
+- **techStack**: Array of technologies from spec-analyzer (e.g., [Next.js, PostgreSQL, Stripe]). May be empty if no spec provided.
+- **detectedStack**: Array of technologies from project-stack-detector (e.g., [React, TypeScript, Prisma]). May be empty if `--detect-stack` not used.
+- **specContent**: Original specification content to check for already-decided technologies. May be empty.
+
+## Input Merge Strategy
+
+Before Phase 1, merge input sources:
+
+```typescript
+// Combine tech stacks with source tracking
+const mergedTechStack = {
+  fromSpec: techStack || [],
+  fromProject: detectedStack || [],
+  combined: [...new Set([...(techStack || []), ...(detectedStack || [])])]
+}
+
+// Detect conflicts (e.g., spec says PostgreSQL, project has MySQL)
+const conflicts = detectConflicts(mergedTechStack.fromSpec, mergedTechStack.fromProject)
+if (conflicts.length > 0) {
+  // Present conflicts to user via AskUserQuestion
+  // "Your spec mentions PostgreSQL but the project uses MySQL. Which should we use?"
+}
+```
 
 ## Execution Flow
 
@@ -25,7 +46,7 @@ Task({
   subagent_type: "general-purpose",
   prompt: `Use Web search to discover related technologies and implicit dependencies.
 
-           Tech Stack: ${techStack.join(", ")}
+           Tech Stack: ${mergedTechStack.combined.join(", ")}
 
            Search for each technology:
            - "${tech} recommended tech stack 2025"
@@ -50,7 +71,7 @@ Task({
   subagent_type: "general-purpose",
   prompt: `Use Web search to discover technology options.
 
-           Tech Stack: ${techStack.join(", ")}
+           Tech Stack: ${mergedTechStack.combined.join(", ")}
 
            If frontend technologies present:
            - "CSS framework comparison 2025"
@@ -96,27 +117,34 @@ Task({
            Note: Present the latest options based on actual Web search results.`
 })
 
-// Subagent 3: Extract already-decided technologies from spec
+// Subagent 3: Extract already-decided technologies from spec AND project
 Task({
   subagent_type: "Explore",
-  prompt: `Extract technologies already decided in the specification.
+  prompt: `Extract technologies already decided from both specification and project detection.
 
-           Specification content:
-           ${specContent}
+           Sources:
+           1. Specification content (if provided):
+              ${specContent || "(No spec provided)"}
+
+           2. Project detection (if --detect-stack enabled):
+              From Spec: ${mergedTechStack.fromSpec.join(", ") || "(none)"}
+              From Project: ${mergedTechStack.fromProject.join(", ") || "(none)"}
 
            Extract:
-           - Explicitly specified technologies (e.g., "using TailwindCSS", "Prisma for database access")
-           - Implicitly decided technologies (e.g., listed in package.json, used in existing code)
+           - Explicitly specified technologies from spec (e.g., "using TailwindCSS")
+           - Technologies detected from project files (e.g., package.json dependencies)
+           - Mark source for each: "spec", "project", or "both"
 
            Output format:
            alreadyDecided:
-             styling: TailwindCSS  # specified in spec
-             orm: Prisma           # listed in package.json
+             styling: TailwindCSS  # source: spec
+             orm: Prisma           # source: project (from package.json)
+             database: PostgreSQL  # source: both
              ...
 
            undecided:
-             - stateManagement    # not in spec
-             - authentication     # not in spec
+             - stateManagement    # not in spec or project
+             - authentication     # not in spec or project
              ...`
 })
 ```
@@ -250,7 +278,9 @@ expandedTechStack:
 ## Output Format
 
 Return the `expandedTechStack` object with:
-- `original`: Original tech stack from spec-analyzer
+- `fromSpec`: Technologies from spec-analyzer (may be empty)
+- `fromProject`: Technologies from project-stack-detector (may be empty)
+- `original`: Combined original tech stack (merged, deduplicated)
 - `implicit`: Discovered implicit dependencies
 - `userSelected`: Technologies chosen by user
 - `confirmed`: All confirmed technologies (combined)

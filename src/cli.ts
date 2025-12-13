@@ -29,6 +29,7 @@ const SPEC2IMPL_PATHS = [
 interface InstallOptions {
   force?: boolean;
   dryRun?: boolean;
+  detectStack?: boolean;
 }
 
 interface FileInfo {
@@ -206,8 +207,13 @@ function install(targetDir: string, options: InstallOptions = {}) {
     console.log(chalk.cyan("  2. Run the command:"));
     console.log("");
     console.log(chalk.bold.white("     /spec2impl docs/"));
+    console.log(chalk.dim("     # From specification documents"));
     console.log("");
-    console.log(chalk.dim("  Replace 'docs/' with your specification directory."));
+    console.log(chalk.bold.white("     /spec2impl --detect-stack"));
+    console.log(chalk.dim("     # From project files (package.json, etc.)"));
+    console.log("");
+    console.log(chalk.bold.white("     /spec2impl docs/ --detect-stack"));
+    console.log(chalk.dim("     # Both: spec + project detection (merged)"));
     console.log("");
   } catch (error) {
     spinner.fail(chalk.red("Installation failed"));
@@ -227,6 +233,7 @@ program
   .argument("[directory]", "Target project directory", ".")
   .option("-f, --force", "Overwrite all existing files (including user files)")
   .option("--dry-run", "Preview files without installing")
+  .option("--detect-stack", "Detect tech stack from project files (package.json, etc.)")
   .action((directory: string, options: InstallOptions) => {
     install(directory, options);
   });
@@ -236,6 +243,7 @@ program
   .argument("[directory]", "Target project directory (defaults to current directory)")
   .option("-f, --force", "Overwrite all existing files (including user files)")
   .option("--dry-run", "Preview files without installing")
+  .option("--detect-stack", "Detect tech stack from project files (package.json, etc.)")
   .action((directory: string | undefined, options: InstallOptions) => {
     if (directory && !directory.startsWith("-")) {
       install(directory, options);
