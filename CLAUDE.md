@@ -56,7 +56,7 @@ Step 7:  mcps-downloader        → Download MCPs, configure .mcp.json (3-layer 
 Step 8:  settings-downloader    → Configure .claude/settings.local.json (3-layer selection)
 Step 9:  Deploy bundled         → Deploy ux-psychology for UI/frontend projects
 Step 10: task-list-generator    → Extract/generate tasks → docs/TASKS.md
-Step 11: claude-md-updater      → Merge generated section into CLAUDE.md
+Step 11: rules-generator         → Generate .claude/rules/spec2impl.md
 Step 12: harness-guide-generator → Generate docs/HARNESS_GUIDE.md
 Step 13: Cleanup                → Optionally remove spec2impl files
 ```
