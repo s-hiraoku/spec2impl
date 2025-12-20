@@ -277,18 +277,18 @@ Task({
 
 ---
 
-### Step 11: CLAUDE.md Update
-**Agent:** `claude-md-updater.md`
+### Step 11: Rules Generation
+**Agent:** `rules-generator.md`
 
 ```typescript
 Task({
   subagent_type: "general-purpose",
-  prompt: `Read .claude/agents/spec2impl/claude-md-updater.md and execute.
+  prompt: `Read .claude/agents/spec2impl/rules-generator.md and execute.
            Generated Files: ${fileList}`
 })
 ```
 
-→ Output: `CLAUDE.md` (updated)
+→ Output: `.claude/rules/spec2impl.md` (created)
 
 ---
 
@@ -326,6 +326,7 @@ Delete spec2impl files:
 - `.claude/commands/spec2impl.md`
 - `.claude/agents/spec2impl/`
 - `.claude/skills/spec2impl/`
+- `.claude/rules/spec2impl.md`
 
 → Call `approval-presenter` for cleanup confirmation
 
@@ -345,7 +346,7 @@ Delete spec2impl files:
 | settings-downloader | Download settings (3-layer) | 8 |
 | category-downloader | Router to category-specific agents | 4-8 |
 | task-list-generator | Generate TASKS.md | 10 |
-| claude-md-updater | Update CLAUDE.md | 11 |
+| rules-generator | Generate .claude/rules/spec2impl.md | 11 |
 | harness-guide-generator | Generate HARNESS_GUIDE.md | 12 |
 | progress-dashboard | Show progress | All |
 | approval-presenter | Get user approval | 1-8, 10, 12, 13 |
